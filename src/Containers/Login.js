@@ -15,7 +15,7 @@ function Login() {
                 <main id="main-content">
                     <img src={require ('./logo.jpg')}></img>
                     <h1> Welcome to Course Pilot! </h1>
-                    <form id="login-form">
+                    <form id="login-form" action="/" method="POST">
                         <input type="email" name="email" id="email-field" className="login-form-field" placeholder="Email"></input>
                         <input type="password" name="password" id="password-field" className="login-form-field" placeholder="password"></input>
                         <input type="submit" value="login" id="login-form-submit"></input>

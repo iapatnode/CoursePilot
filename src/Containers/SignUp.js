@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { Route, Link } from 'react-router-dom'
 import './SignUp-Style.css'
 
@@ -13,7 +13,7 @@ function SignUp() {
             <body>
                 <main id="main-content">
                     <h1> Sign Up for Course Pilot </h1>
-                    <form id="login-form">
+                    <form id="login-form" method="post" action="/SignUp/">
                         <input type="email" name="email" id="email-field" className="signup-form-field" placeholder="Enter Email"></input>
                         <input type="text" name="username" id="username-field" className="signup-form-field" placeholder="Enter Username"></input>
                         <input type="password" name="password" id="password-field" className="signup-form-field" placeholder="Enter Password"></input>
@@ -26,7 +26,7 @@ function SignUp() {
                             <option value="2018">2018</option>
                         </select>
                         <p> Graduation Year </p>
-                        <select name="requirement-year" id="requirement-year">
+                        <select name="graduation-year" id="requirement-year">
                             <option value="2021">2021</option>
                             <option value="2022">2022</option>
                             <option value="2023">2023</option>
