@@ -2,7 +2,7 @@
 
 # Contents
 - [Course Pilot](#course-pilot)
-- [Contents])#contents)
+- [Contents](#contents)
 - [Set Up](#set-up)
 - [Downloading Course Pilot](#downloading-course-pilot)
 - [Running Course Pilot](#running-course-pilot)
@@ -11,11 +11,11 @@
 
 The following must be installed:
 
-### `Node.js`
+## Node.js
 
 Navigate to [Node.js](https://nodejs.org/en/download/) and download the Windows Installer version. Follow the prompts for installing Node.js. Do not select the checkbox for installing the necessary tools and Chocolately.
 
-### `Yarn`
+## Yarn
 
 Using the command line, run the following commands:
 
@@ -29,7 +29,7 @@ You can check the installed version of yarn using
 
 The installed version should be 1.22.10.
 
-### `Python`
+## Python
 
 Navigate to [Python](https://www.python.org/downloads/release/python-385/) and select the Windows x86-64 executable installer. Follow the prompts for installation
 
@@ -39,7 +39,7 @@ You can check the installed version of python using
 
 The installed version should be Python 3.8.5.
 
-### `Flask`
+## Flask
 
 Using the command line, run the following command
 
@@ -47,7 +47,7 @@ Using the command line, run the following command
 
 Note: it may tell you to update pip. You can do this by running the command provided in the warning.
 
-### `Python-dotenv`
+## Python-dotenv
 
 Using the command line, run the following command
 
