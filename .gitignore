@@ -17,10 +17,17 @@
 .env.development.local
 .env.test.local
 .env.production.local
-
-.metals
-.vscode
+.eslintcache
 
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# VSCode
+.metals
+.vscode
+
+# Python
+venv
+__pycache__
+

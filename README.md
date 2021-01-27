@@ -1,4 +1,72 @@
-# Senior Project Capstone
+# Course Pilot
+
+# Contents
+- [Course Pilot](#course-pilot)
+- [Contents])#contents)
+- [Set Up](#set-up)
+- [Downloading Course Pilot](#downloading-course-pilot)
+- [Running Course Pilot](#running-course-pilot)
+
+# Set Up
+
+The following must be installed:
+
+### `Node.js`
+
+Navigate to [Node.js](https://nodejs.org/en/download/) and download the Windows Installer version. Follow the prompts for installing Node.js. Do not select the checkbox for installing the necessary tools and Chocolately.
+
+### `Yarn`
+
+Using the command line, run the following commands:
+
+#### `npm install -g yarn`
+
+#### `yarn set version latest`
+
+You can check the installed version of yarn using 
+
+#### `yarn --version`
+
+The installed version should be 1.22.10.
+
+### `Python`
+
+Navigate to [Python](https://www.python.org/downloads/release/python-385/) and select the Windows x86-64 executable installer. Follow the prompts for installation
+
+You can check the installed version of python using 
+
+#### `python --version`
+
+The installed version should be Python 3.8.5.
+
+### `Flask`
+
+Using the command line, run the following command
+
+#### `pip install flask`
+
+Note: it may tell you to update pip. You can do this by running the command provided in the warning.
+
+### `Python-dotenv`
+
+Using the command line, run the following command
+
+#### `pip install python-dotenv`
+
+# Downloading Course Pilot
+
+# Running Course Pilot
+To run the application, open a terminal and run the following command
+
+#### `yarn start`
+
+A browser window should open with the application from React loaded from http://localhost:3000.
+
+Once the above browser window is running, open a second terminal and run the following command
+
+#### `yarn start-api`
+
+This starts the backend (flask server) running.
 
 # Getting Started with Create React App
 
