@@ -1,6 +1,7 @@
 import React from 'react'
 import { Route, Link } from 'react-router-dom'
 import './Login-Style.css'
+import logo from './logo.jpg'
 
 function Login() {
     return(
@@ -12,6 +13,7 @@ function Login() {
         </head>
             <body>
                 <main id="main-content">
+                    <img src={require ('./logo.jpg')}></img>
                     <h1> Welcome to Course Pilot! </h1>
                     <form id="login-form">
                         <input type="email" name="email" id="email-field" className="login-form-field" placeholder="Email"></input>
