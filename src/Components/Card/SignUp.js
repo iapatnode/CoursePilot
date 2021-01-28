@@ -1,8 +1,8 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import { Route, Link } from 'react-router-dom'
-import './SignUp-Style.css'
+//import '../SignUp-Style.css'
 
-function SignUp() {
+export const SignUp = ()=> {
     return(
         <div id="main-content">
             <head>
@@ -11,6 +11,7 @@ function SignUp() {
                 <title>Welcome to Course Pilot</title>
             </head>
             <body>
+                
                 <main id="main-content">
                     <h1> Sign Up for Course Pilot </h1>
                     <form id="login-form" method="post" action="/SignUp/">
@@ -38,7 +39,7 @@ function SignUp() {
                 </main>
             </body>
         </div>
-    )
+    );
 }
 
-export default SignUp;
+export default SignUp
