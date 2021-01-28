@@ -53,6 +53,12 @@ Using the command line, run the following command
 
 #### `pip install python-dotenv`
 
+## Dependencies
+
+To make sure the dependencies for the project are installed, run the following command on the command line
+
+#### `npm install1`
+
 # Downloading Course Pilot
 
 # Running Course Pilot
@@ -67,6 +73,8 @@ Once the above browser window is running, open a second terminal and run the fol
 #### `yarn start-api`
 
 This starts the backend (flask server) running.
+
+You may need to start the backend running before the front end.
 
 # Getting Started with Create React App
 
