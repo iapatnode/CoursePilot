@@ -63,6 +63,10 @@ Navigate to [MySQL](https://dev.mysql.com/downloads/installer/) and download the
 
 Note: do not change anything from the default options.
 
+Using the command line, run the following command to install the python connector
+
+#### `pip install mysql-connector-python`
+
 In the config.json file, change the username and password to match the credentials for your local server.
 
 # Downloading Course Pilot

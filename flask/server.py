@@ -19,16 +19,16 @@ with open(os.path.join(scriptdir, "config.json")) as text:
 #Connects to server and creates database
 def create_db():
     try:
-        with connect(host="localhost", user=config.get('username'), password=config.get('password')) as conn:
+        with connect(host=config.get('host'), user=config.get('username'), password=config.get('password')) as conn:
             with conn.cursor() as cursor:
-                cursor.execute("create database course_pilot")  
+                cursor.execute("create database if not exists course_pilot")  
     except Error as error:
         print(error)
 
 #Establishes connection to database
 def connection():
     try:
-        with connect(host="localhost", user=config.get('username'), password=config.get('password'), database="course_pilot") as conn:
+        with connect(host=config.get('host'), user=config.get('username'), password=config.get('password'), database="course_pilot") as conn:
             return conn
     except Error as error:
         print(error)
@@ -38,9 +38,10 @@ def init_db():
     try:
         conn = connection()
         with conn.cursor() as cursor:
-            cursor.execute()
+            cursor.execute("select * from Student")
 
     except Exception as exception:
+        print("database not found")
         print(exception)
         #TODO: create tables and fill with dummy data
 
