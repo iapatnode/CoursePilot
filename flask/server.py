@@ -42,7 +42,7 @@ def init_db():
 
     except Exception as exception:
         print(exception)
-        #create tables and fill data
+        #TODO: create tables and fill with dummy data
 
 #Creates Course Pilot database and fills it with tables and data when application is opened
 create_db()
