@@ -1,18 +1,18 @@
-import React, {useEffect, useState} from 'react'
-import { Route, Link } from 'react-router-dom'
-//import '../SignUp-Style.css'
+import React from 'react'
+import { Link } from 'react-router-dom'
+import './SignUp-Style.css'
 
 export const SignUp = ()=> {
     return(
         <div id="main-content">
-            <head>
-                <meta charset="UTF-8"></meta>
+            <div>
+                <meta charSet="UTF-8"></meta>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
                 <title>Welcome to Course Pilot</title>
-            </head>
-            <body>
+            </div>
+            <div>
                 
-                <main id="main-content">
+                <div id="main-content">
                     <h1> Sign Up for Course Pilot </h1>
                     <form id="login-form" method="post" action="/SignUp/">
                         <input type="email" name="email" id="email-field" className="signup-form-field" placeholder="Enter Email"></input>
@@ -27,7 +27,7 @@ export const SignUp = ()=> {
                             <option value="2018">2018</option>
                         </select>
                         <p> Graduation Year </p>
-                        <select name="graduation-year" id="requirement-year">
+                        <select name="graduation-year" id="graduation-year">
                             <option value="2021">2021</option>
                             <option value="2022">2022</option>
                             <option value="2023">2023</option>
@@ -36,8 +36,8 @@ export const SignUp = ()=> {
                         <input type="submit" value="Create Account" id="login-form-submit" className="signup-form-field"></input>
                     </form>
                     <p> Already have an account? Click <Link to="/">Here</Link> to login. </p>
-                </main>
-            </body>
+                </div>
+            </div>
         </div>
     );
 }
