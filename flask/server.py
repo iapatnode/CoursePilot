@@ -56,7 +56,6 @@ def sign_up():
         if(password_regex.search(password)) != None:
             if(string_check.search(password) != None):
                 print("Password has all needed characteristics")
-            else:
                 
 
         return f'{email} - {username} - {password} - {confirm_password} - {requirement_year} - {graduation_year}'
