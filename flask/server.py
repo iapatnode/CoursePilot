@@ -12,7 +12,7 @@ app.config["SECRET_KEY"] = os.urandom(32)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 #Credentails for database connection
-scriptdir = os.path.dirname(os.path.abspath(__file__))
+"""scriptdir = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(scriptdir, "config.json")) as text:
     config = json.load(text)
 
@@ -47,10 +47,10 @@ def init_db():
 
 #Creates Course Pilot database and fills it with tables and data when application is opened
 create_db()
-init_db()
+init_db()"""
 
 
-@app.route("/", methods=["POST", "GET"])
+@app.route("/api/login", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
         email = request.form.get("email")
@@ -58,8 +58,9 @@ def login():
         #TODO: If the user's credentials are correct, reroute them to the home page
         return f'{email}, {password}'
 
-@app.route("/SignUp/", methods=["POST", "GET"])
+@app.route("/api/signup", methods=["POST", "GET"])
 def sign_up():
+    session["email"] = ""
     if request.method == "POST":
         valid = True
         email = request.form.get("email")
@@ -95,12 +96,20 @@ def sign_up():
         if(password_regex.search(password)) != None:
             if(string_check.search(password) != None):
                 print("Password has all needed characteristics")
+        
+        if valid:
+            session["email"] = email
+        
+        print(session["email"])
                 
         return f'{email} - {username} - {password} - {confirm_password} - {requirement_year} - {graduation_year}'
-    else:
-        return 'Test'
 
-
-@app.route("/Test/", methods=["GET"])
-def test():
-    return f'This is the test page'
+    if request.method == "GET":
+        if session["email"]:
+            return {
+                "successful_account_creation": "true"
+            }
+        else:
+            return {
+                "successful_account_creation": "false"
+            }
