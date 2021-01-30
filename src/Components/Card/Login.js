@@ -1,7 +1,12 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import './Login-Style.css'
+import React from 'react';
+import { Link } from 'react-router-dom';
+import './Login-Style.css';
+
+
+import AdminFooter from "../Footers/AdminFooter.js";
 //import axios from 'axios'
+
+
 
 
 class Login extends React.Component {
@@ -45,6 +50,7 @@ class Login extends React.Component {
                         <p> Don't have an account? Sign up <Link to="/SignUp">Here</Link> </p>
                     </main>
                 </div>
+                <AdminFooter />
             </div>
         );
     }
