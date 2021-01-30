@@ -1,8 +1,8 @@
 from flask import Flask, request, render_template, redirect, session, Response
 from flask_cors import CORS
 import os
-import re
-
+import re, json
+from mysql.connector import connect, Error
 
 app = Flask(__name__)
 CORS(app)
@@ -10,6 +10,45 @@ app.config["SECRET_KEY"] = os.urandom(32)
 
 #Settings for testing
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+
+#Credentails for database connection
+scriptdir = os.path.dirname(os.path.abspath(__file__))
+with open(os.path.join(scriptdir, "config.json")) as text:
+    config = json.load(text)
+
+#Connects to server and creates database
+def create_db():
+    try:
+        with connect(host=config.get('host'), user=config.get('username'), password=config.get('password')) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("create database if not exists course_pilot")  
+    except Error as error:
+        print(error)
+
+#Establishes connection to database
+def connection():
+    try:
+        with connect(host=config.get('host'), user=config.get('username'), password=config.get('password'), database="course_pilot") as conn:
+            return conn
+    except Error as error:
+        print(error)
+
+#Creating and initializing the database
+def init_db():
+    try:
+        conn = connection()
+        with conn.cursor() as cursor:
+            cursor.execute("select * from Student")
+
+    except Exception as exception:
+        print("database not found")
+        print(exception)
+        #TODO: create tables and fill with dummy data
+
+#Creates Course Pilot database and fills it with tables and data when application is opened
+create_db()
+init_db()
+
 
 @app.route("/", methods=["POST", "GET"])
 def login():
@@ -57,7 +96,6 @@ def sign_up():
             if(string_check.search(password) != None):
                 print("Password has all needed characteristics")
                 
-
         return f'{email} - {username} - {password} - {confirm_password} - {requirement_year} - {graduation_year}'
     else:
         return 'Test'

@@ -47,19 +47,35 @@ Using the command line, run the following command
 
 Note: it may tell you to update pip. You can do this by running the command provided in the warning.
 
-## Python-dotenv
+You also need to install the flask_cors library. Using the command line, run 
 
-Using the command line, run the following command
+#### `pip install flask_cors`
+
+## Python Libraries
+
+Using the command line, run the following commands to install the necessary libraries
 
 #### `pip install python-dotenv`
 
-## Dependencies
+## MySQL
 
-To make sure the dependencies for the project are installed, run the following command on the command line
+Navigate to [MySQL](https://dev.mysql.com/downloads/installer/) and download the second installer. Follow the prompts for installing the necessary bundles and setting up a local server. You do not have to install Visual Studio. Simply, click next and continue with the installation.
 
-#### `npm install1`
+Note: do not change anything from the default options.
+
+Using the command line, run the following command to install the python connector
+
+#### `pip install mysql-connector-python`
+
+In the config.json file, change the username and password to match the credentials for your local server.
 
 # Downloading Course Pilot
+
+Download the CoursePilot.zip and unzip it in the folder you want to open the project. 
+
+To make sure all dependencies for the project are installed, navigate to the project directory using the command line and run
+
+#### `npm install`
 
 # Running Course Pilot
 To run the application, open a terminal and run the following command

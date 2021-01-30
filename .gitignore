@@ -31,3 +31,5 @@ yarn-error.log*
 venv
 __pycache__
 
+#Database Files
+/flask/config.json
