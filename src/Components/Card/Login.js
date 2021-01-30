@@ -37,7 +37,7 @@ class Login extends React.Component {
                 <div>
                     <main id="main-content">
                         <h1> Welcome to Course Pilot! </h1>
-                        <form id="login-form" action="/" method="POST">
+                        <form id="login-form" action="/api/login" method="POST">
                             <input type="email" name="email" id="email-field" className="login-form-field" placeholder="Email" onChange={this.onChange} />
                             <input type="password" name="password" id="password-field" className="login-form-field" placeholder="password" onChange={this.onChange} />
                             <input type="submit" value="login" id="login-form-submit"></input>

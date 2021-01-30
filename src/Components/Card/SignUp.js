@@ -1,8 +1,13 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import './SignUp-Style.css'
 
 export const SignUp = ()=> {
+
+    useEffect(() => {
+        fetch("/api/SignUp").then(resp => resp.json()).then(resp => console.log(resp))
+      }, [])
+
     return(
         <div id="main-content">
             <div>
@@ -14,7 +19,7 @@ export const SignUp = ()=> {
                 
                 <div id="main-content">
                     <h1> Sign Up for Course Pilot </h1>
-                    <form id="login-form" method="post" action="/SignUp/">
+                    <form id="login-form" method="post" action="/api/SignUp">
                         <input type="email" name="email" id="email-field" className="signup-form-field" placeholder="Enter Email"></input>
                         <input type="text" name="username" id="username-field" className="signup-form-field" placeholder="Enter Username"></input>
                         <input type="password" name="password" id="password-field" className="signup-form-field" placeholder="Enter Password"></input>
