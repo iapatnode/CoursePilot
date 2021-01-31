@@ -1,13 +1,8 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import './SignUp-Style.css'
 
-export const SignUp = ()=> {
-
-    useEffect(() => {
-        fetch("/api/SignUp").then(resp => resp.json()).then(resp => console.log(resp))
-      }, [])
-
+export const SignUp = () => {
     return(
         <div id="main-content">
             <div>

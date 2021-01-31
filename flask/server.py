@@ -98,11 +98,10 @@ def sign_up():
                 print("Password has all needed characteristics")
         
         if valid:
-            session["email"] = email
-        
-        print(session["email"])
-                
-        return f'{email} - {username} - {password} - {confirm_password} - {requirement_year} - {graduation_year}'
+            session["email"] = email #use this to determine in the future who is logged in
+            return redirect("http://localhost:3000/home")
+        else:
+            return redirect("http://localhost:3000/SignUp")
 
     if request.method == "GET":
         if session["email"]:
@@ -113,3 +112,11 @@ def sign_up():
             return {
                 "successful_account_creation": "false"
             }
+
+@app.route("/api/home", methods=["GET"])
+def home():
+    return {
+        "name": "Foo", 
+        "email": "foo@bar.com",
+        "graduation_year": "2021"
+    }
