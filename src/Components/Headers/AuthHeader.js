@@ -20,6 +20,8 @@ import PropTypes from "prop-types";
 // reactstrap components
 import { Container, Row, Col } from "reactstrap";
 
+import "./argon-dashboard-pro-react.css";
+
 function AuthHeader({ title, lead }) {
   return (
     <>

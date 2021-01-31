@@ -19,6 +19,7 @@ import React from "react";
 import PropTypes from "prop-types";
 // reactstrap components
 import {
+  NavbarText,
   Breadcrumb,
   BreadcrumbItem,
   Button,
@@ -26,6 +27,7 @@ import {
   Row,
   Col,
 } from "reactstrap";
+
 
 function TimelineHeader({ name, parentName }) {
   return (
@@ -42,6 +44,7 @@ function TimelineHeader({ name, parentName }) {
                   className="d-none d-md-inline-block ml-lg-4"
                   listClassName="breadcrumb-links breadcrumb-dark"
                 >
+                  <NavbarText>HEYO DID THIS WORK</NavbarText>
                   <BreadcrumbItem>
                     <a href="#pablo" onClick={(e) => e.preventDefault()}>
                       <i className="fas fa-home" />
@@ -57,6 +60,7 @@ function TimelineHeader({ name, parentName }) {
                   </BreadcrumbItem>
                 </Breadcrumb>
               </Col>
+              
               <Col className="mt-3 mt-md-0 text-md-right" lg="6" xs="5">
                 <Button className="btn-neutral" color="default" size="sm">
                   New
@@ -64,6 +68,7 @@ function TimelineHeader({ name, parentName }) {
                 <Button className="btn-neutral" color="default" size="sm">
                   Filters
                 </Button>
+                
               </Col>
             </Row>
           </div>

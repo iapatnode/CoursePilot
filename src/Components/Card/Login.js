@@ -2,8 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './Login-Style.css';
 
-
+ 
 import AdminFooter from "../Footers/AdminFooter.js";
+
 //import axios from 'axios'
 
 
@@ -35,6 +36,7 @@ class Login extends React.Component {
         return(
             <div id="main-content">
             <header>
+                
                 <meta charSet="UTF-8"></meta>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
                 <title>Welcome to Course Pilot</title>
