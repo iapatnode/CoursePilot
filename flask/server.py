@@ -174,8 +174,8 @@ def login():
         
         #TODO: If valid, check the database to see if the user's credentials are correct
 
-        #TODO: If the user's credentials are correct, reroute them to the home page
         if valid:
+            session["email"] = email
             return redirect("http://localhost:3000/home")
         
         #If the user's credentials are not found, redirect them back to the login page
@@ -238,12 +238,14 @@ def sign_up():
             valid = False
         
         if valid:
+            #TODO: If there user entered valid information, write it to the database
             session["email"] = email #use this to determine in the future who is logged in
             return redirect("http://localhost:3000/home")
         else:
             return redirect("http://localhost:3000/SignUp")
 
     if request.method == "GET":
+        #TODO: Replace these lists with accurate lists containing all majors and minors
         return {
             "majors": [
                 "computer science", 
@@ -262,6 +264,7 @@ def sign_up():
 
 @app.route("/api/home", methods=["GET"])
 def home():
+    #TODO: Return user data retrieved from database tables as needed
     return {
         "name": "Foo", 
         "email": "foo@bar.com",
