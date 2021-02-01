@@ -182,6 +182,7 @@ def login():
         else:
             return redirect("http://localhost:3000")
 
+
 @app.route("/api/signup", methods=["POST", "GET"])
 def sign_up():
     session["email"] = ""
@@ -193,6 +194,8 @@ def sign_up():
         confirm_password = request.form.get("confirm-password")
         requirement_year = request.form.get("requirement-year")
         graduation_year = request.form.get("graduation-year")
+        major = request.form.get("major")
+        minor = request.form.get("minor")
 
         #Check to see that the user gives a valid gcc email address
         if email is None or email == "":
@@ -226,6 +229,13 @@ def sign_up():
         #Check to see if the two password fields match
         if password != confirm_password:
             valid = False
+
+        #Check to see that the user's major/minor selections are valid
+        if major is None or major == "":
+            valid = False
+        
+        if minor is None or minor == "":
+            valid = False
         
         if valid:
             session["email"] = email #use this to determine in the future who is logged in
@@ -234,14 +244,21 @@ def sign_up():
             return redirect("http://localhost:3000/SignUp")
 
     if request.method == "GET":
-        if session["email"]:
-            return {
-                "successful_account_creation": "true"
-            }
-        else:
-            return {
-                "successful_account_creation": "false"
-            }
+        return {
+            "majors": [
+                "computer science", 
+                "mechanical engineering", 
+                "accounting"
+            ],
+            "minors": [
+                "none",
+                "computer science", 
+                "finance", 
+                "biblical and religious studies",
+                "data science"
+            ]
+        }
+
 
 @app.route("/api/home", methods=["GET"])
 def home():

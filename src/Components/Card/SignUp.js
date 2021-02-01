@@ -1,8 +1,23 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
 import './SignUp-Style.css'
 
+
 export const SignUp = () => {
+    const [isLoading, setLoading] = useState(true);
+    const [success, setSuccess] = useState();
+
+    useEffect(() => {
+        axios.get("/api/signup").then(response => {
+            setSuccess(response.data);
+            setLoading(false);
+        });
+    }, []);
+    
+    if (isLoading) {
+        return <div> Loading... </div>
+    }
     return(
         <div id="main-content">
             <div>
@@ -19,6 +34,18 @@ export const SignUp = () => {
                         <input type="text" name="username" id="username-field" className="signup-form-field" placeholder="Enter Username"></input>
                         <input type="password" name="password" id="password-field" className="signup-form-field" placeholder="Enter Password"></input>
                         <input type="password" name="confirm-password" id="confirm-password-field" className="signup-form-field" placeholder="Confirm Password"></input>
+                        <p> Select Major </p>
+                        <select name="major" id="major">
+                            {success.majors.map((value, index) => {
+                                return <option value={value}>{value}</option>
+                            })}
+                        </select>
+                        <p> Select Minor (Optional) </p>
+                        <select name="minor" id="minor">
+                            {success.minors.map((value, index) => {
+                                return <option value={value}> {value} </option>
+                            })}
+                        </select>
                         <p> Requirement Year </p>
                         <select name="requirement-year" id="requirement-year">
                             <option value="2021">2021</option>
