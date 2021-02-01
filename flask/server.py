@@ -161,8 +161,26 @@ def login():
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
+        valid = True
+
+        #Check to see that an email was entered
+        regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+        if not re.search(regex, email):
+            valid = False
+        
+        #Check to see that a password was entered
+        if password is None or password == "":
+            valid = False
+        
+        #TODO: If valid, check the database to see if the user's credentials are correct
+
         #TODO: If the user's credentials are correct, reroute them to the home page
-        return f'{email}, {password}'
+        if valid:
+            return redirect("http://localhost:3000/home")
+        
+        #If the user's credentials are not found, redirect them back to the login page
+        else:
+            return redirect("http://localhost:3000")
 
 @app.route("/api/signup", methods=["POST", "GET"])
 def sign_up():
@@ -183,25 +201,31 @@ def sign_up():
         if(re.search(regex, email)):
             domain = re.search("@[\w.]+", email)
             if domain.group() == '@gcc.edu':
-                print('valid')
+                print("valid")
             else:
-                print('invalid')
+                valid = False
         else:
-            print("invalid")
+            valid = False
         
         #Check to see whether or not the user gave a valid username
         string_check = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
         if(string_check.search(username) != None):
-            print("Special characters found")
+            valid = False
         
         if username is None or username == "":
-            print("username cannot be empty")
+            valid = False
 
         #Check to see if the user gave a valid password
         password_regex = re.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)")
         if(password_regex.search(password)) != None:
             if(string_check.search(password) != None):
                 print("Password has all needed characteristics")
+            else:
+                valid = False
+        
+        #Check to see if the two password fields match
+        if password != confirm_password:
+            valid = False
         
         if valid:
             session["email"] = email #use this to determine in the future who is logged in
