@@ -16,6 +16,8 @@
 */
 import React from "react";
 
+import logo from "./logo.jpg";
+
 // reactstrap components
 import {
   Breadcrumb,
@@ -24,62 +26,47 @@ import {
   Container,
   Row,
   Col,
+  Navbar,
+  NavbarBrand
 } from "reactstrap";
 
 function AlternativeHeader() {
   return (
     <>
       <div className="header pb-6">
-        <Container fluid>
-          <div className="header-body">
-            <Row className="align-items-center py-4">
-              <Col lg="6" xs="7">
-                <h6 className="h2 d-inline-block mb-0">Alternative</h6>{" "}
-                <Breadcrumb
-                  className="d-none d-md-inline-block ml-md-4"
-                  listClassName="breadcrumb-links"
-                >
-                  <BreadcrumbItem>
-                    <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                      <i className="fas fa-home" />
-                    </a>
-                  </BreadcrumbItem>
-                  <BreadcrumbItem>
-                    <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                      Dashboards
-                    </a>
-                  </BreadcrumbItem>
-                  <BreadcrumbItem aria-current="page" className="active">
-                    Alternative
-                  </BreadcrumbItem>
-                </Breadcrumb>
-              </Col>
-              <Col className="text-right" lg="6" xs="5">
-                <Button
-                  className="btn-neutral"
-                  color=""
-                  href="#pablo"
-                  onClick={(e) => e.preventDefault()}
-                  size="sm"
-                >
-                  New
-                </Button>
-                <Button
-                  className="btn-neutral"
-                  color=""
-                  href="#pablo"
-                  onClick={(e) => e.preventDefault()}
-                  size="sm"
-                >
-                  Filters
-                </Button>
-              </Col>
-            </Row>
+        <Navbar style = {styles.mainNavbar}>
+          <NavbarBrand>
+            <img src={logo} style={{width: 100, marginTop: -7}} />
+          </NavbarBrand>
+          <div style={styles.rectangle} >
+            
           </div>
-        </Container>
+          <div style={styles.rectangle} >
+            
+          </div>
+          <div style={styles.rectangle} >
+            
+          </div>
+          <div style={styles.rectangle} >
+            
+          </div>
+        </Navbar>
       </div>
     </>
   );
+}
+
+const styles = {
+  mainNavbar: {
+    backgroundColor: 'black',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  rectangle: {
+    width: '200px',
+    height: '100px',
+    backgroundColor: 'white'
+  }
 }
 
 export default AlternativeHeader;
