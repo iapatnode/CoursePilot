@@ -135,20 +135,23 @@ def init_db():
     conn.close()
 
 #Creates Course Pilot database and fills it with tables and data when application is opened
-create_db()
-init_db()
+#create_db()
+#init_db()
 
 
 @app.route("/api/login", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
-        email = request.form.get("email")
+        username = request.form.get("username")
         password = request.form.get("password")
         valid = True
 
-        #Check to see that an email was entered
-        regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
-        if not re.search(regex, email):
+        #Check to see that a valid username was entered
+        string_check = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+        if(string_check.search(username) != None):
+            valid = False
+        
+        if username is None or username == "":
             valid = False
         
         #Check to see that a password was entered
@@ -158,7 +161,7 @@ def login():
         #TODO: If valid, check the database to see if the user's credentials are correct
 
         if valid:
-            session["email"] = email
+            session["user"] = username
             return redirect("http://localhost:3000/home")
         
         #If the user's credentials are not found, redirect them back to the login page
@@ -222,7 +225,7 @@ def sign_up():
         
         if valid:
             #TODO: If there user entered valid information, write it to the database
-            session["email"] = email #use this to determine in the future who is logged in
+            session["user"] = username #use this to determine in the future who is logged in
             return redirect("http://localhost:3000/home")
         else:
             return redirect("http://localhost:3000/SignUp")
