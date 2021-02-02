@@ -137,16 +137,15 @@ init_db()
 @app.route("/api/login", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
-        username = request.form.get("username")
+        email = request.form.get("email")
         password = request.form.get("password")
         valid = True
 
-        #Check to see that a valid username was entered
-        string_check = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
-        if(string_check.search(username) != None):
+        #Check to see that a valid email was entered
+        if email is None or email == "":
             valid = False
-        
-        if username is None or username == "":
+        domain = re.search("@[\w.]+", email)
+        if domain.group() != '@gcc.edu':
             valid = False
         
         #Check to see that a password was entered
@@ -173,7 +172,7 @@ def login():
             conn.close()
 
         if valid:
-            session["user"] = username
+            session["email"] = email
             return redirect("http://localhost:3000/home")
         
         #If the user's credentials are not found, redirect them back to the login page
@@ -254,7 +253,7 @@ def sign_up():
             cursor.close()
             conn.close()
 
-            session["user"] = username #use this to determine in the future who is logged in
+            session["email"] = email #use this to determine in the future who is logged in
             return redirect("http://localhost:3000/home")
         else:
             return redirect("http://localhost:3000/SignUp")

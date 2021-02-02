@@ -15,7 +15,7 @@ export const Login = ()  => {
                 <main id="main-content">
                     <h1> Welcome to Course Pilot! </h1>
                     <form id="login-form" action="/api/login" method="POST">
-                        <input type="text" name="username" id="username-field" className="login-form-field" placeholder="Username"/>
+                        <input type="email" name="email" id="email-field" className="login-form-field" placeholder="Email"/>
                         <input type="password" name="password" id="password-field" className="login-form-field" placeholder="Password"/>
                         <input type="submit" value="login" id="login-form-submit"></input>
                     </form>
