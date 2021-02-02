@@ -45,35 +45,46 @@ def init_db():
     #what is the difference between Exception and Error?
     except Error as error:
         try:
+            #MAY ADD REQYEAR AS A ELEMENT
             cursor.execute("""create table if not exists Student(
                 username varchar(100), 
                 email varchar(50),
                 fname varchar(50),
                 lname varchar(50),
                 passwrd varchar(30),
-                graduationYear year,
+                gradYear year,
                 constraint pk_student primary key (username, email))""")
 
-            cursor.execute("""create table if not exists MajorOrMinor(
-                id char(6),
+            cursor.execute("""create table if not exists MajorMinor(
+                degreeId char(6),
                 degreeName varchar(100),
                 totalHours int,
-                requirementYear year,
+                reqYear year,
                 isMinor boolean,
-                constraint pk_major_minor primary key (id))""")
-            
-            cursor.execute("""create table if not exists Requirements(
-                id char(6),
-                category varchar(50),
-                reqId char(6),
-                constraint pk_requirements primary key (id),
-                constraint fk_requirements_id foreign key (reqId) references Requirements(id))""")
+                constraint pk_major_minor primary key (degreeId))""")
+
+            cursor.execute("""create table if not exists StudentMajorMinor(
+                username varchar(100),
+                email varchar(50),
+                degreeId char(6),
+                constraint pk_student_degree primary key (username, email, degreeId),
+                constraint fk_student_info foreign key (username, email) references Student(username, email),
+                constraint fk_degree_info foreign key (degreeId) references MajorMinor(degreeId))""")
             
             cursor.execute("""create table if not exists Course(
                 courseCode varchar(12),
                 courseName varchar(50),
                 creditHours int,
                 constraint pk_course primary key (courseCode, courseName))""")
+
+            cursor.execute("""create table if not exists StudentCourses(
+                username varchar(100),
+                email varchar(50),
+                courseCode varchar(12),
+                courseName varchar(50),
+                constraint pk_student_courses primary key (username, email, courseCode, courseName),
+                constraint fk_student_details foreign key (username, email) references Student(username, email),
+                constraint fk_course_info foreign key (courseCode, courseName) references Course(courseCode, courseName))""")
 
             cursor.execute("""create table if not exists Class(
                 section char,
@@ -84,7 +95,14 @@ def init_db():
                 constraint pk_class primary key (section, courseCode, courseName),
                 constraint fk_class_course foreign key (courseCode, courseName) references Course(courseCode, courseName))""")
             
-            #TODO: need to check this relationship
+            cursor.execute("""create table if not exists ClassDays(
+                section char, 
+                courseCode varchar(12), 
+                courseName varchar(50), 
+                dayOfWeek varchar(30),
+                constraint pk_class_days primary key (section, courseCode, courseName, dayOfWeek),
+                constraint fk_class_info foreign key (section, courseCode, courseName) references Class(section, courseCode, courseName))""")
+            
             cursor.execute("""create table if not exists Schedule(
                 scheduleName varchar(50),
                 dateModified date,
@@ -93,15 +111,7 @@ def init_db():
                 constraint pk_schedule primary key (scheduleName, username, email),
                 constraint fk_schedule_user foreign key (username, email) references Student(username, email))""")
             
-            cursor.execute("""create table if not exists ClassDay(
-                dayOfWeek varchar(50),
-                classSection char,
-                courseCode varchar(12),
-                courseName varchar(50),
-                constraint pk_class_day primary key (dayOfWeek, classSection, courseCode, courseName),
-                constraint fk_class_details foreign key (classSection, courseCode, courseName) references Class(section, courseCode, courseName))""")
-    
-            cursor.execute("""create table if not exists ClassSchedule(
+            cursor.execute("""create table if not exists ScheduleClass(
                 scheduleName varchar(50),
                 username varchar(100),
                 email varchar(50),
@@ -111,40 +121,8 @@ def init_db():
                 constraint pk_class_schedule primary key (scheduleName, username, email, classSection, courseCode, courseName),
                 constraint fk_schedule_info foreign key (scheduleName, username, email) references Schedule(scheduleName, username, email),
                 constraint fk_schedule_course_info foreign key (classSection, courseCode, courseName) references Class(section, courseCode, courseName))""")
-
-            cursor.execute("""create table if not exists StudentCourse(
-                hasTaken boolean,
-                username varchar(100),
-                email varchar(50),
-                courseCode varchar(12),
-                courseName varchar(50),
-                constraint pk_student_course primary key (username, email, courseCode, courseName),
-                constraint fk_course_info foreign key (courseCode, courseName) references Course(courseCode, courseName),
-                constraint fk_student_info foreign key (username, email) references Student(username, email))""")
-           
-            cursor.execute("""create table if not exists CourseRequirements(
-                courseCode varchar(12),
-                courseName varchar(50),
-                reqID char(6),
-                constraint pk_course_requirements primary key (courseCode, courseName, reqID),
-                constraint fk_requirement_id foreign key (reqID) references Requirements(id),
-                constraint fk_requirements_course foreign key (courseCode, courseName) references Course(courseCode, courseName))""")
             
-            cursor.execute("""create table if not exists MajorOrMinorRequirements(
-                degreeID char(6),
-                reqID char(6),
-                constraint pk_major_minor_reqs primary key (degreeID, reqID),
-                constraint fk_major_minor_id foreign key (degreeID) references MajorOrMinor(id),
-                constraint fk_major_minor_req_id foreign key (reqID) references Requirements(id))""")
-            
-            cursor.execute("""create table if not exists StudentMajorOrMinor(
-                username varchar(100),
-                email varchar(50),
-                degreeID char(6),
-                constraint pk_student_major_or_minor primary key (username, email, degreeID),
-                constraint fk_student_details foreign key (username, email) references Student(username, email),
-                constraint fk_student_req_id foreign key (degreeID) references MajorOrMinor(id))""")
-            
+            #TODO: need to create tables for Requirements and Prereqs
             conn.commit()
 
             #TODO: fill tables with dummy data
