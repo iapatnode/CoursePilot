@@ -46,11 +46,10 @@ def init_db():
     except Error as error:
         try:
             #MAY ADD REQYEAR AS A ELEMENT
+            #creates all tables for database
             cursor.execute("""create table if not exists Student(
                 username varchar(100), 
                 email varchar(50),
-                fname varchar(50),
-                lname varchar(50),
                 passwrd varchar(30),
                 gradYear year,
                 constraint pk_student primary key (username, email))""")
@@ -75,33 +74,30 @@ def init_db():
                 courseCode varchar(12),
                 courseName varchar(50),
                 creditHours int,
-                constraint pk_course primary key (courseCode, courseName))""")
+                constraint pk_course primary key (courseCode))""")
 
             cursor.execute("""create table if not exists StudentCourses(
                 username varchar(100),
                 email varchar(50),
                 courseCode varchar(12),
-                courseName varchar(50),
-                constraint pk_student_courses primary key (username, email, courseCode, courseName),
+                constraint pk_student_courses primary key (username, email, courseCode),
                 constraint fk_student_details foreign key (username, email) references Student(username, email),
-                constraint fk_course_info foreign key (courseCode, courseName) references Course(courseCode, courseName))""")
+                constraint fk_course_info foreign key (courseCode) references Course(courseCode))""")
 
             cursor.execute("""create table if not exists Class(
                 section char,
                 startTime time,
                 endTime time,
                 courseCode varchar(12),
-                courseName varchar(50),
-                constraint pk_class primary key (section, courseCode, courseName),
-                constraint fk_class_course foreign key (courseCode, courseName) references Course(courseCode, courseName))""")
+                constraint pk_class primary key (section, courseCode),
+                constraint fk_class_course foreign key (courseCode) references Course(courseCode))""")
             
             cursor.execute("""create table if not exists ClassDays(
                 section char, 
-                courseCode varchar(12), 
-                courseName varchar(50), 
+                courseCode varchar(12),
                 dayOfWeek varchar(30),
-                constraint pk_class_days primary key (section, courseCode, courseName, dayOfWeek),
-                constraint fk_class_info foreign key (section, courseCode, courseName) references Class(section, courseCode, courseName))""")
+                constraint pk_class_days primary key (section, courseCode, dayOfWeek),
+                constraint fk_class_info foreign key (section, courseCode) references Class(section, courseCode))""")
             
             cursor.execute("""create table if not exists Schedule(
                 scheduleName varchar(50),
@@ -117,10 +113,9 @@ def init_db():
                 email varchar(50),
                 classSection char,
                 courseCode varchar(12),
-                courseName varchar(50),
-                constraint pk_class_schedule primary key (scheduleName, username, email, classSection, courseCode, courseName),
+                constraint pk_class_schedule primary key (scheduleName, username, email, classSection, courseCode),
                 constraint fk_schedule_info foreign key (scheduleName, username, email) references Schedule(scheduleName, username, email),
-                constraint fk_schedule_course_info foreign key (classSection, courseCode, courseName) references Class(section, courseCode, courseName))""")
+                constraint fk_schedule_course_info foreign key (classSection, courseCode) references Class(section, courseCode))""")
             
             #TODO: need to create tables for Requirements and Prereqs
             conn.commit()
@@ -128,15 +123,15 @@ def init_db():
             #TODO: fill tables with dummy data
 
         except Error as error:
-            print("database not found")
-            print(error)
-
+            print("database not found:" + str(error))
+    
+    #DBMS connection cleanup
     cursor.close()
     conn.close()
 
 #Creates Course Pilot database and fills it with tables and data when application is opened
-#create_db()
-#init_db()
+create_db()
+init_db()
 
 
 @app.route("/api/login", methods=["POST", "GET"])
@@ -158,7 +153,24 @@ def login():
         if password is None or password == "":
             valid = False
         
-        #TODO: If valid, check the database to see if the user's credentials are correct
+        if valid:
+            conn = connection()
+            cursor = conn.cursor()
+            studentQuery = "select * from Student where email = %s and passwrd = %s"
+            studentCredentials = (username, password)
+
+            #Check if student with credentials exists
+            try:
+                cursor.execute(studentQuery, studentCredentials)
+                conn.commit()
+                #TODO: finish query check
+            except Error as error:
+                print("Query did not work: " + str(error))
+                valid = False
+            
+            #DBMS connection cleanup
+            cursor.close()
+            conn.close()
 
         if valid:
             session["user"] = username
@@ -224,7 +236,24 @@ def sign_up():
             valid = False
         
         if valid:
-            #TODO: If there user entered valid information, write it to the database
+            conn = connection()
+            cursor = conn.cursor()
+            newStudentQuery = "Insert into Student values (%s, %s, %s)"
+            newStudentData = (username, password, graduation_year)
+
+            #adds student and his/her info to the database
+            try:
+                cursor.execute(newStudentQuery, newStudentData)
+                conn.commit()
+            except error as error:
+                #If you cannot insert the invidual into the database, print error and reroute
+                print("Insertion in database unsuccessful: " + str(error))
+                return redirect("http//localhost:3000/SignUp")
+            
+            #DBMS connection cleanup
+            cursor.close()
+            conn.close()
+
             session["user"] = username #use this to determine in the future who is logged in
             return redirect("http://localhost:3000/home")
         else:
