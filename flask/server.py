@@ -47,12 +47,11 @@ def init_db():
         try:
             #MAY ADD REQYEAR AS A ELEMENT
             #creates all tables for database
-            cursor.execute("""create table if not exists Student(
-                username varchar(100), 
+            cursor.execute("""create table if not exists Student( 
                 email varchar(50),
                 passwrd varchar(30),
                 gradYear year,
-                constraint pk_student primary key (username, email))""")
+                constraint pk_student primary key (email))""")
 
             cursor.execute("""create table if not exists MajorMinor(
                 degreeId char(6),
@@ -63,11 +62,10 @@ def init_db():
                 constraint pk_major_minor primary key (degreeId))""")
 
             cursor.execute("""create table if not exists StudentMajorMinor(
-                username varchar(100),
                 email varchar(50),
                 degreeId char(6),
-                constraint pk_student_degree primary key (username, email, degreeId),
-                constraint fk_student_info foreign key (username, email) references Student(username, email),
+                constraint pk_student_degree primary key (email, degreeId),
+                constraint fk_student_info foreign key (email) references Student(email),
                 constraint fk_degree_info foreign key (degreeId) references MajorMinor(degreeId))""")
             
             cursor.execute("""create table if not exists Course(
@@ -77,11 +75,10 @@ def init_db():
                 constraint pk_course primary key (courseCode))""")
 
             cursor.execute("""create table if not exists StudentCourses(
-                username varchar(100),
                 email varchar(50),
                 courseCode varchar(12),
-                constraint pk_student_courses primary key (username, email, courseCode),
-                constraint fk_student_details foreign key (username, email) references Student(username, email),
+                constraint pk_student_courses primary key (email, courseCode),
+                constraint fk_student_details foreign key (email) references Student(email),
                 constraint fk_course_info foreign key (courseCode) references Course(courseCode))""")
 
             cursor.execute("""create table if not exists Class(
@@ -102,19 +99,17 @@ def init_db():
             cursor.execute("""create table if not exists Schedule(
                 scheduleName varchar(50),
                 dateModified date,
-                username varchar(100),
                 email varchar(50),
-                constraint pk_schedule primary key (scheduleName, username, email),
-                constraint fk_schedule_user foreign key (username, email) references Student(username, email))""")
+                constraint pk_schedule primary key (scheduleName, email),
+                constraint fk_schedule_user foreign key (email) references Student(email))""")
             
             cursor.execute("""create table if not exists ScheduleClass(
                 scheduleName varchar(50),
-                username varchar(100),
                 email varchar(50),
                 classSection char,
                 courseCode varchar(12),
-                constraint pk_class_schedule primary key (scheduleName, username, email, classSection, courseCode),
-                constraint fk_schedule_info foreign key (scheduleName, username, email) references Schedule(scheduleName, username, email),
+                constraint pk_class_schedule primary key (scheduleName, email, classSection, courseCode),
+                constraint fk_schedule_info foreign key (scheduleName, email) references Schedule(scheduleName, email),
                 constraint fk_schedule_course_info foreign key (classSection, courseCode) references Class(section, courseCode))""")
             
             #TODO: need to create tables for Requirements and Prereqs
@@ -156,13 +151,17 @@ def login():
             conn = connection()
             cursor = conn.cursor()
             studentQuery = "select * from Student where email = %s and passwrd = %s"
-            studentCredentials = (username, password)
+            studentCredentials = (email, password)
 
-            #Check if student with credentials exists
             try:
                 cursor.execute(studentQuery, studentCredentials)
                 conn.commit()
-                #TODO: finish query check
+
+                #Checks if user with credentials exists
+                if cursor.fetchone() is None:
+                    print("User not found")
+                    valid = False
+                
             except Error as error:
                 print("Query did not work: " + str(error))
                 valid = False
@@ -186,7 +185,7 @@ def sign_up():
     if request.method == "POST":
         valid = True
         email = request.form.get("email")
-        username = request.form.get("username")
+        # username = request.form.get("username")
         password = request.form.get("password")
         confirm_password = request.form.get("confirm-password")
         requirement_year = request.form.get("requirement-year")
@@ -207,13 +206,13 @@ def sign_up():
         else:
             valid = False
         
-        #Check to see whether or not the user gave a valid username
+        # #Check to see whether or not the user gave a valid username
         string_check = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
-        if(string_check.search(username) != None):
-            valid = False
+        # if(string_check.search(username) != None):
+        #     valid = False
         
-        if username is None or username == "":
-            valid = False
+        # if username is None or username == "":
+        #     valid = False
 
         #Check to see if the user gave a valid password
         password_regex = re.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)")
@@ -238,7 +237,9 @@ def sign_up():
             conn = connection()
             cursor = conn.cursor()
             newStudentQuery = "Insert into Student values (%s, %s, %s)"
-            newStudentData = (username, password, graduation_year)
+            newStudentData = (email, password, graduation_year)
+
+            #TODO: add student major/minor information
 
             #adds student and his/her info to the database
             try:
@@ -259,6 +260,7 @@ def sign_up():
             return redirect("http://localhost:3000/SignUp")
 
     if request.method == "GET":
+        
         #TODO: Replace these lists with accurate lists containing all majors and minors
         return {
             "majors": [
