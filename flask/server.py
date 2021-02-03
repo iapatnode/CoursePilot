@@ -54,7 +54,7 @@ def init_db():
                 constraint pk_student primary key (email))""")
 
             cursor.execute("""create table if not exists MajorMinor(
-                degreeId char(6),
+                degreeId int not null auto_increment,
                 degreeName varchar(100),
                 totalHours int,
                 reqYear year,
@@ -63,7 +63,7 @@ def init_db():
 
             cursor.execute("""create table if not exists StudentMajorMinor(
                 email varchar(50),
-                degreeId char(6),
+                degreeId int,
                 constraint pk_student_degree primary key (email, degreeId),
                 constraint fk_student_info foreign key (email) references Student(email),
                 constraint fk_degree_info foreign key (degreeId) references MajorMinor(degreeId))""")
@@ -72,6 +72,7 @@ def init_db():
                 courseCode varchar(12),
                 courseName varchar(50),
                 creditHours int,
+                semester varchar(30),
                 constraint pk_course primary key (courseCode))""")
 
             cursor.execute("""create table if not exists StudentCourses(
@@ -113,9 +114,97 @@ def init_db():
                 constraint fk_schedule_course_info foreign key (classSection, courseCode) references Class(section, courseCode))""")
             
             #TODO: need to create tables for Requirements and Prereqs
+
             conn.commit()
 
-            #TODO: fill tables with dummy data
+            #Inserts some majors into database
+            cursor.execute('''Insert into MajorMinor (degreeName, totalHours, reqYear, isMinor) values
+                ("Communication Studies", 36, 2017, false),
+                ("Accounting & Finance", 88, 2017, false),
+                ("Philosophy", 30, 2017, false),
+                ("Mechanical Engineering", 100, 2017, false),
+                ("Music", 44, 2017, false),
+                ("Undeclared", 0, 2017, false),
+
+                ("Communication Studies", 36, 2018, false),
+                ("Accounting & Finance", 88, 2018, false),
+                ("Philosophy", 33, 2018, false),
+                ("Mechanical Engineering", 100, 2018, false),
+                ("Music", 44, 2018, false),
+                ("Undeclared", 0, 2018, false),
+
+                ("Communication Studies", 36, 2019, false),
+                ("Accounting & Finance", 88, 2019, false),
+                ("Philosophy", 33, 2019, false),
+                ("Mechanical Engineering", 100, 2019, false),
+                ("Music", 46, 2019, false),
+                ("Undeclared", 0, 2019, false),
+
+                ("Communication Arts", 36, 2020, false),
+                ("Accounting & Finance", 88, 2020, false),
+                ("Philosophy", 33, 2020, false),
+                ("Mechanical Engineering", 100, 2020, false),
+                ("Music", 46, 2020, false),
+                ("Undeclared", 0, 2020, false)''')
+            
+            #Inserts some minors into database
+            cursor.execute('''Insert into MajorMinor (degreeName, totalHours, reqYear, isMinor) values
+                ("Astronomy", 21, 2017, true),
+                ("Data Science", 19, 2017, true),
+                ("French", 18, 2017, true),
+                ("Nutrition", 15, 2017, true),
+                ("Robotics", 20, 2017, true),
+                ("Theatre", 24, 2017, true),
+
+                ("Astronomy", 21, 2018, true),
+                ("Data Science", 19, 2018, true),
+                ("French", 18, 2018, true),
+                ("Nutrition", 15, 2018, true),
+                ("Robotics", 20, 2018, true),
+                ("Theatre", 24, 2018, true),
+
+                ("Astronomy", 21, 2019, true),
+                ("Data Science", 19, 2019, true),
+                ("French", 18, 2019, true),
+                ("Nutrition", 15, 2019, true),
+                ("Robotics", 20, 2019, true),
+                ("Theatre", 24, 2019, true),
+
+                ("Astronomy", 21, 2020, true),
+                ("AI & Data Science", 22, 2020, true),
+                ("French", 18, 2020, true),
+                ("Nutrition", 15, 2020, true),
+                ("Robotics", 20, 2020, true),
+                ("Theatre", 24, 2020, true)''')
+
+            #Inserts some courses into database
+            cursor.execute('''Insert into Course(courseCode, courseName, creditHours, semester) values
+                ("ACCT 201", "Principles of Accounting I", 3, "fall"),
+                ("ART 208", "Pueblo Pottery", 3, "fall"),
+                ("BIOL 101", "General Biology I", 4, "fall"),
+                ("CHEM 111", "General Chemistry I", 3, "fall"),
+                ("COMP 448", "Computer Security", 3, "fall"),
+                ("MATH 331", "Theory Statistics 1", 3, "fall"),
+
+                ("COMP 141", "Computer Programming I", 3, "both"),
+                ("ENGR 156", "Intro to Engineering", 2, "both"),
+                ("ENGR 301", "Ethics in Engineering & Robotics", 1, "both"),
+                ("HUMA 102", "Civ/Biblical Revelation", 3, "both"),
+                ("HUMA 301", "Civ/The Arts", 3, "both"),
+                ("MATH 161", "Calculus I", 4, "both"),
+                ("MATH 162", "Calculus II", 4, "both"),
+                ("MUSI 119", "Grove City College Singers", 0, "both"),
+                ("POLS 101", "Foundations of Political Science", 3, "both"),
+                ("SOCI 251", "Courtship & Marriage", 3, "both"),
+
+                ("ACCT 202", "Principles of Accounting II", 3, "spring"),
+                ("BIOL 102", "General Biology II", 4, "spring"),
+                ("CHEM 112", "General Chemistry II", 3, "spring"),
+                ("COMP 350", "Software Engineering", 3, "spring"),
+                ("MATH 332", "Theory Statistics II", 3, "spring"),
+                ("MATH 421", "Abstract Algebra", 3, "spring")''')
+            
+            conn.commit()
 
         except Error as error:
             print("database not found:" + str(error))
@@ -147,28 +236,28 @@ def login():
         if password is None or password == "":
             valid = False
         
-        if valid:
-            conn = connection()
-            cursor = conn.cursor()
-            studentQuery = "select * from Student where email = %s and passwrd = %s"
-            studentCredentials = (email, password)
+        # if valid:
+        #     conn = connection()
+        #     cursor = conn.cursor()
+        #     studentQuery = "select * from Student where email = %s and passwrd = %s"
+        #     studentCredentials = (email, password)
 
-            try:
-                cursor.execute(studentQuery, studentCredentials)
-                conn.commit()
+        #     try:
+        #         cursor.execute(studentQuery, studentCredentials)
+        #         conn.commit()
 
-                #Checks if user with credentials exists
-                if cursor.fetchone() is None:
-                    print("User not found")
-                    valid = False
+        #         #Checks if user with credentials exists
+        #         if cursor.fetchone() is None:
+        #             print("User not found")
+        #             valid = False
                 
-            except Error as error:
-                print("Query did not work: " + str(error))
-                valid = False
+        #     except Error as error:
+        #         print("Query did not work: " + str(error))
+        #         valid = False
             
-            #DBMS connection cleanup
-            cursor.close()
-            conn.close()
+        #     #DBMS connection cleanup
+        #     cursor.close()
+        #     conn.close()
 
         if valid:
             session["email"] = email
@@ -242,17 +331,17 @@ def sign_up():
             #TODO: add student major/minor information
 
             #adds student and his/her info to the database
-            try:
-                cursor.execute(newStudentQuery, newStudentData)
-                conn.commit()
-            except error as error:
-                #If you cannot insert the invidual into the database, print error and reroute
-                print("Insertion in database unsuccessful: " + str(error))
-                return redirect("http//localhost:3000/SignUp")
+            # try:
+            #     cursor.execute(newStudentQuery, newStudentData)
+            #     conn.commit()
+            # except error as error:
+            #     #If you cannot insert the invidual into the database, print error and reroute
+            #     print("Insertion in database unsuccessful: " + str(error))
+            #     return redirect("http//localhost:3000/SignUp")
             
-            #DBMS connection cleanup
-            cursor.close()
-            conn.close()
+            # #DBMS connection cleanup
+            # cursor.close()
+            # conn.close()
 
             session["email"] = email #use this to determine in the future who is logged in
             return redirect("http://localhost:3000/home")
