@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 
 export const Home = ()=> {
+    // Fetch the user information from the home page
     const [isLoading, setLoading] = useState(true);
     const [success, setSuccess] = useState();
 
@@ -16,13 +17,19 @@ export const Home = ()=> {
         return <div> Loading... </div>
     }
     return(
-        <div>
-            <h1> Data Received From Server: </h1>
-            <ul>
-                <li>{success.name}</li>
-                <li>{success.email}</li>
-                <li>{success.graduation_year}</li>
-            </ul>
+        <div id="main-content">
+            <h1> Schedules </h1>
+            <div id="schedule-list-view">
+                <h2> Name </h2>
+                <p> Put the name of all of the user's schedules here </p>
+                <h2> Date Modified </h2> 
+                <p> Put the date of last modification to the schedule here </p>
+            </div>
+            <div id="button-container">
+                <button type="button" id="auto-generate"> Auto-Generate Schedule </button>
+                <button type="button" id="new-schedule"> Create New Schedule </button>
+                <button type="button" id="compare-schedule"> Compare Schedules </button>
+            </div>
         </div>     
     );
 }
