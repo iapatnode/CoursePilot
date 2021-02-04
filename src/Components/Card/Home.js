@@ -2,13 +2,17 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
-import Modal from 'react-modal'
+import Modal from 'react-bootstrap/Modal'
+import Button from 'react-bootstrap/Button'
 
 export const Home = ()=> {
     // Fetch the user information from the home page
     const [isLoading, setLoading] = useState(true);
     const [success, setSuccess] = useState();
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
 
     useEffect(() => {
         axios.get("/api/home").then(response => {
@@ -29,9 +33,9 @@ export const Home = ()=> {
             <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="mr-auto">
                 <Nav.Link href="/home">Scheduling</Nav.Link>
-                <Nav.Link href="/degree">Degree Report</Nav.Link>
-                <Nav.Link href="/majors">Majors and Minors</Nav.Link>
-                <Nav.Link href="/profile">Profile</Nav.Link>
+                {/* <Nav.Link href="/degree">Degree Report</Nav.Link> */}
+                {/* <Nav.Link href="/majors">Majors and Minors</Nav.Link> */}
+                {/* <Nav.Link href="/profile">Profile</Nav.Link> */}
             </Nav>
         </Navbar.Collapse>
         </Navbar>
@@ -44,13 +48,16 @@ export const Home = ()=> {
             </div>
             <div id="button-container">
                 {/* <button type="button" id="auto-generate"> Auto-Generate Schedule </button> */}
-                <button onClick={() => setModalIsOpen(true)} type="button" id="create-schedule"> Create New Schedule </button>
-                <Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
-                    <h2> Test Modal Title </h2>
-                    <p> Test Modal Body </p>
-                    <div>
-                        <button onClick={() => setModalIsOpen(false)}> Cancel </button>
-                    </div>
+                <button variant="primary" onClick={handleShow}> Create New Schedule </button>
+                <Modal show={show} onHide={handleClose}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Modal heading</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleClose}> Close </Button>
+                        <Button variant="primary" onClick={handleClose}> Save Changes </Button>
+                    </Modal.Footer>
                 </Modal>
                 {/* <button type="button" id="compare-schedule"> Compare Schedules </button> */}
             </div>

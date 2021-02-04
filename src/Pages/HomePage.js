@@ -8,8 +8,7 @@ export const HomePage = ()=> {
 
     return(
         <>
-            <Home />
-            
+            <Home />   
         </>
     )
 }
