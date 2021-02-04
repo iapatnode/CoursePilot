@@ -214,8 +214,8 @@ def init_db():
     conn.close()
 
 #Creates Course Pilot database and fills it with tables and data when application is opened
-create_db()
-init_db()
+#create_db()
+#init_db()
 
 
 @app.route("/api/login", methods=["POST", "GET"])
