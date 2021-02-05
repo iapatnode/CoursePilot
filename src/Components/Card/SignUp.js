@@ -60,10 +60,10 @@ export const SignUp = () => {
                     <Form.Group>
                         <Form.Label>Select Your Requirement Year</Form.Label>
                         <Form.Control as="select" name="requirement-year" id="requirement-year">
-                            <option value="2021">2021</option>
                             <option value="2020">2020</option>
                             <option value="2019">2019</option>
                             <option value="2018">2018</option>
+                            <option value="2017">2017</option>
                         </Form.Control>
                     </Form.Group>
                     <Form.Group>
