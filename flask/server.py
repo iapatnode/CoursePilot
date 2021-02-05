@@ -379,11 +379,14 @@ def sign_up():
         }
 
 
-@app.route("/api/home", methods=["GET"])
+@app.route("/api/home", methods=["GET", "POST"])
 def home():
     #TODO: Return user data retrieved from database tables as needed
-    return {
-        "name": "Foo", 
-        "email": "foo@bar.com",
-        "graduation_year": "2021"
-    }
+    if request.method == "GET":
+        return {
+            "name": "Foo", 
+            "email": "foo@bar.com",
+            "graduation_year": "2021"
+        }
+    if request.method == "POST":
+        return redirect("http://localhost:3000/Schedule")

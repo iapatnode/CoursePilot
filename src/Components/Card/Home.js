@@ -29,7 +29,9 @@ export const Home = ()=> {
             setShowSemester(true);
         }
     }
-    const handleSemesterClose = () => setShowSemester(false);
+    const handleSemesterClose = () => {
+        setShowSemester(false);
+    }
 
     useEffect(() => {
         axios.get("/api/home").then(response => {
@@ -96,9 +98,14 @@ export const Home = ()=> {
                         <p> semester drop down will eventually go here</p>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={handleSemesterClose}> Cancel </Button>
-                        <Button variant="primary" onClick={handleSemesterClose}> Create Schedule </Button>
-                        
+                        <Form id="signup-form" method="post" action="/api/home">
+                            <Button variant="secondary" onClick={handleSemesterClose}>
+                                Cancel
+                            </Button>
+                            <Button variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
+                                Create Schedule
+                            </Button>
+                        </Form>
                     </Modal.Footer>
                 </Modal>
 
