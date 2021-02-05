@@ -7,6 +7,9 @@ import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 
 export const Home = ()=> {
+
+    var test = "";
+
     // Fetch the user information from the home page
     const [isLoading, setLoading] = useState(true);
     const [success, setSuccess] = useState();
@@ -20,6 +23,8 @@ export const Home = ()=> {
             setShow(true);
         }
         else {
+            // test = document.getElementById("schedule-name").value
+            // console.log(test);
             setShow(false);
             setShowSemester(true);
         }
@@ -93,6 +98,7 @@ export const Home = ()=> {
                     <Modal.Footer>
                         <Button variant="secondary" onClick={handleSemesterClose}> Cancel </Button>
                         <Button variant="primary" onClick={handleSemesterClose}> Create Schedule </Button>
+                        
                     </Modal.Footer>
                 </Modal>
 
