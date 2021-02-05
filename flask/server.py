@@ -36,9 +36,10 @@ def connection():
 #Creating and initializing the database
 def init_db():
     try:
-        conn = connection()
+        # conn = connection()
         cursor = conn.cursor()
         cursor.execute("select * from Student")
+        cursor.fetchall()
         #Why does it print here?
         # print("table not found")
 
@@ -211,11 +212,12 @@ def init_db():
     
     #DBMS connection cleanup
     cursor.close()
-    conn.close()
+    # conn.close()
 
 #Creates Course Pilot database and fills it with tables and data when application is opened
-#create_db()
-#init_db()
+create_db()
+conn = connection()
+init_db()
 
 
 @app.route("/api/login", methods=["POST", "GET"])
@@ -236,27 +238,28 @@ def login():
         if password is None or password == "":
             valid = False
         
-        # if valid:
-        #     conn = connection()
-        #     cursor = conn.cursor()
-        #     studentQuery = "select * from Student where email = %s and passwrd = %s"
-        #     studentCredentials = (email, password)
+        #Checks if student's credentials are in the database
+        if valid:
+            # conn = connection()
+            cursor = conn.cursor(buffered=True)
+            studentQuery = "select * from Student where email = %s and passwrd = %s"
+            studentCredentials = (email, password)
 
-        #     try:
-        #         cursor.execute(studentQuery, studentCredentials)
-        #         conn.commit()
+            try:
+                cursor.execute(studentQuery, studentCredentials)
+                conn.commit()
 
-        #         #Checks if user with credentials exists
-        #         if cursor.fetchone() is None:
-        #             print("User not found")
-        #             valid = False
+                #Checks if user with credentials exists
+                if cursor.rowcount == 0:
+                    print("User not found")
+                    valid = False
                 
-        #     except Error as error:
-        #         print("Query did not work: " + str(error))
-        #         valid = False
+            except Error as error:
+                print("Query did not work: " + str(error))
+                valid = False
             
-        #     #DBMS connection cleanup
-        #     cursor.close()
+            #DBMS connection cleanup
+            cursor.close()
         #     conn.close()
 
         if valid:
@@ -319,29 +322,43 @@ def sign_up():
         #Check to see that the user's major/minor selections are valid
         if major is None or major == "":
             valid = False
+
+        print(major)
         
         if minor is None or minor == "":
             valid = False
         
+        print(minor)
         if valid:
-            #conn = connection()
-            #cursor = conn.cursor()
-            #newStudentQuery = "Insert into Student values (%s, %s, %s)"
-            #newStudentData = (email, password, graduation_year)
+            # conn = connection()
+            cursor = conn.cursor()
+            newStudentQuery = "Insert into Student values (%s, %s, %s)"
+            newStudentData = (email, password, graduation_year)
+
+            studentDegreeQuery = "select degreeID from MajorMinor where degreeName = %s and reqYear = %s and isMinor = %s"
 
             #TODO: add student major/minor information
 
             #adds student and his/her info to the database
-            # try:
-            #     cursor.execute(newStudentQuery, newStudentData)
-            #     conn.commit()
-            # except error as error:
-            #     #If you cannot insert the invidual into the database, print error and reroute
-            #     print("Insertion in database unsuccessful: " + str(error))
-            #     return redirect("http//localhost:3000/SignUp")
+            try:
+                cursor.execute(newStudentQuery, newStudentData)
+
+                majorIDs = []
+                for degree in major:
+                    cursor.execute(studentDegreeQuery, (degree, requirement_year, False))
+
+                    print(cursor.fetchall())
+
+                    # majorIDs.append(cursor.fetchall().toList)
+
+                conn.commit()
+            except error as error:
+                #If you cannot insert the invidual into the database, print error and reroute
+                print("Insertion in database unsuccessful: " + str(error))
+                return redirect("http//localhost:3000/SignUp")
             
-            # #DBMS connection cleanup
-            # cursor.close()
+            #DBMS connection cleanup
+            cursor.close()
             # conn.close()
 
             session["email"] = email #use this to determine in the future who is logged in
