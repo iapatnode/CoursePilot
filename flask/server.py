@@ -277,7 +277,6 @@ def sign_up():
     if request.method == "POST":
         valid = True
         email = request.form.get("email")
-        # username = request.form.get("username")
         password = request.form.get("password")
         confirm_password = request.form.get("confirm-password")
         requirement_year = request.form.get("requirement-year")
@@ -301,11 +300,6 @@ def sign_up():
         
         # #Check to see whether or not the user gave a valid username
         string_check = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
-        # if(string_check.search(username) != None):
-        #     valid = False
-        
-        # if username is None or username == "":
-        #     valid = False
 
         #Check to see if the user gave a valid password
         password_regex = re.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)")
