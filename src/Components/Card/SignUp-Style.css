@@ -4,10 +4,3 @@
     align-items: center;
 }
 
-input {
-    margin: 0.5rem;
-}
-
-#major, #minor, #requirement-year, #graduation-year {
-    margin: 0.5rem;
-}

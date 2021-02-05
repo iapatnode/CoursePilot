@@ -279,8 +279,9 @@ def sign_up():
         confirm_password = request.form.get("confirm-password")
         requirement_year = request.form.get("requirement-year")
         graduation_year = request.form.get("graduation-year")
-        major = request.form.get("major")
-        minor = request.form.get("minor")
+        major = request.form.getlist("major")
+        minor = request.form.getlist("minor")
+        print(f'{email}, {password}, {confirm_password}, {requirement_year}, {graduation_year}, {major}, {minor}')
 
         #Check to see that the user gives a valid gcc email address
         if email is None or email == "":
@@ -323,10 +324,10 @@ def sign_up():
             valid = False
         
         if valid:
-            conn = connection()
-            cursor = conn.cursor()
-            newStudentQuery = "Insert into Student values (%s, %s, %s)"
-            newStudentData = (email, password, graduation_year)
+            #conn = connection()
+            #cursor = conn.cursor()
+            #newStudentQuery = "Insert into Student values (%s, %s, %s)"
+            #newStudentData = (email, password, graduation_year)
 
             #TODO: add student major/minor information
 
