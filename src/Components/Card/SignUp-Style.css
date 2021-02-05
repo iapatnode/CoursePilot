@@ -1,9 +1,13 @@
-.signup-form-field {
+#signup-form {
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
-#login-form {
-    align-content: center;
-    display: inline-block;
+input {
+    margin: 0.5rem;
+}
+
+#major, #minor, #requirement-year, #graduation-year {
+    margin: 0.5rem;
 }

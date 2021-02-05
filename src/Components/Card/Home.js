@@ -37,8 +37,8 @@ export const Home = ()=> {
                 {/* <Nav.Link href="/majors">Majors and Minors</Nav.Link> */}
                 {/* <Nav.Link href="/profile">Profile</Nav.Link> */}
             </Nav>
-        </Navbar.Collapse>
-        </Navbar>
+            </Navbar.Collapse>
+            </Navbar>
             <h1> Schedules </h1>
             <div id="schedule-list-view">
                 <h2> Name </h2>
