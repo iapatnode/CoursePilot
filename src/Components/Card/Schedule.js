@@ -117,7 +117,7 @@ export const Schedule = () => {
               </form> */}
               <form className={classes.root} noValidate autoComplete="off" method="POST" action="/api/search">
                 <div>
-                <TextField id="outlined-search" label="Search class" type="search" variant="outlined" />
+                <TextField id="outlined-search" label="Search class" type="search" variant="outlined"/>
                 </div>
               </form>
 
