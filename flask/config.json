@@ -1,5 +1,6 @@
 {
-    "host": "localhost",
-    "username": "root",
-    "password": "C0ur$eP1l0t"
+    "host": "10.18.110.182",
+    "username": "coursepilot",
+    "password": "C0ur$eP1l0t",
+    "database": "course_pilot"
 }
