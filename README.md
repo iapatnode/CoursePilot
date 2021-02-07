@@ -61,15 +61,13 @@ Using the command line, run the following commands to install the necessary libr
 
 ## MySQL
 
-Navigate to [MySQL](https://dev.mysql.com/downloads/installer/) and download the second installer. Follow the prompts for installing the necessary bundles and setting up a local server. You do not have to install Visual Studio. Simply, click next and continue with the installation.
+<!-- Navigate to [MySQL](https://dev.mysql.com/downloads/installer/) and download the second installer. Follow the prompts for installing the necessary bundles and setting up a local server. You do not have to install Visual Studio. Simply, click next and continue with the installation.
 
 Note: do not change anything from the default options.
 
-Using the command line, run the following command to install the python connector
+Using the command line, run the following command to install the python connector -->
 
 #### `pip install mysql-connector-python`
-
-In the config.json file, change the username and password to match the credentials for your local server.
 
 # Downloading Course Pilot
 

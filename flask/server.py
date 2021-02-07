@@ -277,6 +277,7 @@ def sign_up():
     if request.method == "POST":
         valid = True
         email = request.form.get("email")
+        # username = request.form.get("username")
         password = request.form.get("password")
         confirm_password = request.form.get("confirm-password")
         requirement_year = request.form.get("requirement-year")
@@ -300,6 +301,11 @@ def sign_up():
         
         # #Check to see whether or not the user gave a valid username
         string_check = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+        # if(string_check.search(username) != None):
+        #     valid = False
+        
+        # if username is None or username == "":
+        #     valid = False
 
         #Check to see if the user gave a valid password
         password_regex = re.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)")
@@ -337,14 +343,7 @@ def sign_up():
             try:
                 cursor.execute(newStudentQuery, newStudentData)
 
-                majorIDs = []
                 for degree in major:
-                    cursor.execute(studentDegreeQuery, (degree, requirement_year, False))
-
-                    print(cursor.fetchall())
-
-                    # majorIDs.append(cursor.fetchall().toList)
-
                 conn.commit()
             except error as error:
                 #If you cannot insert the invidual into the database, print error and reroute
@@ -379,14 +378,11 @@ def sign_up():
         }
 
 
-@app.route("/api/home", methods=["GET", "POST"])
+@app.route("/api/home", methods=["GET"])
 def home():
     #TODO: Return user data retrieved from database tables as needed
-    if request.method == "GET":
-        return {
-            "name": "Foo", 
-            "email": "foo@bar.com",
-            "graduation_year": "2021"
-        }
-    if request.method == "POST":
-        return redirect("http://localhost:3000/Schedule")
+    return {
+        "name": "Foo", 
+        "email": "foo@bar.com",
+        "graduation_year": "2021"
+    }
