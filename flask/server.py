@@ -390,3 +390,12 @@ def home():
         }
     if request.method == "POST":
         return redirect("http://localhost:3000/Schedule")
+
+@app.route("/api/search", method=["POST"])
+def autoSearch():
+    if request.method == "POST":
+        cursor = conn.cursor()
+        conn.commit()
+        return redirect("http://localhost:3000/Profile")
+        
+    
