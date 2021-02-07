@@ -381,8 +381,19 @@ def sign_up():
 @app.route("/api/home", methods=["GET"])
 def home():
     #TODO: Return user data retrieved from database tables as needed
-    return {
-        "name": "Foo", 
-        "email": "foo@bar.com",
-        "graduation_year": "2021"
-    }
+    if request.method == "GET":
+        return {
+            "name": "Foo", 
+            "email": "foo@bar.com",
+            "graduation_year": "2021"
+        }
+    if request.method == "POST":
+        return redirect("http://localhost:3000/Schedule")
+
+@app.route("/api/search", method=["POST"])
+def autoSearch():
+    if request.method == "POST":
+        cursor = conn.cursor()
+        conn.commit()
+        return redirect("http://localhost:3000/Profile")
+         

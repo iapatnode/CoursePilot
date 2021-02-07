@@ -1,0 +1,21 @@
+.flex-grid {
+    display: flex;
+    flex-direction: column;
+}
+
+#search-menu {
+    display: flex;
+    flex-direction: column;
+    align-items:flex-end
+}
+
+#search-container {
+    border: 1pt;
+    border-color: black;
+    background-color: lightgray;
+}
+
+#search-container {
+    align-items: center;
+}
+
