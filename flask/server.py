@@ -176,7 +176,7 @@ def sign_up():
             ]
         }
 
-@app.route("/api/home", methods=["GET"])
+@app.route("/api/home", methods=["GET", "POST"])
 def home():
     #TODO: Return user data retrieved from database tables as needed
     if request.method == "GET":
