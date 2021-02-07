@@ -23,6 +23,8 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
+import './Schedule-Style.css';
+import TextField from '@material-ui/core/TextField';
 
 //import * as React from 'react';
 import Paper from '@material-ui/core/Paper';
@@ -44,6 +46,10 @@ const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex-right',
+    '& .MuiTextField-root': {
+      margin: theme.spacing(1),
+      width: '25ch',
+    },
   },
   appBar: {
     width: `calc(100% - ${drawerWidth}px)`,
@@ -66,7 +72,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const Schedule = () => {
-    const classes = useStyles();
+  const classes = useStyles();
     return(
     <div id="main-content">
         <Navbar bg="dark" variant="dark" expand="lg">
@@ -82,67 +88,41 @@ export const Schedule = () => {
         </Navbar.Collapse>
         </Navbar>
         <div>
-            <h1>Ignore Bar on right</h1>
+            <h1 id="schedule-title">Semester 1</h1>
         </div>
-        <div className={classes.root}>
-      <CssBaseline />
-      {/* <AppBar position="fixed" className={classes.appBar}>
-        <Toolbar>
-          <Typography variant="h6" noWrap>
-            Permanent drawer
-          </Typography>
-        </Toolbar>
-      </AppBar> */}
-      <Drawer
-        className={classes.drawer}
-        variant="permanent"
-        classes={{
-          paper: classes.drawerPaper,
-        }}
-        anchor="right"
-      >
-        <div className={classes.toolbar} />
-        <Divider />
-        <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
-        <Divider />
-        <List>
-          {['All mail', 'Trash', 'Spam'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
-      <main className={classes.content}>
-        <div className={classes.toolbar} />
-        <div id="calendar-view">
-        <Paper>
-            <Scheduler
-            data={schedulerData}
-            >
-         <ViewState
-            currentDate={currentDate}
-        />
-        <WeekView
-            startDayHour={8}
-            endDayHour={22}
-        />
-                <Appointments />
-            </Scheduler>
-        </Paper>
-        </div>
-      </main>
-    </div>
+        <div class="row">
+          <div className="col-md-9">
+            <Paper>
+                <Scheduler
+                data={schedulerData}
+                >
+            <ViewState
+                currentDate={currentDate}
+            />
+            <WeekView
+                startDayHour={8}
+                endDayHour={22}
+            />
+                    <Appointments />
+                </Scheduler>
+            </Paper>
+          </div>
+          <div id="search-container" className="col-md-3">
 
-        
+              <h3>Search Classes</h3>
+              {/* <form id="class-search" action="/api/search" method="POST">
+                <input type="search" name="classSearch" id="search-bar" class="col-sm-9" placeholder="Search"/>
+                <input type="submit" value="Search" class="col-sm-3">
+                </input>
+              </form> */}
+              <form className={classes.root} noValidate autoComplete="on">
+                <div>
+                <TextField id="outlined-search" label="Search class" type="search" variant="outlined" />
+                </div>
+              </form>
+
+          </div>
+        </div>
     </div>
     );
 }
