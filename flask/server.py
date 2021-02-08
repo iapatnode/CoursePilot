@@ -131,10 +131,6 @@ def sign_up():
             newStudentQuery = "Insert into Student values (%s, %s, %s)"
             newStudentData = (email, password, graduation_year)
 
-            studentDegreeQuery = "select degreeID from MajorMinor where degreeName = %s and reqYear = %s and isMinor = %s"
-
-            #TODO: add student major/minor information
-
             #adds student and his/her info to the database
             try:
                 cursor.execute(newStudentQuery, newStudentData)
@@ -145,6 +141,37 @@ def sign_up():
                 print("Insertion in database unsuccessful: " + str(error))
                 return redirect("http//localhost:3000/SignUp")
             
+            #Adds student major information to database
+            try:
+                studentDegreeQuery = "select degreeID from MajorMinor where degreeName = %s and reqYear = %s and isMinor = %s"
+                for m in major:
+                    mid = 0
+                    cursor.execute(studentDegreeQuery, (m, requirement_year, 0))
+                    result = cursor.fetchall()
+                    for row in result:
+                        mid = row[0]
+                    
+                    addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
+                    cursor.execute(addToMajorMinor, (email, mid))
+                
+                for mm in minor:
+                    mid = 0
+                    cursor.execute(studentDegreeQuery, (mm, requirement_year, 1))
+                    result = cursor.fetchall()
+                    for row in result:
+                        mid = row[0]
+                    
+                    addToMinor = "insert into StudentMajorMinor values (%s, %s)"
+                    cursor.execute(addToMinor, (email, mid))
+                    
+                conn.commit()
+                print("Added major to the database")
+            
+            except error as error:
+                #If you cannot insert the major/minor into the database, print error and reroute
+                print("Insertion in database unsuccessful: " + str(error))
+                return redirect("http//localhost:3000/SignUp")
+
             #DBMS connection cleanup
             cursor.close()
             # conn.close()
@@ -157,14 +184,14 @@ def sign_up():
     if request.method == "GET":
         # Get a list of all majors and minors from the database
         cursor = conn.cursor()
-        major_query = "select degreeName, degreeId from MajorMinor where isMinor = 0"
+        major_query = "select distinct degreeName from MajorMinor where isMinor = 0"
         cursor.execute(major_query)
         result = cursor.fetchall()
         all_majors = []
         for entry in result:
             all_majors.append(entry[0])
     
-        minor_query = "select degreeName, degreeId from MajorMinor where isMinor = 1"
+        minor_query = "select distinct degreeName from MajorMinor where isMinor = 1"
         cursor.execute(minor_query)
         result = cursor.fetchall()
         all_minors = []
