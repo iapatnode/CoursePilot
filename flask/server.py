@@ -124,11 +124,7 @@ def sign_up():
             valid = False
 
         print(major)
-        
-        if minor is None or minor == "":
-            valid = False
-        
-        print(minor)
+
         if valid:
             # conn = connection()
             cursor = conn.cursor()
@@ -159,21 +155,27 @@ def sign_up():
             return redirect("http://localhost:3000/SignUp")
 
     if request.method == "GET":
+        # Get a list of all majors and minors from the database
+        cursor = conn.cursor()
+        major_query = "select degreeName, degreeId from MajorMinor where isMinor = 0"
+        cursor.execute(major_query)
+        result = cursor.fetchall()
+        all_majors = []
+        for entry in result:
+            all_majors.append(entry[0])
+    
+        minor_query = "select degreeName, degreeId from MajorMinor where isMinor = 1"
+        cursor.execute(minor_query)
+        result = cursor.fetchall()
+        all_minors = []
+        for entry in result:
+            all_minors.append(entry[0])
         
-        #TODO: Replace these lists with accurate lists containing all majors and minors
+        cursor.close()
+
         return {
-            "majors": [
-                "computer science", 
-                "mechanical engineering", 
-                "accounting"
-            ],
-            "minors": [
-                "none",
-                "computer science", 
-                "finance", 
-                "biblical and religious studies",
-                "data science"
-            ]
+            "majors": all_majors,
+            "minors": all_minors
         }
 
 @app.route("/api/home", methods=["GET", "POST"])
