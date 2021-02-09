@@ -217,9 +217,25 @@ def home():
     if request.method == "POST":
         return redirect("http://localhost:3000/Schedule")
 
-# @app.route("/api/search", method=["POST"])
-# def autoSearch():
+# @app.route("/api/search", methods=["GET","POST"])
+# def search():
 #     if request.method == "POST":
-#         cursor = conn.cursor()
-#         conn.commit()
-#         return redirect("http://localhost:3000/Profile")
+#         search_val = ""
+#         search_val = request.form.get("outlined-search")
+#         # cursor = conn.cursor()
+#         # class_query = "select * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like %s"%('%' + str(search_val)+'%')
+#         print(search_val)
+#         # cursor.execute(class_query)
+#         # class_table = cursor.fetchall()
+#         # print(class_table)
+
+#         # result_string = ""
+#         # for row in class_table:
+#         #     for item in row:
+#         #         print(row)
+#         #         result_string += str(item)
+            
+        
+#         # return result_string
+#         return "search_val"
+        
