@@ -1,15 +1,6 @@
 # Sam's algorithm
 
 
-int main():
-
-
-def AutoGenerateSchedule():
-
-
-def getMajorClasses():
-
-
 
 
 '''

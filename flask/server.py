@@ -252,3 +252,132 @@ def search():
         return result_string
         # return (search_val)
         
+
+
+
+
+
+
+
+
+
+
+def getClasses():
+    cursor = conn.cursor()
+    try:
+        cursor.execute("select * from Class")
+
+        info = cursor.fetchall()
+        print(info)
+    except error as error:
+        print("Could not pull the data" + str(error))
+    
+def getCourse():
+    cursor = conn.cursor()
+    try:
+        cursor.execute("select * from Course")
+
+        info = cursor.fetchall()
+        print(info)
+    except error as error:
+        print("Could not pull the data" + str(error))
+
+def getMajorMinor():
+    cursor = conn.cursor()
+    try:
+        cursor.execute("select * from MajorMinor")
+
+        info = cursor.fetchall()
+        print(info)
+    except error as error:
+        print("Could not pull the data" + str(error))
+
+def getMajorMinorRequirements():
+    cursor = conn.cursor()
+    try:
+        cursor.execute("select * from MajorMinorRequirements")
+
+        info = cursor.fetchall()
+        print(info)
+    except error as error:
+        print("Could not pull the data" + str(error))
+
+def getPrerequisite():
+    cursor = conn.cursor()
+    try:
+        cursor.execute("select * from Prerequisite")
+
+        info = cursor.fetchall()
+        print(info)
+    except error as error:
+        print("Could not pull the data" + str(error))
+
+def getReqCourses():
+    cursor = conn.cursor()
+    try:
+        cursor.execute("select * from ReqCourses")
+
+        info = cursor.fetchall()
+        print(info)
+    except error as error:
+        print("Could not pull the data" + str(error))
+
+def getRequirement():
+    cursor = conn.cursor()
+    try:
+        cursor.execute("select * from Requirement")
+
+        info = cursor.fetchall()
+        print(info)
+    except error as error:
+        print("Could not pull the data" + str(error))
+
+def getSchedule():
+    cursor = conn.cursor()
+    try:
+        cursor.execute("select * from Schedule")
+
+        info = cursor.fetchall()
+        print(info)
+    except error as error:
+        print("Could not pull the data" + str(error))
+
+def getScheduleClass():
+    cursor = conn.cursor()
+    try:
+        cursor.execute("select * from ScheduleClass")
+
+        info = cursor.fetchall()
+        print(info)
+    except error as error:
+        print("Could not pull the data" + str(error))
+
+def getStudent():
+    cursor = conn.cursor()
+    try:
+        cursor.execute("select * from Student")
+
+        info = cursor.fetchall()
+        print(info)
+    except error as error:
+        print("Could not pull the data" + str(error))
+
+def getStudentCourses():
+    cursor = conn.cursor()
+    try:
+        cursor.execute("select * from StudentCourses")
+
+        info = cursor.fetchall()
+        print(info)
+    except error as error:
+        print("Could not pull the data" + str(error))
+
+def getStudentMajorMinor():
+    cursor = conn.cursor()
+    try:
+        cursor.execute("select * from StudentMajorMinor")
+
+        info = cursor.fetchall()
+        print(info)
+    except error as error:
+        print("Could not pull the data" + str(error))
