@@ -223,20 +223,26 @@ def search():
     if request.method == "POST":
         search_val = ""
         search_val = request.form.get("outlined-search")
-        # cursor = conn.cursor()
-        # class_query = "select * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like %s"%('%' + str(search_val)+'%')
-        print(search_val)
+        cursor = conn.cursor()
+        # class_query = "select * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like ?;", (f"%{(search_val)}%",)
+        
+        # print(search_val)
         # cursor.execute(class_query)
-        # class_table = cursor.fetchall()
-        # print(class_table)
 
-        # result_string = ""
-        # for row in class_table:
-        #     for item in row:
-        #         print(row)
-        #         result_string += str(item)
+        cursor.execute(''' 
+            SELECT * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like %s;
+        ''', (f"%{(search_val)}%",))
+
+        class_table = cursor.fetchall()
+        print(class_table)
+
+        result_string = ""
+        for row in class_table:
+            for item in row:
+                print(row)
+                result_string += str(item) + "\n"
             
         
-        # return result_string
-        return "search_val"
+        return result_string
+        # return (search_val)
         
