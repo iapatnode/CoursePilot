@@ -1,0 +1,23 @@
+.login-form-field {
+    display: flex;
+    flex-direction: column;
+    margin: 1rem;
+}
+
+#login-form {
+    align-content: center;
+    display: inline-block;
+}
+
+#welcome-text {
+    color: #926DD6;
+    margin: 1%;
+}
+
+#logo {
+    margin: 0.5%;
+}
+
+#login-form-submit {
+    margin: 1rem;
+}

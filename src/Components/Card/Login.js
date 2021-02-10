@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './Login-Style.css';
+import '../static/styles/Login-Style.css'
 import AdminFooter from "../Footers/AdminFooter.js";
 import Logo from '../../CoursePilotLogo.jpg'
 import Image from 'react-bootstrap/Image'
@@ -16,17 +16,16 @@ export const Login = ()  => {
             </header>
             <div>
                 <main id="main-content">
-                    <Image src={Logo} fluid/>
-                    <h1> Welcome to Course Pilot! </h1>
+                    <Image src={Logo} fluid id="logo"/>
+                    <h1 id="welcome-text"> Welcome to Course Pilot! </h1>
                     <form id="login-form" action="/api/login" method="POST">
                         <input type="email" name="email" id="email-field" className="login-form-field" placeholder="Email"/>
                         <input type="password" name="password" id="password-field" className="login-form-field" placeholder="Password"/>
-                        <input type="submit" value="login" id="login-form-submit"></input>
+                        <input type="submit" value="Login" id="login-form-submit"></input>
                     </form>
-                    <p> Don't have an account? Sign up <Link to="/SignUp">Here</Link> </p>
+                    <p id="sign-up-link"> Don't have an account? Sign up <Link to="/SignUp">Here</Link> </p>
                 </main>
             </div>
-            <AdminFooter />
         </div>
     );    
 }

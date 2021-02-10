@@ -37,9 +37,10 @@ def login():
         #Check to see that a valid email was entered
         if email is None or email == "":
             valid = False
-        domain = re.search("@[\w.]+", email)
-        if domain.group() != '@gcc.edu':
-            valid = False
+        else:
+            domain = re.search("@[\w.]+", email)
+            if domain.group() != '@gcc.edu':
+                valid = False
         
         #Check to see that a password was entered
         if password is None or password == "":
