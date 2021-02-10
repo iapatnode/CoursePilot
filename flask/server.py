@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, session, Response
+from flask import Flask, request, render_template, redirect, session, Response, jsonify
 from flask_cors import CORS
 import os
 import re, json
@@ -83,13 +83,15 @@ def sign_up():
     session["email"] = ""
     if request.method == "POST":
         valid = True
-        email = request.form.get("email")
-        password = request.form.get("password")
-        confirm_password = request.form.get("confirm-password")
-        requirement_year = request.form.get("requirement-year")
-        graduation_year = request.form.get("graduation-year")
-        major = request.form.getlist("major")
-        minor = request.form.getlist("minor")
+        data = request.data.decode("utf-8")
+        json_data = json.loads(data)
+        email = json_data.get("email")
+        password = json_data.get("password")
+        confirm_password = json_data.get("confirm_password")
+        requirement_year = json_data.get("requirement_year")
+        graduation_year = json_data.get("graduation_year")
+        major = json_data.get("major")
+        minor = json_data.get("minor")
         print(f'{email}, {password}, {confirm_password}, {requirement_year}, {graduation_year}, {major}, {minor}')
 
         #Check to see that the user gives a valid gcc email address
@@ -135,6 +137,7 @@ def sign_up():
             #adds student and his/her info to the database
             try:
                 cursor.execute(newStudentQuery, newStudentData)
+                print("Inserted student into the database")
 
                 conn.commit()
             except error as error:
@@ -154,6 +157,8 @@ def sign_up():
                     
                     addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
                     cursor.execute(addToMajorMinor, (email, mid))
+                    print("Inserted one major")
+                    conn.commit()
                 
                 for mm in minor:
                     mid = 0
@@ -164,8 +169,10 @@ def sign_up():
                     
                     addToMinor = "insert into StudentMajorMinor values (%s, %s)"
                     cursor.execute(addToMinor, (email, mid))
+                    print("Inserted one minor")
+                    conn.commit()
                     
-                conn.commit()
+                #conn.commit()
                 print("Added major to the database")
             
             except error as error:
@@ -178,9 +185,11 @@ def sign_up():
             # conn.close()
 
             session["email"] = email #use this to determine in the future who is logged in
-            return redirect("http://localhost:3000/home")
+            print("DONE WITH VALIDATION")
+            # return redirect("http://localhost:3000/home")
+            return jsonify({'redirect_to_home': True}), 200
         else:
-            return redirect("http://localhost:3000/SignUp")
+            return jsonify({'redirect_to_home': False}), 400
 
     if request.method == "GET":
         # Get a list of all majors and minors from the database
@@ -251,10 +260,6 @@ def search():
         
         return result_string
         # return (search_val)
-        
-
-
-
 
 
 
