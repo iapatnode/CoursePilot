@@ -61,6 +61,7 @@ export const SignUp = () => {
         }
         
         axios.post('/api/signup', parameters).then(response => {
+            alert("You created an account")
             window.location = '/Home'
         })
         .catch((error) => {
