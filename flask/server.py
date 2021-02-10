@@ -224,6 +224,7 @@ def search():
         search_val = ""
         search_val = request.form.get("outlined-search")
         cursor = conn.cursor()
+        classArray = []
         # class_query = "select * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like ?;", (f"%{(search_val)}%",)
         
         # print(search_val)
@@ -234,13 +235,18 @@ def search():
         ''', (f"%{(search_val)}%",))
 
         class_table = cursor.fetchall()
-        print(class_table)
+        # print(class_table)
 
         result_string = ""
         for row in class_table:
+            classArray.append(row[0])
+            classArray.append(row[2])
             for item in row:
-                print(row)
+                # print(row)
                 result_string += str(item) + "\n"
+
+        for row in classArray:
+            print(row)
             
         
         return result_string

@@ -82,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
 export const Schedule = () => {
   const classes = useStyles();
   const [state, setState] = React.useState({
-    gilad: true,
+    gilad: false,
     jason: false,
     antoine: false,
   });
