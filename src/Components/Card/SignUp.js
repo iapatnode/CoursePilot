@@ -61,11 +61,11 @@ export const SignUp = () => {
         }
         
         axios.post('/api/signup', parameters).then(response => {
-            alert("You created an account")
+            alert("Account Creation Successful!")
             window.location = '/Home'
         })
         .catch((error) => {
-            if (error.status === 401) {
+            if (error.status === 400) {
                 alert("Error")
                 window.location = '/Signup'
             }

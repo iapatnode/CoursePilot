@@ -96,37 +96,40 @@ def sign_up():
 
         #Check to see that the user gives a valid gcc email address
         if email is None or email == "":
+            print("email is wrong")
             valid = False
         regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
         if(re.search(regex, email)):
             domain = re.search("@[\w.]+", email)
-            if domain.group() == '@gcc.edu':
-                print("valid")
-            else:
+            if domain.group() != '@gcc.edu':
+                print("email is wrong (non-gcc)")
                 valid = False
-        else:
-            valid = False
         
         # #Check to see whether or not the user gave a valid username
         string_check = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
 
         #Check to see if the user gave a valid password
         password_regex = re.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)")
-        if(password_regex.search(password)) != None:
-            if(string_check.search(password) != None):
-                print("Password has all needed characteristics")
-            else:
-                valid = False
+        if(password_regex.search(password)) == None:
+            print("Password has no uppercase or decimal or lowercase")
+            valid = False
+            
+        if(string_check.search(password) == None):
+            print("Password has no special characters")
+            valid = False
         
         #Check to see if the two password fields match
         if password != confirm_password:
+            print("Passwords do not match")
             valid = False
 
         #Check to see that the user's major/minor selections are valid
         if major is None or major == "":
+            print("Need to enter a major")
             valid = False
 
         print(major)
+        print(valid)
 
         if valid:
             # conn = connection()
