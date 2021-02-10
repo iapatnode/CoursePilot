@@ -11,5 +11,9 @@ class Class:
     def myfunc(self):
         print("Class name is " + self.name + " Code " + self.code + " Semester: " + self.semester + " Hours: " + str(self.hours) + " Days: " + self.days + "Section: " + self.section)
 
+
+
+
+
 c1 = Class("Intro to Comp Sci", "COMP 101", "fall", 3, 'A', "MWF")
 c1.myfunc()
