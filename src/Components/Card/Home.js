@@ -5,6 +5,8 @@ import Nav from 'react-bootstrap/Nav'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
+import '../static/styles/Home-Style.css'
+
 
 export const Home = ()=> {
 
@@ -81,32 +83,22 @@ export const Home = ()=> {
                         <Modal.Title>Create New Schedule - Enter Name</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Form.Group controlId="schedule-name-form">
-                            <Form.Control type="text" placeholder="Enter Schedule Name" id="schedule-name" name="schedule-name"></Form.Control>
-                        </Form.Group>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="secondary" onClick={handleClose}> Cancel </Button>
-                        <Button variant="primary" onClick={handleSubmit}> Continue </Button>
-                    </Modal.Footer>
-                </Modal>
-                <Modal show={showSemester} onHide={handleSemesterClose}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Create New Schedule - Select Semester</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <p> semester drop down will eventually go here</p>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Form id="signup-form" method="post" action="/api/home">
-                            <Button variant="secondary" onClick={handleSemesterClose}>
-                                Cancel
-                            </Button>
-                            <Button variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
-                                Create Schedule
-                            </Button>
+                        <Form method="post" action="/api/home">
+                            <Form.Group>
+                                <Form.Control type="text" placeholder="Enter Schedule Name" id="schedule-name" name="schedule-name"></Form.Control>
+                                <Form.Control as="select" defaultValue="Choose Semester" id="schedule-semester" namw="schedule-name">
+                                    <option value="fall">Fall</option>
+                                    <option value="spring">Spring</option>
+                                </Form.Control>
+                                <Button variant="secondary" onClick={handleSemesterClose}>
+                                    Cancel
+                                </Button>
+                                <Button variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
+                                    Create Schedule
+                                </Button>
+                            </Form.Group>
                         </Form>
-                    </Modal.Footer>
+                    </Modal.Body>
                 </Modal>
 
                 {/* <button type="button" id="compare-schedule"> Compare Schedules </button> */}
