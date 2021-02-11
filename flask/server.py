@@ -268,7 +268,31 @@ def search():
 
 
 
+# function to auto generate the schedule
+#def AutoGenerateSchedule():
+#    print("testing!")
 
+
+#    recommendedSchedule = []
+
+#    takenCourses = getTakenCourses()
+
+#    majorCourses = []
+
+#    for majorCourse in majorCourses:
+#        for takenCourse in takenCourses:
+#            # need to add if student has not taken prereqs
+#            # need to add if the class is not offered in the semester selected
+#            if (takenCourse != majorCourse):
+#                recommendedSchedule.append(majorCourse)
+
+
+
+
+
+#def getTakenCourses():
+#    takenCourses = []
+#    return takenCourses
 
 def getClasses():
     cursor = conn.cursor()
