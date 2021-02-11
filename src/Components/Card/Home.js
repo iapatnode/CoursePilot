@@ -20,20 +20,6 @@ export const Home = ()=> {
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    const handleSubmit = () => {
-        if(document.getElementById("schedule-name").value == "") {
-            setShow(true);
-        }
-        else {
-            // test = document.getElementById("schedule-name").value
-            // console.log(test);
-            setShow(false);
-            setShowSemester(true);
-        }
-    }
-    const handleSemesterClose = () => {
-        setShowSemester(false);
-    }
 
     useEffect(() => {
         axios.get("/api/home").then(response => {
@@ -90,7 +76,7 @@ export const Home = ()=> {
                                     <option value="fall">Fall</option>
                                     <option value="spring">Spring</option>
                                 </Form.Control>
-                                <Button variant="secondary" onClick={handleSemesterClose}>
+                                <Button variant="secondary" onClick={handleClose}>
                                     Cancel
                                 </Button>
                                 <Button variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
