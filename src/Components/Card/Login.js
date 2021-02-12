@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../static/styles/Login-Style.css'
-import AdminFooter from "../Footers/AdminFooter.js";
-import Logo from '../../CoursePilotLogo.jpg'
+import Logo from '../static/images/logo.jpg'
 import Image from 'react-bootstrap/Image'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'

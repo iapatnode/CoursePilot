@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import LoginPage from './Pages/LoginPage'
 import SignUpPage from './Pages/SignUpPage'
@@ -7,7 +6,7 @@ import SchedulePage from './Pages/SchedulePage';
 import DegreeReportPage from './Pages/DegreeReportPage';
 import MajorsPage from './Pages/MajorsPage';
 import ProfilePage from './Pages/ProfilePage';
-import { Route, Link, BrowserRouter } from 'react-router-dom'
+import { Route, BrowserRouter } from 'react-router-dom'
 
 
 function App() {

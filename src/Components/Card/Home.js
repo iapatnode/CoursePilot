@@ -12,22 +12,14 @@ import Link from 'react-router-dom/Link'
 
 export const Home = ()=> {
 
-    var test = "";
-
     // Fetch the user information from the home page
     const [isLoading, setLoading] = useState(true);
     const [success, setSuccess] = useState();
     const [show, setShow] = useState(false);
     const [showSemester, setShowSemester] = useState(false)
-    const semesters = {"semesters": ["fall", "spring"]}
-    const [semester, setSemester] = useState();
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-
-    const semesterChange = (e) => {
-        setSemester(e.target.value);
-    }
 
     useEffect(() => {
         axios.get("/api/home").then(response => {
@@ -78,7 +70,6 @@ export const Home = ()=> {
                 </div>
             </div>
             <div id="button-container">
-                {/* <button type="button" id="auto-generate"> Auto-Generate Schedule </button> */}
                 <button variant="primary" onClick={handleShow}> Create New Schedule </button>
                 <Modal show={show} onHide={handleClose}>
                     <Modal.Header closeButton>
@@ -102,8 +93,6 @@ export const Home = ()=> {
                         </Form>
                     </Modal.Body>
                 </Modal>
-
-                {/* <button type="button" id="compare-schedule"> Compare Schedules </button> */}
             </div>
         </div>     
     );
