@@ -268,7 +268,36 @@ def search():
         return result_string
         # return (search_val)
 
+@app.route('/api/schedule', methods=["GET", "POST"])
+def schedule():
+     if request.method == "GET":
+        data = json.dumps(
+            [           
+                {
+                "id": 1,
+                "text": "SOCI 101",
+                "start": "2013-03-25T12:00:00",
+                "end": "2013-03-25T14:00:00",
+                "resource": "monday"
+                },
+                {
+                "id": 2,
+                "text": "COMP 141",
+                "start": "2013-03-25T15:00:00",
+                "end": "2013-03-25T17:00:00",
+                "resource": "wednesday"
+                },
+                {
+                "id": 3,
+                "text": "Event 3",
+                "start": "2013-03-25T18:00:00",
+                "end": "2013-03-25T19:00:00",
+                "resource": "friday"
+                },
+            ]
+        )
 
+        return data
 
 
 
