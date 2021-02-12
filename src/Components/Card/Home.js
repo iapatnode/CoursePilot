@@ -5,6 +5,7 @@ import Nav from 'react-bootstrap/Nav'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
+import Select from 'react-select'
 import '../static/styles/Home-Style.css'
 
 
@@ -17,9 +18,15 @@ export const Home = ()=> {
     const [success, setSuccess] = useState();
     const [show, setShow] = useState(false);
     const [showSemester, setShowSemester] = useState(false)
+    const semesters = {"semesters": ["fall", "spring"]}
+    const [semester, setSemester] = useState();
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+
+    const semesterChange = (e) => {
+        setSemester(e.target.value);
+    }
 
     useEffect(() => {
         axios.get("/api/home").then(response => {
@@ -72,7 +79,7 @@ export const Home = ()=> {
                         <Form method="post" action="/api/home">
                             <Form.Group>
                                 <Form.Control type="text" placeholder="Enter Schedule Name" id="schedule-name" name="schedule-name"></Form.Control>
-                                <Form.Control as="select" defaultValue="Choose Semester" id="schedule-semester" namw="schedule-name">
+                                <Form.Control as="select" id="schedule-semester" name="schedule-semester">
                                     <option value="fall">Fall</option>
                                     <option value="spring">Spring</option>
                                 </Form.Control>

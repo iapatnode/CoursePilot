@@ -228,6 +228,10 @@ def home():
             "graduation_year": "2021"
         }
     if request.method == "POST":
+        schedule_name = request.form.get("schedule-name")
+        schedule_semester = request.form.get("schedule-semester")
+        print(f"{schedule_name}, {schedule_semester}")
+        print(request.form)
         return redirect("http://localhost:3000/Schedule")
 
 @app.route("/api/search", methods=["GET","POST"])
