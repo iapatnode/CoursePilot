@@ -174,13 +174,12 @@ def sign_up():
                     cursor.execute(addToMinor, (email, mid))
                     print("Inserted one minor")
                     conn.commit()
-                    
-                #conn.commit()
-                print("Added major to the database")
+
+                print("Added majo/minorr to the database")
             
-            except error as error:
+            except err as error:
                 #If you cannot insert the major/minor into the database, print error and reroute
-                print("Insertion in database unsuccessful: " + str(error))
+                print("Insertion in database unsuccessful: " + str(err))
                 return redirect("http//localhost:3000/SignUp")
 
             #DBMS connection cleanup

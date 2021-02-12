@@ -69,6 +69,9 @@ export const SignUp = () => {
                 alert("Error")
                 window.location = '/Signup'
             }
+            else {
+                window.location = '/Home'
+            }
         })
     }
 
@@ -98,7 +101,7 @@ export const SignUp = () => {
                 <div className="container">
                     <div className="row">
                         <div className="col-md-4 col-md-offset-4"></div>
-                        <Form id="signup-form">
+                        <Form id="signup-form" onSubmit={handleSubmit}>
                         {/* <Form id="signup-form" method="post" action="/api/signup"> */}
                             <Form.Group>
                                 <Form.Label>Email Address</Form.Label>
