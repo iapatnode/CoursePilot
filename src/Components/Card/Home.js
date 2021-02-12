@@ -7,6 +7,7 @@ import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import Select from 'react-select'
 import '../static/styles/Home-Style.css'
+import Link from 'react-router-dom/Link'
 
 
 export const Home = ()=> {
@@ -54,16 +55,24 @@ export const Home = ()=> {
             </Navbar.Collapse>
             </Navbar>
             <h1> Schedules </h1>
-            <div id="schedule-list-view">
+            <div className="container" id="schedule-list-view">
                 <div className="row">
-                    <div className="col-2"></div>
-                    <div className="col-md-4" id="names">
+                <div className="col-2 text-center" id="container"></div>
+                    <div className="col-md-4 col-md-offset-2" id="names">
                         <h2> Name </h2>
-                        <p> Put the name of all of the user's schedules here </p>
+                        <ul>
+                            {success.map((value, index) => {
+                                return <Link id="link" to='/Schedule' key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></Link>
+                            })}
+                        </ul>
                     </div>
                     <div className="col-md-4" id="dates">
                         <h2> Date Modified </h2> 
-                        <p> Put the date of last modification to the schedule here </p>
+                        <ul>
+                            {success.map((value, index) => {
+                                return <li key={index} value={value["dateModified"]}>{value["dateModified"]}</li>
+                            })}
+                        </ul>
                     </div>
                     <div className="col-2"></div>
                 </div>

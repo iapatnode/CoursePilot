@@ -3,6 +3,8 @@ from flask_cors import CORS
 import os
 import re, json
 from mysql.connector import connect, Error
+from datetime import datetime
+
 
 app = Flask(__name__)
 CORS(app)
@@ -187,7 +189,6 @@ def sign_up():
             # conn.close()
 
             session["email"] = email #use this to determine in the future who is logged in
-            print("DONE WITH VALIDATION")
             # return redirect("http://localhost:3000/home")
             return jsonify({'redirect_to_home': True}), 200
         else:
@@ -221,16 +222,35 @@ def sign_up():
 def home():
     #TODO: Return user data retrieved from database tables as needed
     if request.method == "GET":
-        return {
-            "name": "Foo", 
-            "email": "foo@bar.com",
-            "graduation_year": "2021"
-        }
+        all_schedules = []
+        cursor = conn.cursor()
+        get_schedules_query = """ SELECT * FROM Schedule WHERE email = "dybasjt17@gcc.edu" """
+        cursor.execute(get_schedules_query)
+        result = cursor.fetchall()
+        for schedule in result:
+            all_schedules.append(
+                {
+                    "scheduleName": schedule[0],
+                    "dateModified": str(schedule[1]),
+                    "email": schedule[2],
+                    "scheduleSemester": schedule[3]
+                }
+            )
+        print(all_schedules)
+        return json.dumps(all_schedules)
+
     if request.method == "POST":
+        cursor = conn.cursor()
+
         schedule_name = request.form.get("schedule-name")
         schedule_semester = request.form.get("schedule-semester")
-        print(f"{schedule_name}, {schedule_semester}")
-        print(request.form)
+        created_at = datetime.now()
+        formatted_date = created_at.strftime('%Y-%m-%d %H:%M:%S')
+
+        insert_schedule_query = "INSERT INTO Schedule values (%s, %s, %s, %s)"
+        cursor.execute(insert_schedule_query, (schedule_name, formatted_date, session["email"], schedule_semester))
+        conn.commit()
+
         return redirect("http://localhost:3000/Schedule")
 
 @app.route("/api/search", methods=["GET","POST"])
