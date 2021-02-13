@@ -47,11 +47,15 @@ Using the command line, run the following command
 
 Note: it may tell you to update pip. You can do this by running the command provided in the warning.
 
-You also need to install the flask_cors library and a native modal library. Using the command line, run 
+You also need to install several libraries. Using the command line, run 
 
 #### `pip install flask_cors`
 
 #### `npm install react-boostrap bootstrap`
+
+#### `npm install https://npm.daypilot.org/daypilot-pro-react/trial/2020.4.4784.tar.gz --save`
+
+#### `npm install react-select --save`
 
 ## Python Libraries
 

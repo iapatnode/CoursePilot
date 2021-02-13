@@ -453,8 +453,7 @@ def getTakenCourses():
         return takenCourses
     except error as error:
         print("Could not pull the data" + str(error))
-    
-    
+      
 def getCourse():
     cursor = conn.cursor()
     try:
