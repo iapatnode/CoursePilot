@@ -348,17 +348,17 @@ def schedule():
 #def AutoGenerateSchedule():
 #    print("testing!")
 
-
+    # this will be the list that is the final recommended schedule
 #    recommendedSchedule = []
-
+    # This will be a list of the classes 
 #    takenCourses = getTakenCourses()
 
 #    majorCourses = []
 
 #    for majorCourse in majorCourses:
 #        for takenCourse in takenCourses:
-#            # need to add if student has not taken prereqs
-#            # need to add if the class is not offered in the semester selected
+            # need to add if student has not taken prereqs
+            # need to add if the class is not offered in the semester selected
 #            if (takenCourse != majorCourse):
 #                recommendedSchedule.append(majorCourse)
 
@@ -366,19 +366,16 @@ def schedule():
 
 
 
-#def getTakenCourses():
-#    takenCourses = []
-#    return takenCourses
-
-def getClasses():
+def getTakenCourses():
     cursor = conn.cursor()
     try:
-        cursor.execute("select * from Class")
+        cursor.execute("select courseCode from StudentCourses")
 
-        info = cursor.fetchall()
-        print(info)
+        takenCourses = cursor.fetchall()
+        return takenCourses
     except error as error:
         print("Could not pull the data" + str(error))
+    
     
 def getCourse():
     cursor = conn.cursor()
