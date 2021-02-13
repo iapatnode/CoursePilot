@@ -343,6 +343,84 @@ def schedule():
         return data
 
 
+@app.route("/api/schedule/<name>")
+def schedule_with_name(name):
+    cursor = conn.cursor()
+    email = session["email"]
+    schedule_course_list = []
+    if request.method == "GET":
+        schedule_course_info = """
+            select * from Class join ScheduleClass on Class.courseCode = ScheduleClass.courseCode
+            where schedule_name = %s and email = %s
+            """
+        cursor.execute(schedule_course_into, (name, email))
+        results = cursor.fetchall()
+        for course in results:
+            section = course[0]
+            start_time = course[2]
+            end_time = course[3]
+            meeting_days = course[4]
+            course_code = course[5]
+            schedule_course_list.extend(
+                {
+                    "code": course_code,
+                    "section": section,
+                    "start": start_time,
+                    "end": end_time,
+                    "days": meeting_days
+                }
+            )
+        #Now, need to create a new calendar entry for each day a class is offered
+        data = []
+        i = 1
+        for c in schedule_course_list:
+            for day in c["days"]:
+                schedule_event = {}
+                if day == "M":
+                    schedule_event = {
+                        "id": i,
+                        "text": f"{c["code"]} {c["section"]}",
+                        "start": f"2013-03-25T{c["start"]}",
+                        "end": f"2013-03-25T{c["end"]}",
+                        "resource": "monday"
+                    }
+                elif day == "T":
+                    schedule_event = {
+                        "id": i,
+                        "text": f"{c["code"]} {c["section"]}",
+                        "start": f"2013-03-25T{c["start"]}",
+                        "end": f"2013-03-25T{c["end"]}",
+                        "resource": "tuesday"
+                    }
+                elif day == "W":
+                    schedule_event = {
+                        "id": i,
+                        "text": f"{c["code"]} {c["section"]}",
+                        "start": f"2013-03-25T{c["start"]}",
+                        "end": f"2013-03-25T{c["end"]}",
+                        "resource": "wednesday"
+                    }
+                elif day == "R":
+                    schedule_event = {
+                        "id": i,
+                        "text": f"{c["code"]} {c["section"]}",
+                        "start": f"2013-03-25T{c["start"]}",
+                        "end": f"2013-03-25T{c["end"]}",
+                        "resource": "thursday"
+                    }
+                else:
+                    schedule_event = {
+                        "id": i,
+                        "text": f"{c["code"]} {c["section"]}",
+                        "start": f"2013-03-25T{c["start"]}",
+                        "end": f"2013-03-25T{c["end"]}",
+                        "resource": "friday"
+                    }
+                i = i + 1
+            data.append(schedule_event)
+            
+        return json.dumps(data)
+
 
 # function to auto generate the schedule
 #def AutoGenerateSchedule():
