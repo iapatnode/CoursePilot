@@ -69,6 +69,9 @@ export const SignUp = () => {
                 alert("Error")
                 window.location = '/Signup'
             }
+            else {
+                window.location = '/Home'
+            }
         })
     }
 
@@ -98,8 +101,7 @@ export const SignUp = () => {
                 <div className="container">
                     <div className="row">
                         <div className="col-md-4 col-md-offset-4"></div>
-                        <Form id="signup-form">
-                        {/* <Form id="signup-form" method="post" action="/api/signup"> */}
+                        <Form id="signup-form" onSubmit={handleSubmit}>
                             <Form.Group>
                                 <Form.Label>Email Address</Form.Label>
                                 <Form.Control onChange={handleEmailChange} type="email" name="email" id="email-field" className="signup-form-field" placeholder="Enter Email"></Form.Control>
@@ -122,11 +124,6 @@ export const SignUp = () => {
                                         name="major"
                                         id="major"
                                     />
-                                {/* <Form.Control as="select" name="major" id="major" multiple className="signup-form-field">
-                                    {success.majors.map((value, index) => {
-                                        return <option key={index} value={value}>{value}</option>
-                                    })}
-                                </Form.Control> */}
                             </Form.Group>
                             <Form.Group>
                                 <Form.Label className="signup-form-field">Select Your Minor(s) -- [CTRL + Click to Select Multiple]</Form.Label>
@@ -140,11 +137,6 @@ export const SignUp = () => {
                                         name="minor"
                                         id="minor"
                                     />
-                                {/* <Form.Control as="select" name="minor" id="minor" multiple className="signup-form-field">
-                                    {success.minors.map((value, index) => {
-                                        return <option key={index} value={value}>{value}</option>
-                                    })}
-                                </Form.Control> */}
                             </Form.Group>
                             <Form.Group>
                                 <Form.Label className="signup-form-field">Select Your Requirement Year</Form.Label>
@@ -171,11 +163,7 @@ export const SignUp = () => {
                         <div className="col"></div>
                     </div>
                 </div>
-                <h2> Selected values: {JSON.stringify(minorSelectedValue, null, 2)} </h2>
-                <h2> Email: {password} </h2>
-                <p> Already have an account? Click <Link to="/">Here</Link> to login. </p>
             </div>
-            <AdminFooter/>
         </div>
     );
 }
