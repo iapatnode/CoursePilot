@@ -256,18 +256,18 @@ def home():
         all_schedules = []
         cursor = conn.cursor()
         get_schedules_query = "select * from Schedule where email = %s"
-        #cursor.execute(get_schedules_query, (email,))
-        #result = cursor.fetchall()
-        # for schedule in result:
-        #     all_schedules.append(
-        #         {
-        #             "scheduleName": schedule[0],
-        #             "dateModified": str(schedule[1]),
-        #             "email": schedule[2],
-        #             "scheduleSemester": schedule[3]
-        #         }
-        #     )
-        # #print(all_schedules)
+        cursor.execute(get_schedules_query, (email,))
+        result = cursor.fetchall()
+        for schedule in result:
+            all_schedules.append(
+                {
+                    "scheduleName": schedule[0],
+                    "dateModified": str(schedule[1]),
+                    "email": schedule[2],
+                    "scheduleSemester": schedule[3]
+                }
+            )
+        #print(all_schedules)
         return json.dumps(all_schedules)
 
     #If a post request is sent, add schedule information to the Schedule database
