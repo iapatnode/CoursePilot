@@ -110,7 +110,9 @@ def sign_up():
         requirement_year = json_data.get("requirement_year")
         graduation_year = json_data.get("graduation_year")
         major = json_data.get("major")
+        print(major)
         minor = json_data.get("minor")
+        print(minor)
 
         #Check to see that the user gives a valid gcc email address
         if email is None or email == "":
@@ -153,9 +155,10 @@ def sign_up():
             #adds student and his/her info to the database
             try:
                 cursor.execute(newStudentQuery, newStudentData)
+                print("Inserted student into the database")
                 conn.commit()
 
-            except err as error:
+            except error as error:
                 #If you cannot insert the invidual into the database, print error and reroute
                 print("Insertion in database unsuccessful: " + str(err))
                 return redirect("http//localhost:3000/SignUp")
@@ -175,26 +178,31 @@ def sign_up():
                         mid = row[0]
                     
                     #Add the current major to the database
-                    addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
-                    cursor.execute(addToMajorMinor, (email, mid))
-                    conn.commit()
+                        addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
+                        cursor.execute(addToMajorMinor, (email, mid))
+                        print("Added a major")
+                
+                conn.commit()
                 
                 #For every minor that the student chooses, add it to the StudentMajorMinor database table
-                for mm in minor:
-                    mid = 0
-                    cursor.execute(studentDegreeQuery, (mm, requirement_year, 1))
-                    result = cursor.fetchall()
+                if minor is not None or minor != "":
+                    for mm in minor:
+                        mid = 0
+                        cursor.execute(studentDegreeQuery, (mm, requirement_year, 1))
+                        result = cursor.fetchall()
 
-                    #Get the minor if of the minor to be added to the database
-                    for row in result:
-                        mid = row[0]
+                        #Get the minor if of the minor to be added to the database
+                        for row in result:
+                            mid = row[0]
+                        
+                        #Add the current minor to the database
+                            addToMinor = "insert into StudentMajorMinor values (%s, %s)"
+                            cursor.execute(addToMinor, (email, mid))
+                            print("Added a minor")
                     
-                    #Add the current minor to the database
-                    addToMinor = "insert into StudentMajorMinor values (%s, %s)"
-                    cursor.execute(addToMinor, (email, mid))
                     conn.commit()
             
-            except err as error:
+            except error as error:
                 #If you cannot insert the major/minor into the database, print error and reroute
                 print("Insertion in database unsuccessful: " + str(err))
                 return redirect("http//localhost:3000/SignUp")
@@ -248,18 +256,18 @@ def home():
         all_schedules = []
         cursor = conn.cursor()
         get_schedules_query = "select * from Schedule where email = %s"
-        cursor.execute(get_schedules_query, (email,))
-        result = cursor.fetchall()
-        for schedule in result:
-            all_schedules.append(
-                {
-                    "scheduleName": schedule[0],
-                    "dateModified": str(schedule[1]),
-                    "email": schedule[2],
-                    "scheduleSemester": schedule[3]
-                }
-            )
-        print(all_schedules)
+        #cursor.execute(get_schedules_query, (email,))
+        #result = cursor.fetchall()
+        # for schedule in result:
+        #     all_schedules.append(
+        #         {
+        #             "scheduleName": schedule[0],
+        #             "dateModified": str(schedule[1]),
+        #             "email": schedule[2],
+        #             "scheduleSemester": schedule[3]
+        #         }
+        #     )
+        # #print(all_schedules)
         return json.dumps(all_schedules)
 
     #If a post request is sent, add schedule information to the Schedule database
@@ -343,83 +351,83 @@ def schedule():
         return data
 
 
-@app.route("/api/schedule/<name>")
-def schedule_with_name(name):
-    cursor = conn.cursor()
-    email = session["email"]
-    schedule_course_list = []
-    if request.method == "GET":
-        schedule_course_info = """
-            select * from Class join ScheduleClass on Class.courseCode = ScheduleClass.courseCode
-            where schedule_name = %s and email = %s
-            """
-        cursor.execute(schedule_course_into, (name, email))
-        results = cursor.fetchall()
-        for course in results:
-            section = course[0]
-            start_time = course[2]
-            end_time = course[3]
-            meeting_days = course[4]
-            course_code = course[5]
-            schedule_course_list.extend(
-                {
-                    "code": course_code,
-                    "section": section,
-                    "start": start_time,
-                    "end": end_time,
-                    "days": meeting_days
-                }
-            )
-        #Now, need to create a new calendar entry for each day a class is offered
-        data = []
-        i = 1
-        for c in schedule_course_list:
-            for day in c["days"]:
-                schedule_event = {}
-                if day == "M":
-                    schedule_event = {
-                        "id": i,
-                        "text": f"{c["code"]} {c["section"]}",
-                        "start": f"2013-03-25T{c["start"]}",
-                        "end": f"2013-03-25T{c["end"]}",
-                        "resource": "monday"
-                    }
-                elif day == "T":
-                    schedule_event = {
-                        "id": i,
-                        "text": f"{c["code"]} {c["section"]}",
-                        "start": f"2013-03-25T{c["start"]}",
-                        "end": f"2013-03-25T{c["end"]}",
-                        "resource": "tuesday"
-                    }
-                elif day == "W":
-                    schedule_event = {
-                        "id": i,
-                        "text": f"{c["code"]} {c["section"]}",
-                        "start": f"2013-03-25T{c["start"]}",
-                        "end": f"2013-03-25T{c["end"]}",
-                        "resource": "wednesday"
-                    }
-                elif day == "R":
-                    schedule_event = {
-                        "id": i,
-                        "text": f"{c["code"]} {c["section"]}",
-                        "start": f"2013-03-25T{c["start"]}",
-                        "end": f"2013-03-25T{c["end"]}",
-                        "resource": "thursday"
-                    }
-                else:
-                    schedule_event = {
-                        "id": i,
-                        "text": f"{c["code"]} {c["section"]}",
-                        "start": f"2013-03-25T{c["start"]}",
-                        "end": f"2013-03-25T{c["end"]}",
-                        "resource": "friday"
-                    }
-                i = i + 1
-            data.append(schedule_event)
+# @app.route("/api/schedule/<name>")
+# def schedule_with_name(name):
+#     cursor = conn.cursor()
+#     email = session["email"]
+#     schedule_course_list = []
+#     if request.method == "GET":
+#         schedule_course_info = """
+#             select * from Class join ScheduleClass on Class.courseCode = ScheduleClass.courseCode
+#             where schedule_name = %s and email = %s
+#             """
+#         cursor.execute(schedule_course_into, (name, email))
+#         results = cursor.fetchall()
+#         for course in results:
+#             section = course[0]
+#             start_time = course[2]
+#             end_time = course[3]
+#             meeting_days = course[4]
+#             course_code = course[5]
+#             schedule_course_list.extend(
+#                 {
+#                     "code": course_code,
+#                     "section": section,
+#                     "start": start_time,
+#                     "end": end_time,
+#                     "days": meeting_days
+#                 }
+#             )
+#         #Now, need to create a new calendar entry for each day a class is offered
+#         data = []
+#         i = 1
+#         for c in schedule_course_list:
+#             for day in c["days"]:
+#                 schedule_event = {}
+#                 if day == "M":
+#                     schedule_event = {
+#                         "id": i,
+#                         "text": f"{c["code"]} {c["section"]}",
+#                         "start": f"2013-03-25T{c["start"]}",
+#                         "end": f"2013-03-25T{c["end"]}",
+#                         "resource": "monday"
+#                     }
+#                 elif day == "T":
+#                     schedule_event = {
+#                         "id": i,
+#                         "text": f"{c["code"]} {c["section"]}",
+#                         "start": f"2013-03-25T{c["start"]}",
+#                         "end": f"2013-03-25T{c["end"]}",
+#                         "resource": "tuesday"
+#                     }
+#                 elif day == "W":
+#                     schedule_event = {
+#                         "id": i,
+#                         "text": f"{c["code"]} {c["section"]}",
+#                         "start": f"2013-03-25T{c["start"]}",
+#                         "end": f"2013-03-25T{c["end"]}",
+#                         "resource": "wednesday"
+#                     }
+#                 elif day == "R":
+#                     schedule_event = {
+#                         "id": i,
+#                         "text": f"{c["code"]} {c["section"]}",
+#                         "start": f"2013-03-25T{c["start"]}",
+#                         "end": f"2013-03-25T{c["end"]}",
+#                         "resource": "thursday"
+#                     }
+#                 else:
+#                     schedule_event = {
+#                         "id": i,
+#                         "text": f"{c["code"]} {c["section"]}",
+#                         "start": f"2013-03-25T{c["start"]}",
+#                         "end": f"2013-03-25T{c["end"]}",
+#                         "resource": "friday"
+#                     }
+#                 i = i + 1
+#             data.append(schedule_event)
             
-        return json.dumps(data)
+#         return json.dumps(data)
 
 
 # function to auto generate the schedule

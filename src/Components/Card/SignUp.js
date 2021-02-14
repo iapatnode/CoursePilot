@@ -101,7 +101,7 @@ export const SignUp = () => {
                 <div className="container">
                     <div className="row">
                         <div className="col-md-4 col-md-offset-4"></div>
-                        <Form id="signup-form" onSubmit={handleSubmit}>
+                        <Form id="signup-form">
                             <Form.Group>
                                 <Form.Label>Email Address</Form.Label>
                                 <Form.Control onChange={handleEmailChange} type="email" name="email" id="email-field" className="signup-form-field" placeholder="Enter Email"></Form.Control>
