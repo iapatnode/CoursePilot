@@ -77,6 +77,7 @@ with open('2020-2021.csv', newline='') as f:
             else:
                 classSemester.append("spring")
 
+    
     #variables for determining whether the course is offered in the fall, spring, or both
     prevCode = classCode[0]
     semesterLst = []
@@ -112,6 +113,16 @@ with open('2020-2021.csv', newline='') as f:
         courseSemester.append("spring")
     elif "fall" in semesterLst:
         courseSemester.append("fall")
+
+# for index in range(len(classCode)):
+#     if classCode[index] == "BIOL 234":
+#         print(classCode[index])
+#         print(classSection[index])
+#         print(classSemester[index])
+#         print(classDayOfWeek[index])
+#         print(classStart[index])
+#         print(classEnd[index])
+#         print("\n")
 
 #Courses that potentially alternate every semester
 alternateCourses = []
@@ -384,10 +395,15 @@ with open('2018-2019.csv', newline='') as f:
                 courseSemester[courseIndex] = "alternate"
 
 #TODO: Get rest of courses
-# index = courseCode.index("MATH 465")
-# print(courseCode[index])
-# print(courseName[index])
-# print(courseSemester[index])
+# for index in range(len(classCode)):
+#     if classCode[index] == "BIOL 234":
+#         print(classCode[index])
+#         print(classSection[index])
+#         print(classSemester[index])
+#         print(classDayOfWeek[index])
+#         print(classStart[index])
+#         print(classEnd[index])
+#         print("\n")
 
 classDictionary["courseCode"] = classCode
 classDictionary["courseSection"] = classSection
@@ -420,13 +436,13 @@ try:
     cursor = conn.cursor()
 
     #Inserts Courses into Course table
-    insertCourseQuery = "Insert into Course(courseCode, courseName, creditHours, courseSemester) values (%s, %s, %s, %s)"
+    # insertCourseQuery = "Insert into Course(courseCode, courseName, creditHours, courseSemester) values (%s, %s, %s, %s)"
     
-    for index in range(len(courseDictionary["courseCode"])):
-        courseDetails = (courseDictionary["courseCode"][index], courseDictionary["courseName"][index], courseDictionary["creditHours"][index], courseDictionary["courseSemester"][index])
-        cursor.execute(insertCourseQuery, courseDetails)
+    # for index in range(len(courseDictionary["courseCode"])):
+    #     courseDetails = (courseDictionary["courseCode"][index], courseDictionary["courseName"][index], courseDictionary["creditHours"][index], courseDictionary["courseSemester"][index])
+    #     cursor.execute(insertCourseQuery, courseDetails)
 
-    conn.commit()
+    # conn.commit()
 
     #Inserts classes (course sections) into Class table
     insertClassQuery = "Insert into Class(courseCode, courseSection, classSemester, meetingDays, startTime, endTime) values (%s, %s, %s, %s, %s, %s)"
