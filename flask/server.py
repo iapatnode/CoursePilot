@@ -82,7 +82,6 @@ def login():
 
 @app.route("/api/signup", methods=["POST", "GET"])
 def sign_up():
-    session["email"] = ""
     if request.method == "POST":
         valid = True
         data = request.data.decode("utf-8")
@@ -138,6 +137,8 @@ def sign_up():
             cursor = conn.cursor()
             newStudentQuery = "Insert into Student values (%s, %s, %s)"
             newStudentData = (email, password, graduation_year)
+            session["email"] = email
+            print(session["email"])
 
             #adds student and his/her info to the database
             try:
@@ -160,10 +161,10 @@ def sign_up():
                     for row in result:
                         mid = row[0]
                     
-                    addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
-                    cursor.execute(addToMajorMinor, (email, mid))
-                    print("Inserted one major")
-                    conn.commit()
+                        addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
+                        cursor.execute(addToMajorMinor, (email, mid))
+                        print("Inserted one major")
+                        conn.commit()
                 
                 for mm in minor:
                     mid = 0
@@ -172,10 +173,10 @@ def sign_up():
                     for row in result:
                         mid = row[0]
                     
-                    addToMinor = "insert into StudentMajorMinor values (%s, %s)"
-                    cursor.execute(addToMinor, (email, mid))
-                    print("Inserted one minor")
-                    conn.commit()
+                        addToMinor = "insert into StudentMajorMinor values (%s, %s)"
+                        cursor.execute(addToMinor, (email, mid))
+                        print("Inserted one minor")
+                        conn.commit()
 
                 print("Added majo/minorr to the database")
             
@@ -189,12 +190,14 @@ def sign_up():
             # conn.close()
 
             session["email"] = email #use this to determine in the future who is logged in
+            print("Made it here")
             # return redirect("http://localhost:3000/home")
             return jsonify({'redirect_to_home': True}), 200
         else:
             return jsonify({'redirect_to_home': False}), 400
 
     if request.method == "GET":
+        print(session.get("email"))
         # Get a list of all majors and minors from the database
         cursor = conn.cursor()
         major_query = "select distinct degreeName from MajorMinor where isMinor = 0"
