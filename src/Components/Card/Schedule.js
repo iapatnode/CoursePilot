@@ -37,20 +37,51 @@ class Schedule extends Component {
 
   componentDidMount() {
 
-    axios.get('http://localhost:5000/api/schedule')
-        .then((response) => {
-            console.log(response);
-            this.setState({
-                columns: [
-                    { name: "Monday", id: "monday", start: "2013-03-25" },
-                    { name: "Tuesday", id: "tuesday", start: "2013-03-25" },
-                    { name: "Wednesday", id: "wednesday", start: "2013-03-25" },
-                    { name: "Thursday", id: "thursday", start: "2013-03-25" },
-                    { name: "Friday", id: "friday", start: "2013-03-25" },
-                ],
-                events: response.data,
-            })
-        })
+//     const parameters = {
+//       email: email,
+//       password: password ,
+//       confirm_password: confirm,
+//       major: majorSelectedValue,
+//       minor: minorSelectedValue,
+//       requirement_year: requirement,
+//       graduation_year: graduation 
+//  }
+
+    // axios.get('http://localhost:5000/api/schedule')
+    //     .then((response) => {
+    //         console.log(response);
+    //         this.setState({
+    //             columns: [
+    //                 { name: "Monday", id: "monday", start: "2013-03-25" },
+    //                 { name: "Tuesday", id: "tuesday", start: "2013-03-25" },
+    //                 { name: "Wednesday", id: "wednesday", start: "2013-03-25" },
+    //                 { name: "Thursday", id: "thursday", start: "2013-03-25" },
+    //                 { name: "Friday", id: "friday", start: "2013-03-25" },
+    //             ],
+    //             events: response.data,
+    //         })
+    //     })
+
+      //   axios.post('/api/search', parameters).then(response => {
+      //     alert("Course Searched!")
+      //     window.location = '/Schedule'
+      // })
+      // .catch((error) => {
+      //     if (error.status === 400) {
+      //         alert("Error")
+      //         window.location = '/Schedule'
+      //     }
+      //     else {
+      //         window.location = '/Home'
+      //     }
+      // })
+
+    //   useEffect(() => {
+    //     axios.get("/api/signup").then(response => {
+    //         setSuccess(response.data);
+    //         setLoading(false);
+    //     });
+    // }, []);
   }
 
   render() {
@@ -81,7 +112,7 @@ class Schedule extends Component {
                     </div>
                     <div className="col-md-3" id="search-container">
                       <h2> Search Courses </h2>
-                        <Form noValidate autocomplete="off" method="post" action="/api/search">
+                        <Form noValidate autocomplete="off" method="get" action="/api/search">
                             <Form.Group>
                               <Form.Control 
                                 type="search"

@@ -255,31 +255,40 @@ def home():
 
 @app.route("/api/search", methods=["GET","POST"])
 def search():
-    if request.method == "POST":
+    if request.method == "GET":
         search_val = ""
         search_val = request.form.get("outlined-search")
         cursor = conn.cursor()
         classArray = []
+        courseArray = []
         # class_query = "select * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like ?;", (f"%{(search_val)}%",)
         
         print(search_val)
         # cursor.execute(class_query)
 
-        # cursor.execute(''' 
-        #     SELECT * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like %s;
-        # ''', (f"%{(search_val)}%",))
-
-        cursor.execute('''
-            SELECT * from Course where Course.courseCode like %s;
+        cursor.execute(''' 
+            SELECT * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like %s;
         ''', (f"%{(search_val)}%",))
+
+        # cursor.execute('''
+        #     SELECT * from Course where Course.courseCode like %s;
+        # ''', (f"%{(search_val)}%",))
 
         class_table = cursor.fetchall()
         print(class_table)
 
         result_string = ""
         for row in class_table:
-            # classArray.append(row[0])
-            # classArray.append(row[2])
+            course_dict = {
+                "course_code": row[0],
+                "course_semester": row[1],
+                "course_name": row[2],
+                "course_credits": row[3],
+                "course_section": row[4],
+                "course_time": str(row[6])
+            }
+            courseArray.append(course_dict)
+
             for item in row:
                 # print(row)
                 result_string += str(item)
@@ -288,8 +297,9 @@ def search():
             print(row)
             
         
-        return (result_string)
+        # return (result_string)
         # return (search_val)
+        return json.dumps(courseArray)
 
 @app.route('/api/schedule', methods=["GET", "POST"])
 def schedule():
