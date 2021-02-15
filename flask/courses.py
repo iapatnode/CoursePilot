@@ -56,7 +56,7 @@ with open('2020-2021.csv', newline='') as f:
 
                 if oldStart[1] == ":":
                     temp = int(oldStart[0]) + 12
-                    classStart.append(oldStart.replace(oldStart[0], str(temp)))
+                    classStart.append(oldStart.replace(oldStart[0], str(temp), 1))
                 else:
                     classStart.append(oldStart)
 
@@ -66,8 +66,8 @@ with open('2020-2021.csv', newline='') as f:
                 oldEnd = row[15].replace(" PM", '')
 
                 if oldEnd[1] == ":":
-                    temp = int(oldEnd[0]) + 12
-                    classEnd.append(oldEnd.replace(oldEnd[0], str(temp)))
+                    tempTwo = int(oldEnd[0]) + 12
+                    classEnd.append(oldEnd.replace(oldEnd[0], str(tempTwo), 1))
                 else:
                     classEnd.append(oldEnd)
 
@@ -159,7 +159,7 @@ with open('2019-2020.csv', newline='') as f:
 
                 if oldStart[1] == ":":
                     temp = int(oldStart[0]) + 12
-                    tempClassStart.append(oldStart.replace(oldStart[0], str(temp)))
+                    tempClassStart.append(oldStart.replace(oldStart[0], str(temp), 1))
                 else:
                     tempClassStart.append(oldStart)
 
@@ -169,8 +169,8 @@ with open('2019-2020.csv', newline='') as f:
                 oldEnd = row[15].replace(" PM", '')
 
                 if oldEnd[1] == ":":
-                    temp = int(oldEnd[0]) + 12
-                    tempClassEnd.append(oldEnd.replace(oldEnd[0], str(temp)))
+                    tempTwo = int(oldEnd[0]) + 12
+                    tempClassEnd.append(oldEnd.replace(oldEnd[0], str(tempTwo), 1))
                 else:
                     tempClassEnd.append(oldEnd)
 
@@ -294,7 +294,7 @@ with open('2018-2019.csv', newline='') as f:
 
                 if oldStart[1] == ":":
                     temp = int(oldStart[0]) + 12
-                    tempClassStart.append(oldStart.replace(oldStart[0], str(temp)))
+                    tempClassStart.append(oldStart.replace(oldStart[0], str(temp), 1))
                 else:
                     tempClassStart.append(oldStart)
 
@@ -305,8 +305,8 @@ with open('2018-2019.csv', newline='') as f:
 
                 #TODO: fix this
                 if oldEnd[1] == ":":
-                    temp = int(oldEnd[0]) + 12
-                    tempClassEnd.append(oldEnd.replace(oldEnd[0], str(temp)))
+                    tempTwo = int(oldEnd[0]) + 12
+                    tempClassEnd.append(oldEnd.replace(oldEnd[0], str(tempTwo), 1))
                 else:
                     tempClassEnd.append(oldEnd)
 
@@ -383,8 +383,7 @@ with open('2018-2019.csv', newline='') as f:
             elif tempCode[index] in alternateCourses and courseSemester[courseIndex] == "spring" and tempSemester[index] == "spring":
                 courseSemester[courseIndex] = "alternate"
 
-#TODO: Get rest of course information
-
+#TODO: Get rest of courses
 # index = courseCode.index("MATH 465")
 # print(courseCode[index])
 # print(courseName[index])
@@ -397,12 +396,6 @@ classDictionary["meetingDays"] = classDayOfWeek
 classDictionary["startTime"] = classStart
 classDictionary["endTime"] = classEnd
 
-print(classDictionary["courseCode"][8])
-print("\n")
-print(classDictionary["startTime"][8])
-print("\n")
-print(classDictionary["endTime"][8])
-
 courseDictionary["courseCode"] = courseCode
 courseDictionary["courseName"] = courseName
 courseDictionary["courseSemester"] = courseSemester
@@ -414,32 +407,37 @@ if(len(classCode) == len(classSection) and len(classSection) == len(classSemeste
 if len(courseCode) == len(courseName) and len(courseName) == len(courseSemester) and len(courseSemester) == len(courseHours):
     print("Course dictionary complete")
 
-#Credentails for database connection
+#Credentials for database connection
 scriptdir = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(scriptdir, "config.json")) as text:
     config = json.load(text)
 
+
 try:
+    #Connects to the Course Pilot database
     conn = connect(host=config.get('host'), user=config.get('username'), password=config.get('password'), database=config.get('database'))
     
     cursor = conn.cursor()
 
+    #Inserts Courses into Course table
     insertCourseQuery = "Insert into Course(courseCode, courseName, creditHours, courseSemester) values (%s, %s, %s, %s)"
     
-    # for index in range(len(courseDictionary["courseCode"])):
-    #     courseDetails = (courseDictionary["courseCode"][index], courseDictionary["courseName"][index], courseDictionary["creditHours"][index], courseDictionary["courseSemester"][index])
-    #     cursor.execute(insertCourseQuery, courseDetails)
+    for index in range(len(courseDictionary["courseCode"])):
+        courseDetails = (courseDictionary["courseCode"][index], courseDictionary["courseName"][index], courseDictionary["creditHours"][index], courseDictionary["courseSemester"][index])
+        cursor.execute(insertCourseQuery, courseDetails)
 
-    # conn.commit()
+    conn.commit()
 
-    # insertClassQuery = "Insert into Class(courseCode, courseSection, classSemester, meetingDays, startTime, endTime) values (%s, %s, %s, %s, %s, %s)"
+    #Inserts classes (course sections) into Class table
+    insertClassQuery = "Insert into Class(courseCode, courseSection, classSemester, meetingDays, startTime, endTime) values (%s, %s, %s, %s, %s, %s)"
     
-    # for index in range(len(classDictionary["courseCode"])):
-    #     classDetails = (classDictionary["courseCode"][index], classDictionary["courseSection"][index], classDictionary["classSemester"][index], classDictionary["meetingDays"][index], classDictionary["startTime"][index], classDictionary["endTime"][index])
-    #     cursor.execute(insertClassQuery, classDetails)
+    for index in range(len(classDictionary["courseCode"])):
+        classDetails = (classDictionary["courseCode"][index], classDictionary["courseSection"][index], classDictionary["classSemester"][index], classDictionary["meetingDays"][index], classDictionary["startTime"][index], classDictionary["endTime"][index])
+        cursor.execute(insertClassQuery, classDetails)
 
-    # conn.commit()
+    conn.commit()
 
+    #DB clean up
     cursor.close()
     conn.close()
 
