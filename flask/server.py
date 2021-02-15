@@ -294,29 +294,33 @@ def search():
         classArray = []
         # class_query = "select * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like ?;", (f"%{(search_val)}%",)
         
-        # print(search_val)
+        print(search_val)
         # cursor.execute(class_query)
 
-        cursor.execute(''' 
-            SELECT * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like %s;
+        # cursor.execute(''' 
+        #     SELECT * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like %s;
+        # ''', (f"%{(search_val)}%",))
+
+        cursor.execute('''
+            SELECT * from Course where Course.courseCode like %s;
         ''', (f"%{(search_val)}%",))
 
         class_table = cursor.fetchall()
-        # print(class_table)
+        print(class_table)
 
         result_string = ""
         for row in class_table:
-            classArray.append(row[0])
-            classArray.append(row[2])
+            # classArray.append(row[0])
+            # classArray.append(row[2])
             for item in row:
                 # print(row)
-                result_string += str(item) + "\n"
+                result_string += str(item)
 
         for row in classArray:
             print(row)
             
         
-        return result_string
+        return (result_string)
         # return (search_val)
 
 @app.route('/api/schedule', methods=["GET", "POST"])

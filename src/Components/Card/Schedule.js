@@ -85,7 +85,7 @@ class Schedule extends Component {
                             <Form.Group>
                               <Form.Control 
                                 type="search"
-                                name="outlines-search" 
+                                name="outlined-search" 
                                 placeholder="Enter Course Name/Code Here">
                               </Form.Control>
                             </Form.Group>
