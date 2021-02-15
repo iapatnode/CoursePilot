@@ -145,7 +145,7 @@ def sign_up():
                 print("Inserted student into the database")
 
                 conn.commit()
-            except error as error:
+            except Error as error:
                 #If you cannot insert the invidual into the database, print error and reroute
                 print("Insertion in database unsuccessful: " + str(error))
                 return redirect("http//localhost:3000/SignUp")
@@ -179,9 +179,9 @@ def sign_up():
 
                 print("Added majo/minorr to the database")
             
-            except err as error:
+            except Error as error:
                 #If you cannot insert the major/minor into the database, print error and reroute
-                print("Insertion in database unsuccessful: " + str(err))
+                print("Insertion in database unsuccessful: " + str(error))
                 return redirect("http//localhost:3000/SignUp")
 
             #DBMS connection cleanup
