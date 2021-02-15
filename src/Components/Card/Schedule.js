@@ -47,20 +47,20 @@ class Schedule extends Component {
 //       graduation_year: graduation 
 //  }
 
-    // axios.get('http://localhost:5000/api/schedule')
-    //     .then((response) => {
-    //         console.log(response);
-    //         this.setState({
-    //             columns: [
-    //                 { name: "Monday", id: "monday", start: "2013-03-25" },
-    //                 { name: "Tuesday", id: "tuesday", start: "2013-03-25" },
-    //                 { name: "Wednesday", id: "wednesday", start: "2013-03-25" },
-    //                 { name: "Thursday", id: "thursday", start: "2013-03-25" },
-    //                 { name: "Friday", id: "friday", start: "2013-03-25" },
-    //             ],
-    //             events: response.data,
-    //         })
-    //     })
+    axios.get('http://localhost:5000/api/schedule')
+        .then((response) => {
+            console.log(response);
+            this.setState({
+                columns: [
+                    { name: "Monday", id: "monday", start: "2013-03-25" },
+                    { name: "Tuesday", id: "tuesday", start: "2013-03-25" },
+                    { name: "Wednesday", id: "wednesday", start: "2013-03-25" },
+                    { name: "Thursday", id: "thursday", start: "2013-03-25" },
+                    { name: "Friday", id: "friday", start: "2013-03-25" },
+                ],
+                events: response.data,
+            })
+        })
 
       //   axios.post('/api/search', parameters).then(response => {
       //     alert("Course Searched!")
