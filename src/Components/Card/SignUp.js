@@ -21,6 +21,13 @@ export const SignUp = () => {
     const minorOptions = []
     const majorOptions = []
 
+    useEffect(() => {
+        axios.get("/api/signup").then(response => {
+            setSuccess(response.data);
+            setLoading(false);
+        });
+    }, []);
+
     const handleEmailChange = (e) => {
         setEmail(e.target.value)
     }
@@ -60,27 +67,20 @@ export const SignUp = () => {
              graduation_year: graduation 
         }
         
-        axios.post('/api/signup', parameters).then(response => {
+        axios.post('/api/signup', parameters).finally(response => {
             alert("Account Creation Successful!")
             window.location = '/Home'
         })
-        .catch((error) => {
-            if (error.status === 400) {
-                alert("Error")
-                window.location = '/Signup'
-            }
-            else {
-                window.location = '/Home'
-            }
-        })
+        // var xhttp = new XMLHttpRequest();
+        // xhttp.onreadystatechange = function() {
+        //     if(this.readyState == 4 && this.status == 200) {
+        //         alert("Account Creation Successful!")
+        //         window.location = '/Home'
+        //     }
+        // };
+        // xhttp.open("POST", "/api/signup", true);
+        // xhttp.send(parameters);
     }
-
-    useEffect(() => {
-        axios.get("/api/signup").then(response => {
-            setSuccess(response.data);
-            setLoading(false);
-        });
-    }, []);
     
     if (isLoading) {
         return <div> Loading... </div>
@@ -113,7 +113,7 @@ export const SignUp = () => {
                                 <Form.Control onChange={handleConfirmChange} type="password" name="confirm-password" id="confirm-password-field" className="signup-form-field" placeholder="Confirm Password"></Form.Control>
                             </Form.Group>
                             <Form.Group>
-                                <Form.Label className="signup-form-field">Select Your Major(s) -- [CTRL + Click to Select Multiple]</Form.Label>
+                                <Form.Label className="signup-form-field">Select Your Major(s)</Form.Label>
                                 <Select 
                                         value={majorOptions.filter(obj => majorSelectedValue.includes(obj.value))}
                                         onChange={handleMajorChange}
@@ -126,7 +126,7 @@ export const SignUp = () => {
                                     />
                             </Form.Group>
                             <Form.Group>
-                                <Form.Label className="signup-form-field">Select Your Minor(s) -- [CTRL + Click to Select Multiple]</Form.Label>
+                                <Form.Label className="signup-form-field">Select Your Minor(s)</Form.Label>
                                     <Select 
                                         value={minorOptions.filter(obj => minorSelectedValue.includes(obj.value))}
                                         onChange={handleChange}
