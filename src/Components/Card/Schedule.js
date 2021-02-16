@@ -83,6 +83,55 @@ class Schedule extends Component {
     //     });
     // }, []);
   }
+  // autoSearch() {
+  //   let searchBox = document.getElementById("outlined-search")
+  //   let container = document.getElementsByClassName("auto-complete")[0]
+    
+
+  //   console.log(searchBox.value)
+
+  //   let searchObject = {
+  //     "search": searchBox.value,
+  //   }
+    
+  //   fetch("/auto/search/", {
+  //     method: "GET",
+  //     headers: {
+  //         "Content-Type": "application/json"
+  //     },
+  //     body: JSON.stringify(searchObject)
+  // })
+  // .then(function(response){
+  //   if (response.ok) {
+  //     response.json().then(function(data){
+  //       let oldArray = document.getElementsByClassName("auto-complete")
+  //       for(let item of oldArray) {
+  //         item.remove()
+  //       }
+
+  //       if (data.length > 0) {
+  //         let items = document.createElement("div")
+
+  //         items.classList.add("auto-complete")
+  //         container.appendChild(items)
+
+  //         for(let course of data) {
+  //           let courseCode = course[0]
+  //           let courseName = course[2]
+  //           let oneItem = document.createElement("div")
+  //           oneItem.innerHTML = courseName
+  //           oneItem.addEventListener("click", function() {
+  //             window.location.href = "/api/search/" + courseCode
+  //           })
+
+  //           items.appendChild(oneItem)
+  //         }
+  //       }
+  //     })
+  //   }
+  // })
+    
+  // }
 
   render() {
     var {...config} = this.state;
@@ -112,11 +161,12 @@ class Schedule extends Component {
                     </div>
                     <div className="col-md-3" id="search-container">
                       <h2> Search Courses </h2>
-                        <Form noValidate autocomplete="off" method="get" action="/api/search">
+                        <Form noValidate autocomplete="off" method="post" action="/api/search">
                             <Form.Group>
                               <Form.Control 
                                 type="search"
                                 name="outlined-search" 
+                                //id="outlined-search"
                                 placeholder="Enter Course Name/Code Here">
                               </Form.Control>
                             </Form.Group>

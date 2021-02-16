@@ -256,16 +256,40 @@ def home():
 
         return redirect("http://localhost:3000/Schedule")
 
+#attempt at using AJAX to load data from search bar        
+# @app.route("/search-auto/", methods=["POST"])
+# def autoSearch():
+#     cursor = conn.cursor()
+#     search_val = request.form.get("outlined-search")
+#     request_json = request.get_json()
+
+#     search_item = request_json["outlined-search"]
+#     print(search_val)
+#     if search_item:
+#         sets = cursor.execute(''' 
+#             SELECT * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like %s;
+#         ''', (f"%{(search_val)}%",))
+    
+#     else:
+#         sets = []
+    
+#     return jsonify(sets), 200
+
 @app.route("/api/search", methods=["GET","POST"])
 def search():
-    if request.method == "GET":
+    if request.method == "POST":
         search_val = ""
         search_val = request.form.get("outlined-search")
         cursor = conn.cursor()
         classArray = []
         courseArray = []
+        #request_json = request.get_json()
+        print('here')
         # class_query = "select * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like ?;", (f"%{(search_val)}%",)
         
+       # search_item = request_json["outlined-search"]
+        #print("search Item:" + search_item)
+
         print(search_val)
         # cursor.execute(class_query)
 
