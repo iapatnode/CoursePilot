@@ -127,22 +127,23 @@ with open('2019-2020.csv', newline='') as f:
     #parses data from each class (row) in the file
     for row in csv_f:
         #converts the list of days the course is offered into a single string
-        day = row[9] + row[10] + row[11] + row[12] + row[13]
+        day = row[10] + row[11] + row[12] + row[13] + row[14]
 
         #if day is not null (i.e., there is a timeslot) then add class to temporary lists
         if day:
             tempClassDays.append(day)
-            tempClassCode.append(row[2] + " " + row[3])
-            tempClassTitle.append(row[5])
-            tempClassSection.append(row[4])
-            tempClassHours.append(row[6])
+            tempClassCode.append(row[3] + " " + row[4])
+            tempClassTitle.append(row[6])
+            tempClassSection.append(row[5])
+            tempClassHours.append(row[7])
 
 
             #converts start and end times from 12 hour to 24 hour and removes unnecessary characters
-            if "AM" in row[14]:
-                tempClassStart.append(row[14].replace(" AM", ''))
+            formattedStart = row[15].replace("1/1/1900 ", '')
+            if "AM" in formattedStart:
+                tempClassStart.append(formattedStart.replace(" AM", ''))
             else:
-                oldStart = row[14].replace(" PM", '')
+                oldStart = formattedStart.replace(" PM", '')
 
                 if oldStart[1] == ":":
                     temp = int(oldStart[0]) + 12
@@ -150,10 +151,11 @@ with open('2019-2020.csv', newline='') as f:
                 else:
                     tempClassStart.append(oldStart)
             
-            if "AM" in row[15]:
-                tempClassEnd.append(row[15].replace(" AM", ''))
+            formattedEnd = row[16].replace("1/1/1900 ", '')
+            if "AM" in formattedEnd:
+                tempClassEnd.append(formattedEnd.replace(" AM", ''))
             else:
-                oldEnd = row[15].replace(" PM", '')
+                oldEnd = formattedEnd.replace(" PM", '')
 
                 if oldEnd[1] == ":":
                     tempTwo = int(oldEnd[0]) + 12
