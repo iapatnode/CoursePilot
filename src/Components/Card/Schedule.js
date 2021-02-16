@@ -19,24 +19,6 @@ const styles = {
   }
 };
 
-function classFilter() {
-  console.log("HELOOOOO")
-  var input, filter, ul, li, a, i, txtValue;
-  input = document.getElementById("myInput");
-  console.log(input)
-  filter = input.value.toUpperCase();
-  ul = document.getElementById("courses");
-  li = ul.getElementsByTagName("li");
-  for (i = 0; i < li.length; i++) {
-      a = li[i].getElementsByTagName("a")[0];
-      txtValue = a.textContent || a.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-          li[i].style.display = "";
-      } else {
-          li[i].style.display = "none";
-      }
-  }
-}
 
 class Schedule extends Component {
 
@@ -55,7 +37,6 @@ class Schedule extends Component {
   }
   
   classFilter() {
-    console.log("HELOOOOO")
     var input, filter, ul, li, a, i, txtValue;
     input = document.getElementById("myInput");
     console.log(input)
@@ -105,9 +86,10 @@ class Schedule extends Component {
               element.appendChild(para);
             })
             document.getElementById("courses").addEventListener("click", function(e) {
-              if(e.target && e.target.nodeName == "A") {
-                console.log(e.target.id + " was clicked");
-                text = e.target.id
+              if(e.target && e.target.nodeName === "A") {
+                //was console.log(e.target.id)
+                console.log(e.target.innerText + " was clicked");
+                text = e.target.innerText
                 console.log(text)
                 id = 1
               }
@@ -116,8 +98,6 @@ class Schedule extends Component {
             document.getElementById("myInput").addEventListener("click", function(e) {
               console.log("bar was clicked")
             })
-
-            console.log("Outta here");
             // this.setState({
             //   events: [
             //     {
@@ -175,7 +155,7 @@ class Schedule extends Component {
                         </Form>
                         
                         <div id="div1">
-                        <input type="text" id="myInput" onKeyUp={this.classFilter} placeholder="Search for names.." title="Type in a name"></input>
+                        <input type="text" id="myInput" onKeyUp={this.classFilter} placeholder="Search for Class" title="Type in a name"></input>
                           <ul id="courses">
                             
                           </ul>
