@@ -104,4 +104,6 @@ Minors = ["Mathematics":[1:["MATH101","MATH202"], 2:["MATH365","MATH475"]]]
 """
 
 
-'''SELECT degreeName, degreeHrs, Requirement.category, requiredHrs, totalHrs FROM MajorMinor JOIN (MajorMinorRequirements JOIN Requirement ON MajorMinorRequirements.category = Requirement.category) ON MajorMinor.degreeId = MajorMinorRequirements.degreeId WHERE isMinor=1 AND requirementYear=2017;'''
+'''SELECT degreeName, degreeHrs, Requirement.category, requiredHrs, totalHrs 
+FROM MajorMinor JOIN (MajorMinorRequirements JOIN Requirement ON MajorMinorRequirements.category = Requirement.category) ON MajorMinor.degreeId = MajorMinorRequirements.degreeId 
+WHERE isMinor=1 AND requirementYear=2017;'''

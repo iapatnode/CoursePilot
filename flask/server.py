@@ -344,7 +344,7 @@ def schedule():
         # print(search_val)
 
         cursor.execute(''' 
-            SELECT * from Course join Class on Class.courseCode = Course.courseCode order by courseName;
+            SELECT * from Course join Class on Class.courseCode = Course.courseCode order by Course.courseCode;
         ''',)
 
 

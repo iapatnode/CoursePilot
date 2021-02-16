@@ -78,10 +78,13 @@ class Schedule extends Component {
             response.data.forEach(element => {
               var para = document.createElement("li");
               var tag = document.createElement("a");
-              para.setAttribute("id", element["course_name"] + "/" + element["course_section"])
-              para.appendChild(tag)
+              para.setAttribute("id", element["course_name"] + "/" + element["course_section"]);
+              para.appendChild(tag);
               var node = document.createTextNode(element["course_name"] + " " + element["course_section"]);
+              var course = document.createTextNode(element["course_code"] + "\n");
+              tag.appendChild(course);
               tag.appendChild(node);
+              
               var element = document.getElementById("courses");
               element.appendChild(para);
             })
