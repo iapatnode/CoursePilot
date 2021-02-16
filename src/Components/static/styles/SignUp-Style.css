@@ -1,5 +1,4 @@
-
-#logo-sign-up {
+#logo_signup {
     height: 225px;
     width: 200px;
     margin: 1rem;
@@ -12,4 +11,9 @@
 #signup-text {
     color: #926DD6;
     margin: 1%;
+}
+
+#signup-header {
+    color: #926DD6;
+    margin: 0.5rem;
 }
