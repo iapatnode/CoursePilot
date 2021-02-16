@@ -30,9 +30,11 @@ class courseRequirement:
 #requiredCourses is a list of course requirements
 #hoursRemaining is the hours that a given user has remaining
 class minor:
-    def __init__(self, requiredCourses, hoursRemaining): 
+    def __init__(self, name, requiredCourses, hoursRemaining, requirementYear): 
+        self.name = name
         self.requiredCourses = requiredCourses
         self.hoursRemaining = hoursRemaining
+        self.requirementYear = requirementYear
 
 classesTaken = []
 remainingClassesInMajor = []
@@ -68,13 +70,33 @@ for (remainingClass: remainingClassesInMajor):
 We can begin by just grabbing the minors that are the same requirement year as student's major.
 Later, we could add a layer to reccomendations and provide them based on reqYear too.
 """
-def getMinors(requirementYear):
+def getMinorsByRequirementYear(requirementYear):
+    cursor = conn.cursor()
+    cursor.execute(''' SELECT * FROM MajorMinor WHERE isMinor=1 AND reqYear=%s;''', requirementYear)
+    result = cursor.fetchall()
+    minors = []
+    for entry in result:
+        minors.append(minor(entry[3], getRequiredClasses(entry[1], requirementYear), entry[4], entry[0]))
+    cursor.close()
+    return minors
 
 """
 Once we obtain the list of minors, we need to get the classes required for each of those minors.
 This will most likely be stored in a tree structure or something similar because we need to account for
 ands and ors.
 """
+def getRequiredClasses(degreeId, reqYear):
+    cursor = conn.cursor()
+    cursor.execute(''' SELECT * FROM MajorMinorRequirements WHERE degreeId=%s AND catYear=%s;''', (degreeId, reqYear))
+    result = cursor.fetchall()
+    for entry in result:
+
+
+
+
+
+
+    cursor.close()
 
 """
 JSON?
@@ -82,3 +104,4 @@ Minors = ["Mathematics":[1:["MATH101","MATH202"], 2:["MATH365","MATH475"]]]
 """
 
 
+'''SELECT degreeName, degreeHrs, Requirement.category, requiredHrs, totalHrs FROM MajorMinor JOIN (MajorMinorRequirements JOIN Requirement ON MajorMinorRequirements.category = Requirement.category) ON MajorMinor.degreeId = MajorMinorRequirements.degreeId WHERE isMinor=1 AND requirementYear=2017;'''
