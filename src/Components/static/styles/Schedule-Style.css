@@ -19,3 +19,8 @@
     align-items: center;
 }
 
+#div1 {
+    height: 450px;
+    overflow: scroll;
+    overflow-x: hidden;
+}

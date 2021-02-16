@@ -330,33 +330,79 @@ def search():
 @app.route('/api/schedule', methods=["GET", "POST"])
 def schedule():
      if request.method == "GET":
-        data = json.dumps(
-            [           
-                {
-                "id": 1,
-                "text": "SOCI 101",
-                "start": "2013-03-25T12:00:00",
-                "end": "2013-03-25T14:00:00",
-                "resource": "monday"
-                },
-                {
-                "id": 2,
-                "text": "COMP 141",
-                "start": "2013-03-25T15:00:00",
-                "end": "2013-03-25T17:00:00",
-                "resource": "wednesday"
-                },
-                {
-                "id": 3,
-                "text": "Event 3",
-                "start": "2013-03-25T18:00:00",
-                "end": "2013-03-25T19:00:00",
-                "resource": "friday"
-                },
-            ]
-        )
+        # search_val = ""
+        # search_val = request.form.get("outlined-search")
+        cursor = conn.cursor()
+        classArray = []
+        courseArray = []
+        #request_json = request.get_json()
+        # class_query = "select * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like ?;", (f"%{(search_val)}%",)
+        
+       # search_item = request_json["outlined-search"]
+        #print("search Item:" + search_item)
 
-        return data
+        # print(search_val)
+
+        cursor.execute(''' 
+            SELECT * from Course join Class on Class.courseCode = Course.courseCode;
+        ''',)
+
+
+        class_table = cursor.fetchall()
+        print(class_table)
+
+        result_string = ""
+        for row in class_table:
+            course_dict = {
+                "course_code": row[0],
+                "course_semester": row[1],
+                "course_name": row[2],
+                "course_credits": row[3],
+                "course_section": row[4],
+                "course_time": str(row[6])
+            }
+            courseArray.append(course_dict)
+
+            for item in row:
+                # print(row)
+                result_string += str(item)
+
+        for row in classArray:
+            print(row)
+            
+        
+        # return (result_string)
+        # return (search_val)
+        return json.dumps(courseArray)
+
+
+    #     data = json.dumps(
+    #         [           
+    #             {
+    #             "id": 1,
+    #             "text": "SOCI 101",
+    #             "start": "2013-03-25T12:00:00",
+    #             "end": "2013-03-25T14:00:00",
+    #             "resource": "monday"
+    #             },
+    #             {
+    #             "id": 2,
+    #             "text": "COMP 141",
+    #             "start": "2013-03-25T15:00:00",
+    #             "end": "2013-03-25T17:00:00",
+    #             "resource": "wednesday"
+    #             },
+    #             {
+    #             "id": 3,
+    #             "text": "Event 3",
+    #             "start": "2013-03-25T18:00:00",
+    #             "end": "2013-03-25T19:00:00",
+    #             "resource": "friday"
+    #             },
+    #         ]
+    #     )
+
+    #     return data
 
 
 

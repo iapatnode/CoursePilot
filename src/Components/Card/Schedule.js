@@ -19,7 +19,6 @@ const styles = {
   }
 };
 
-
 class Schedule extends Component {
 
   constructor(props) {
@@ -29,27 +28,24 @@ class Schedule extends Component {
       durationBarVisible: false,
       timeRangeSelectedHandling: "Enabled",
       eventDeleteHandling: "Update",
+      courseInfo: [],
       onEventDeleted: function(args) {
           this.message("Course Deleted: " + args.e.text());
       }
     };
   }
+  
 
   componentDidMount() {
 
-//     const parameters = {
-//       email: email,
-//       password: password ,
-//       confirm_password: confirm,
-//       major: majorSelectedValue,
-//       minor: minorSelectedValue,
-//       requirement_year: requirement,
-//       graduation_year: graduation 
-//  }
-
-    axios.get('http://localhost:5000/api/schedule')
+      axios.get('http://localhost:5000/api/schedule')
         .then((response) => {
-            console.log(response);
+            var start = "2013-03-25T12:00:00"
+            var end = "2013-03-25T13:00:00"
+            var text = ""
+            var id = 1
+            var resource = "monday"
+            console.log(response.data);
             this.setState({
                 columns: [
                     { name: "Monday", id: "monday", start: "2013-03-25" },
@@ -58,80 +54,43 @@ class Schedule extends Component {
                     { name: "Thursday", id: "thursday", start: "2013-03-25" },
                     { name: "Friday", id: "friday", start: "2013-03-25" },
                 ],
-                events: response.data,
+                events: [],
+                courseInfo: response.data,
             })
+            response.data.forEach(element => {
+              var para = document.createElement("li");
+              para.setAttribute("id", element["course_name"] + "/" + element["course_section"])
+              var node = document.createTextNode(element["course_name"] + " " + element["course_section"]);
+              para.appendChild(node);
+              var element = document.getElementById("courses");
+              element.appendChild(para);
+            })
+            document.getElementById("courses").addEventListener("click", function(e) {
+              if(e.target && e.target.nodeName == "LI") {
+                console.log(e.target.id + " was clicked");
+                text = e.target.id
+                console.log(text)
+                id = 1
+              }
+              
+            })
+            console.log("Outta here");
+            // this.setState({
+            //   events: [
+            //     {
+            //       "start": start,
+            //       "end": end,
+            //       "text": text,
+            //       "id": id,
+            //       "resource": resource
+            //     }
+            //   ]
+            // })
         })
+    
+    
 
-      //   axios.post('/api/search', parameters).then(response => {
-      //     alert("Course Searched!")
-      //     window.location = '/Schedule'
-      // })
-      // .catch((error) => {
-      //     if (error.status === 400) {
-      //         alert("Error")
-      //         window.location = '/Schedule'
-      //     }
-      //     else {
-      //         window.location = '/Home'
-      //     }
-      // })
-
-    //   useEffect(() => {
-    //     axios.get("/api/signup").then(response => {
-    //         setSuccess(response.data);
-    //         setLoading(false);
-    //     });
-    // }, []);
   }
-  // autoSearch() {
-  //   let searchBox = document.getElementById("outlined-search")
-  //   let container = document.getElementsByClassName("auto-complete")[0]
-    
-
-  //   console.log(searchBox.value)
-
-  //   let searchObject = {
-  //     "search": searchBox.value,
-  //   }
-    
-  //   fetch("/auto/search/", {
-  //     method: "GET",
-  //     headers: {
-  //         "Content-Type": "application/json"
-  //     },
-  //     body: JSON.stringify(searchObject)
-  // })
-  // .then(function(response){
-  //   if (response.ok) {
-  //     response.json().then(function(data){
-  //       let oldArray = document.getElementsByClassName("auto-complete")
-  //       for(let item of oldArray) {
-  //         item.remove()
-  //       }
-
-  //       if (data.length > 0) {
-  //         let items = document.createElement("div")
-
-  //         items.classList.add("auto-complete")
-  //         container.appendChild(items)
-
-  //         for(let course of data) {
-  //           let courseCode = course[0]
-  //           let courseName = course[2]
-  //           let oneItem = document.createElement("div")
-  //           oneItem.innerHTML = courseName
-  //           oneItem.addEventListener("click", function() {
-  //             window.location.href = "/api/search/" + courseCode
-  //           })
-
-  //           items.appendChild(oneItem)
-  //         }
-  //       }
-  //     })
-  //   }
-  // })
-    
-  // }
 
   render() {
     var {...config} = this.state;
@@ -161,16 +120,22 @@ class Schedule extends Component {
                     </div>
                     <div className="col-md-3" id="search-container">
                       <h2> Search Courses </h2>
-                        <Form noValidate autocomplete="off" method="post" action="/api/search">
+                        <Form noValidate autoComplete="off" method="post" action="/api/search">
+                        
                             <Form.Group>
                               <Form.Control 
                                 type="search"
                                 name="outlined-search" 
-                                //id="outlined-search"
                                 placeholder="Enter Course Name/Code Here">
                               </Form.Control>
                             </Form.Group>
                         </Form>
+                        
+                        <div id="div1">
+                          <ul id="courses">
+                            
+                          </ul>
+                        </div>
                     </div>
                 </div>
             </div>
