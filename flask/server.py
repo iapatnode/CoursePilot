@@ -284,7 +284,6 @@ def search():
         classArray = []
         courseArray = []
         #request_json = request.get_json()
-        print('here')
         # class_query = "select * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like ?;", (f"%{(search_val)}%",)
         
        # search_item = request_json["outlined-search"]
