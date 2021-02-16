@@ -56,13 +56,8 @@ class Schedule extends Component {
 
   componentDidMount() {
 
-      axios.get('http://localhost:5000/api/schedule')
+      axios.get('http://localhost:5000/api/filledSchedule')
         .then((response) => {
-            var start = "2013-03-25T12:00:00"
-            var end = "2013-03-25T13:00:00"
-            var text = ""
-            var id = 1
-            var resource = "monday"
             console.log(response.data);
             this.setState({
                 columns: [
@@ -72,46 +67,8 @@ class Schedule extends Component {
                     { name: "Thursday", id: "thursday", start: "2013-03-25" },
                     { name: "Friday", id: "friday", start: "2013-03-25" },
                 ],
-                events: [],
-                courseInfo: response.data,
+                events: response.data,
             })
-            response.data.forEach(element => {
-              var para = document.createElement("li");
-              var tag = document.createElement("a");
-              para.setAttribute("id", element["course_name"] + "/" + element["course_section"]);
-              para.appendChild(tag);
-              var node = document.createTextNode(element["course_name"] + " " + element["course_section"]);
-              var course = document.createTextNode(element["course_code"] + "\n");
-              tag.appendChild(course);
-              tag.appendChild(node);
-              
-              var element = document.getElementById("courses");
-              element.appendChild(para);
-            })
-            document.getElementById("courses").addEventListener("click", function(e) {
-              if(e.target && e.target.nodeName === "A") {
-                //was console.log(e.target.id)
-                console.log(e.target.innerText + " was clicked");
-                text = e.target.innerText
-                console.log(text)
-                id = 1
-              }
-              
-            })
-            document.getElementById("myInput").addEventListener("click", function(e) {
-              console.log("bar was clicked")
-            })
-            // this.setState({
-            //   events: [
-            //     {
-            //       "start": start,
-            //       "end": end,
-            //       "text": text,
-            //       "id": id,
-            //       "resource": resource
-            //     }
-            //   ]
-            // })
         })
     
     
