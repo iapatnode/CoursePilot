@@ -349,7 +349,7 @@ def schedule():
 
 
         class_table = cursor.fetchall()
-        print(class_table)
+       # print(class_table)
 
         result_string = ""
         for row in class_table:

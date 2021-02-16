@@ -19,6 +19,25 @@ const styles = {
   }
 };
 
+function classFilter() {
+  console.log("HELOOOOO")
+  var input, filter, ul, li, a, i, txtValue;
+  input = document.getElementById("myInput");
+  console.log(input)
+  filter = input.value.toUpperCase();
+  ul = document.getElementById("courses");
+  li = ul.getElementsByTagName("li");
+  for (i = 0; i < li.length; i++) {
+      a = li[i].getElementsByTagName("a")[0];
+      txtValue = a.textContent || a.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          li[i].style.display = "";
+      } else {
+          li[i].style.display = "none";
+      }
+  }
+}
+
 class Schedule extends Component {
 
   constructor(props) {
@@ -35,6 +54,24 @@ class Schedule extends Component {
     };
   }
   
+  classFilter() {
+    console.log("HELOOOOO")
+    var input, filter, ul, li, a, i, txtValue;
+    input = document.getElementById("myInput");
+    console.log(input)
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("courses");
+    li = ul.getElementsByTagName("li");
+    for (i = 0; i < li.length; i++) {
+        a = li[i].getElementsByTagName("a")[0];
+        txtValue = a.textContent || a.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+        } else {
+            li[i].style.display = "none";
+        }
+    }
+  }
 
   componentDidMount() {
 
@@ -59,14 +96,16 @@ class Schedule extends Component {
             })
             response.data.forEach(element => {
               var para = document.createElement("li");
+              var tag = document.createElement("a");
               para.setAttribute("id", element["course_name"] + "/" + element["course_section"])
+              para.appendChild(tag)
               var node = document.createTextNode(element["course_name"] + " " + element["course_section"]);
-              para.appendChild(node);
+              tag.appendChild(node);
               var element = document.getElementById("courses");
               element.appendChild(para);
             })
             document.getElementById("courses").addEventListener("click", function(e) {
-              if(e.target && e.target.nodeName == "LI") {
+              if(e.target && e.target.nodeName == "A") {
                 console.log(e.target.id + " was clicked");
                 text = e.target.id
                 console.log(text)
@@ -74,6 +113,10 @@ class Schedule extends Component {
               }
               
             })
+            document.getElementById("myInput").addEventListener("click", function(e) {
+              console.log("bar was clicked")
+            })
+
             console.log("Outta here");
             // this.setState({
             //   events: [
@@ -132,6 +175,7 @@ class Schedule extends Component {
                         </Form>
                         
                         <div id="div1">
+                        <input type="text" id="myInput" onKeyUp={this.classFilter} placeholder="Search for names.." title="Type in a name"></input>
                           <ul id="courses">
                             
                           </ul>
