@@ -5,6 +5,8 @@ import Nav from 'react-bootstrap/Nav'
 import axios from 'axios'
 import Form from 'react-bootstrap/Form'
 import '../static/styles/Schedule-Style.css'
+import Logo from '../static/images/logo.jpg'
+import Image from 'react-bootstrap/Image'
 
 
 const styles = {
@@ -123,7 +125,7 @@ class Schedule extends Component {
     return (
         <div>
             <Navbar bg="dark" variant="dark" expand="lg">
-              <Navbar.Brand href="/home">Course Pilot</Navbar.Brand>
+              <Navbar.Brand><Image src={Logo} style={{height: 50}}/></Navbar.Brand>
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="mr-auto">

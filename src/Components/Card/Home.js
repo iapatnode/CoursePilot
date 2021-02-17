@@ -8,6 +8,8 @@ import Form from 'react-bootstrap/Form'
 import Select from 'react-select'
 import '../static/styles/Home-Style.css'
 import Link from 'react-router-dom/Link'
+import Image from 'react-bootstrap/Image'
+import Logo from '../static/images/logo.jpg'
 
 
 export const Home = ()=> {
@@ -35,16 +37,16 @@ export const Home = ()=> {
     return(
         <div id="main-content">
             <Navbar bg="dark" variant="dark" expand="lg">
-            <Navbar.Brand href="/home">Course Pilot</Navbar.Brand>
-            <Navbar.Toggle aria-controls="basic-navbar-nav" />
-            <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="mr-auto">
-                <Nav.Link href="/home">Scheduling</Nav.Link>
-                <Nav.Link href="/degree">Degree Report</Nav.Link> 
-                <Nav.Link href="/majors">Majors and Minors</Nav.Link> 
-                <Nav.Link href="/profile">Profile</Nav.Link> 
-            </Nav>
-            </Navbar.Collapse>
+              <Navbar.Brand><Image src={Logo} style={{height: 50}}/></Navbar.Brand>
+              <Navbar.Toggle aria-controls="basic-navbar-nav" />
+              <Navbar.Collapse id="basic-navbar-nav">
+              <Nav className="mr-auto">
+                  <Nav.Link href="/home">Scheduling</Nav.Link>
+                  <Nav.Link href="/degree">Degree Report</Nav.Link> 
+                  <Nav.Link href="/majors">Majors and Minors</Nav.Link> 
+                  <Nav.Link href="/profile">Profile</Nav.Link> 
+              </Nav>
+              </Navbar.Collapse>
             </Navbar>
             <h1> Schedules </h1>
             <div className="container" id="schedule-list-view">
