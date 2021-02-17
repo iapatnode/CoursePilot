@@ -5,7 +5,6 @@ import Nav from 'react-bootstrap/Nav'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
-import Select from 'react-select'
 import '../static/styles/Home-Style.css'
 import Link from 'react-router-dom/Link'
 import Image from 'react-bootstrap/Image'
@@ -72,7 +71,7 @@ export const Home = ()=> {
                 </div>
             </div>
             <div id="button-container">
-                <button variant="primary" onClick={handleShow}> Create New Schedule </button>
+                <Button variant="primary" onClick={handleShow}> Create New Schedule </Button>
                 <Modal show={show} onHide={handleClose}>
                     <Modal.Header closeButton>
                         <Modal.Title>Create New Schedule - Enter Name</Modal.Title>
