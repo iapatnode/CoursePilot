@@ -20,9 +20,7 @@
 }
 
 #div1 {
-    height: 450px;
-    overflow: scroll;
-    overflow-x: hidden;
+    
 }
 
 #myInput {
@@ -35,13 +33,16 @@
     margin-bottom: 12px;
   }
 
-  #course {
+  #courses {
     list-style-type: none;
     padding: 0;
     margin: 0;
+    height: 450px;
+    overflow: scroll;
+    overflow-x: hidden;
   }
 
-  #course li a {
+  #courses li a {
     border: 1px solid #ddd;
     margin-top: -1px; /* Prevent double borders */
     background-color: #f6f6f6;
@@ -52,6 +53,6 @@
     display: block
   }
   
-  #course li a:hover:not(.header) {
+  #courses li a:hover:not(.header) {
     background-color: #eee;
   }
