@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link, Redirect } from 'react-router-dom'
 import axios from 'axios'
 import '../static/styles/SignUp-Style.css'
@@ -18,18 +18,19 @@ export const SignUp = () => {
     const [confirm, setConfirm] = useState();
     const [minorSelectedValue, setMinorSelectedValue] = useState([]);
     const [majorSelectedValue, setMajorSelectedValue] = useState([]);
-    const [requirement, setRequirement] = useState("2020");
+    const [requirement, setRequirement] = useState("2017");
     const [graduation, setGraduation] = useState("2021");
+    const [count, setCount] = useState(0);
+    const isFirstRun = useRef(true);
     const minorOptions = []
     const majorOptions = []
-    const [isMounted, setIsMounted] = useState(true);
 
     useEffect(() => {
-        if(isMounted) {
+        if(isFirstRun.current) {
             axios.get("/api/signup").then(response => {
                 setSuccess(response.data);
                 setLoading(false);
-                setIsMounted(false);
+                console.log(response);
             });
         }
     }, []);
@@ -92,21 +93,17 @@ export const SignUp = () => {
     success.majors.forEach(element => majorOptions.push( {"value": element, "label": element} ))
 
     return(
-        <div id="main-content">
+        <div id="signup-content">
             <div>
                 <meta charSet="UTF-8"></meta>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
                 <title>Welcome to Course Pilot</title>
             </div>    
-            <div id="main-content">
+            <div id="signup-form-container">
                 <div className="container">
-                    <div className="row-fluid">
-                        <Image src={Logo} fluid id="logo_signup"/>
-                    </div>
-                    <h1 id="signup-header"> Sign Up for Course Pilot </h1>
                     <div className="row">
                         <div className="col"></div>
-                        <div className="col-lg-6">
+                        <div className="col-md-6 col-fluid" id="form-material-signup">
                             <Form id="signup-form">
                                 <Form.Group>
                                     <Form.Label>Email Address</Form.Label>
@@ -121,6 +118,7 @@ export const SignUp = () => {
                                 <Form.Group>
                                     <Form.Label className="signup-form-field">Select Your Major(s)</Form.Label>
                                     <Select 
+                                            placeholder="Select Your Major(s)"
                                             value={majorOptions.filter(obj => majorSelectedValue.includes(obj.value))}
                                             onChange={handleMajorChange}
                                             options={majorOptions} 
@@ -134,6 +132,7 @@ export const SignUp = () => {
                                 <Form.Group>
                                     <Form.Label className="signup-form-field">Select Your Minor(s)</Form.Label>
                                         <Select 
+                                            placeholder="Select Your Minor(s)"
                                             value={minorOptions.filter(obj => minorSelectedValue.includes(obj.value))}
                                             onChange={handleChange}
                                             options={minorOptions} 
@@ -162,13 +161,13 @@ export const SignUp = () => {
                                         <option value="2024">2024</option>
                                     </Form.Control>
                                 </Form.Group>
-                                <Button onClick={handleSubmit} variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
-                                    Create Account
-                                </Button>
                             </Form>
                         </div>
                         <div className="col"></div>
                     </div>
+                    <Button onClick={handleSubmit} variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
+                                    Create Account
+                    </Button>
                 </div>
             </div>
         </div>

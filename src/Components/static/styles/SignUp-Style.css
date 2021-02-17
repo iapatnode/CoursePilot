@@ -1,11 +1,16 @@
 #logo_signup {
-    height: 225px;
-    width: 200px;
+    height: 170px;
+    width: 150px;
     margin: 1rem;
 }
 
 .signup-form-field {
     margin: 1rem;
+}
+
+#signup-form-submit {
+    background-color: #926DD6;
+    width: 40%;
 }
 
 #signup-text {
@@ -16,4 +21,29 @@
 #signup-header {
     color: #926DD6;
     margin: 0.5rem;
+}
+
+#signup-content {
+    height: 100vh;
+    overflow-y: scroll;
+    scrollbar-width: none;
+}
+
+#form-material-signup {
+    padding-top: 4vh;
+    padding-right: 5vh;
+    height: 80vh;
+    margin-top: 2vh;
+    overflow-y: scroll;
+    background-color: white;
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+#signup-content {
+    height: 100vh;
+    background-image: linear-gradient(#926DD6, gray, black);
 }

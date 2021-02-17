@@ -1,23 +1,41 @@
+#login-content {
+    background-image: linear-gradient(#926DD6, gray, black);
+    height: 100vh;
+}
+
 .login-form-field {
     display: flex;
     flex-direction: column;
     margin-top: 1rem;
+    text-align: center;
 }
 
 #login-form {
+    margin-top: 5vh;
+    margin-bottom: 5vh;
     align-content: center;
     display: inline-block;
-}
-
-#welcome-text {
-    color: #926DD6;
-    margin: 0.5rem;
+    padding-right: 9vh;
+    padding-left: 9vh;
+    background-color: white;
+    border-radius: 8px;
 }
 
 #logo {
-    margin-top: 0.5%;
+    height: 170px;
+    width: 150px;
+    margin-top: 3vh;
+    margin-bottom: 3vh;
 }
 
 #login-form-submit {
-    margin-top: 1rem;
+    /* margin-top: 2rem; */
+    justify-content: center;
+    background-color: #926DD6;
+    width: 100%;
+}
+
+#sign-up-link {
+    margin-top: 4vh;
+    background-color: white;
 }

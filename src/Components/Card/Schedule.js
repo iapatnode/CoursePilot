@@ -128,9 +128,9 @@ class Schedule extends Component {
               <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="mr-auto">
                   <Nav.Link href="/home">Scheduling</Nav.Link>
-                  {/* <Nav.Link href="/degree">Degree Report</Nav.Link> 
+                  <Nav.Link href="/degree">Degree Report</Nav.Link> 
                   <Nav.Link href="/majors">Majors and Minors</Nav.Link> 
-                  <Nav.Link href="/profile">Profile</Nav.Link>  */}
+                  <Nav.Link href="/profile">Profile</Nav.Link> 
               </Nav>
               </Navbar.Collapse>
             </Navbar>
