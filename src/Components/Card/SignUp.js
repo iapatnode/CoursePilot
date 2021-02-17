@@ -22,12 +22,16 @@ export const SignUp = () => {
     const [graduation, setGraduation] = useState("2021");
     const minorOptions = []
     const majorOptions = []
+    const [isMounted, setIsMounted] = useState(true);
 
     useEffect(() => {
-        axios.get("/api/signup").then(response => {
-            setSuccess(response.data);
-            setLoading(false);
-        });
+        if(isMounted) {
+            axios.get("/api/signup").then(response => {
+                setSuccess(response.data);
+                setLoading(false);
+                setIsMounted(false);
+            });
+        }
     }, []);
 
     const handleEmailChange = (e) => {
@@ -70,18 +74,14 @@ export const SignUp = () => {
         }
         
         axios.post('/api/signup', parameters).finally(response => {
-            alert("Account Creation Successful!")
-            window.location = '/Home'
+            alert("Account Creation Successful!");
+            window.location = '/Home';
         })
-        // var xhttp = new XMLHttpRequest();
-        // xhttp.onreadystatechange = function() {
-        //     if(this.readyState == 4 && this.status == 200) {
-        //         alert("Account Creation Successful!")
-        //         window.location = '/Home'
-        //     }
-        // };
-        // xhttp.open("POST", "/api/signup", true);
-        // xhttp.send(parameters);
+        .catch(err => {
+            if (err.response) {
+                console.log("BAD!");
+            }
+        })
     }
     
     if (isLoading) {
