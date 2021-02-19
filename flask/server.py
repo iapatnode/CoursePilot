@@ -31,6 +31,7 @@ conn = connection()
 
 @app.route("/api/login", methods=["POST", "GET"])
 def login():
+    session["email"] = ""
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
@@ -249,31 +250,13 @@ def home():
         schedule_semester = request.form.get("schedule-semester")
         created_at = datetime.now()
         formatted_date = created_at.strftime('%Y-%m-%d %H:%M:%S')
+        session["schedule_semester"] = schedule_semester #Test to load courses and whatnot
 
         insert_schedule_query = "INSERT INTO Schedule values (%s, %s, %s, %s)"
         cursor.execute(insert_schedule_query, (schedule_name, formatted_date, session["email"], schedule_semester))
         conn.commit()
 
         return redirect("http://localhost:3000/Schedule")
-
-#attempt at using AJAX to load data from search bar        
-# @app.route("/search-auto/", methods=["POST"])
-# def autoSearch():
-#     cursor = conn.cursor()
-#     search_val = request.form.get("outlined-search")
-#     request_json = request.get_json()
-
-#     search_item = request_json["outlined-search"]
-#     print(search_val)
-#     if search_item:
-#         sets = cursor.execute(''' 
-#             SELECT * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like %s;
-#         ''', (f"%{(search_val)}%",))
-    
-#     else:
-#         sets = []
-    
-#     return jsonify(sets), 200
 
 @app.route("/api/search", methods=["GET","POST"])
 def search():
@@ -305,13 +288,15 @@ def search():
 
         result_string = ""
         for row in class_table:
+            print(row)
             course_dict = {
                 "course_code": row[0],
                 "course_semester": row[1],
                 "course_name": row[2],
                 "course_credits": row[3],
                 "course_section": row[4],
-                "course_time": str(row[6])
+                "course_time": str(row[6]),
+                "course_end": str(row[7]),
             }
             courseArray.append(course_dict)
 
@@ -330,18 +315,9 @@ def search():
 @app.route('/api/schedule', methods=["GET", "POST"])
 def schedule():
      if request.method == "GET":
-        # search_val = ""
-        # search_val = request.form.get("outlined-search")
         cursor = conn.cursor()
         classArray = []
         courseArray = []
-        #request_json = request.get_json()
-        # class_query = "select * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like ?;", (f"%{(search_val)}%",)
-        
-       # search_item = request_json["outlined-search"]
-        #print("search Item:" + search_item)
-
-        # print(search_val)
 
         cursor.execute(''' 
             SELECT * from Course join Class on Class.courseCode = Course.courseCode order by Course.courseCode;
@@ -359,7 +335,9 @@ def schedule():
                 "course_name": row[2],
                 "course_credits": row[3],
                 "course_section": row[4],
-                "course_time": str(row[6])
+                "course_time": str(row[6]),
+                "course_end": str(row[7]),
+                "days": row[8]
             }
             courseArray.append(course_dict)
 
@@ -369,67 +347,14 @@ def schedule():
 
         for row in classArray:
             print(row)
-            
-        
-        # return (result_string)
-        # return (search_val)
+
         return json.dumps(courseArray)
 
 
-    #     data = json.dumps(
-    #         [           
-    #             {
-    #             "id": 1,
-    #             "text": "SOCI 101",
-    #             "start": "2013-03-25T12:00:00",
-    #             "end": "2013-03-25T14:00:00",
-    #             "resource": "monday"
-    #             },
-    #             {
-    #             "id": 2,
-    #             "text": "COMP 141",
-    #             "start": "2013-03-25T15:00:00",
-    #             "end": "2013-03-25T17:00:00",
-    #             "resource": "wednesday"
-    #             },
-    #             {
-    #             "id": 3,
-    #             "text": "Event 3",
-    #             "start": "2013-03-25T18:00:00",
-    #             "end": "2013-03-25T19:00:00",
-    #             "resource": "friday"
-    #             },
-    #         ]
-    #     )
-
-    #     return data
-
-@app.route("/api/filledSchedule", methods=["GET"])
-def get_filled_schedule():
+@app.route("/api/newSchedule", methods=["GET"])
+def get_new_schedule():
     data = json.dumps(
-        [           
-            {
-            "id": 1,
-            "text": "SOCI 101",
-            "start": "2013-03-25T12:00:00",
-            "end": "2013-03-25T14:00:00",
-            "resource": "monday"
-            },
-            {
-            "id": 2,
-            "text": "COMP 141",
-            "start": "2013-03-25T15:00:00",
-            "end": "2013-03-25T17:00:00",
-            "resource": "wednesday"
-            },
-            {
-            "id": 3,
-            "text": "Event 3",
-            "start": "2013-03-25T18:00:00",
-            "end": "2013-03-25T19:00:00",
-            "resource": "friday"
-            },
-        ]
+        []
     )
 
     return data
