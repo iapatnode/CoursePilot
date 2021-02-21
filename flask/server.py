@@ -314,7 +314,7 @@ def search():
 
 @app.route('/api/schedule', methods=["GET", "POST"])
 def schedule():
-     if request.method == "GET":
+    if request.method == "GET":
         cursor = conn.cursor()
         classArray = []
         courseArray = []
@@ -349,6 +349,26 @@ def schedule():
             print(row)
 
         return json.dumps(courseArray)
+    
+    if request.method == "POST":
+        data = request.data.decode("utf-8")
+        json_data = json.loads(data)
+        code_pt_1 = ""
+        code_pt_2 = ""
+        section = ""
+        #Do some formatting with the strings
+        for course in json_data.get("courses"):
+            course_string = course.replace(" ", "-")
+            index = course_string.index('-')
+            code_pt_1 = course_string[0: index + 4]
+            sec_ind = len(course_string) - 1
+            section = course_string[sec_ind]
+            code = code_pt_1.replace("-", " ")
+            course_w_section = f"{code} {section}"
+            
+            query = "insert into "
+
+        return code
 
 
 @app.route("/api/newSchedule", methods=["GET"])

@@ -5,6 +5,7 @@ import Nav from 'react-bootstrap/Nav'
 import axios from 'axios'
 import Form from 'react-bootstrap/Form'
 import '../static/styles/Schedule-Style.css'
+import Button from 'react-bootstrap/Button'
 
 
 const styles = {
@@ -27,6 +28,40 @@ global.classTime = "";
 global.endTime = "";
 
 class Schedule extends Component {
+
+  constructor(props) {
+    super(props);
+    this.addClass = this.addClass.bind(this);
+    this.state = {
+      viewType: "Resources",
+      durationBarVisible: false,
+      timeRangeSelectedHandling: "Enabled",
+      eventDeleteHandling: "Update",
+      courseInfo: [],
+      myRef: React.createRef(true),
+      onEventDeleted: function(args) {
+          this.message("Course Deleted: " + args.e.text());
+      }
+    };
+  }
+  
+  classFilter() {
+    var input, filter, ul, li, a, i, txtValue;
+    input = document.getElementById("myInput");
+    console.log(input)
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("courses");
+    li = ul.getElementsByTagName("li");
+    for (i = 0; i < li.length; i++) {
+        a = li[i].getElementsByTagName("a")[0];
+        txtValue = a.textContent || a.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+        } else {
+            li[i].style.display = "none";
+        }
+    }
+  }
 
   addClass(e) {
     if(e.target && e.target.nodeName === "A") {
@@ -80,41 +115,21 @@ class Schedule extends Component {
         })
       }
     }
-    console.log(global.courses);
   }
 
-  constructor(props) {
-    super(props);
-    this.addClass = this.addClass.bind(this);
-    this.state = {
-      viewType: "Resources",
-      durationBarVisible: false,
-      timeRangeSelectedHandling: "Enabled",
-      eventDeleteHandling: "Update",
-      courseInfo: [],
-      myRef: React.createRef(true),
-      onEventDeleted: function(args) {
-          this.message("Course Deleted: " + args.e.text());
+  saveSchedule() {
+    console.log("Schedule should save when this is clicked");
+    var http = new XMLHttpRequest();
+    var url = '/api/schedule';
+    var params = JSON.stringify({courses: global.courses});
+    http.open("POST", url, true);
+
+    http.onreadystatechange = function() {
+      if(http.readyState == 4) {
+        alert(http.responseText);
       }
-    };
-  }
-  
-  classFilter() {
-    var input, filter, ul, li, a, i, txtValue;
-    input = document.getElementById("myInput");
-    console.log(input)
-    filter = input.value.toUpperCase();
-    ul = document.getElementById("courses");
-    li = ul.getElementsByTagName("li");
-    for (i = 0; i < li.length; i++) {
-        a = li[i].getElementsByTagName("a")[0];
-        txtValue = a.textContent || a.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            li[i].style.display = "";
-        } else {
-            li[i].style.display = "none";
-        }
     }
+    http.send(params);
   }
 
   componentDidMount() {
@@ -184,17 +199,6 @@ class Schedule extends Component {
                     </div>
                     <div className="col-md-3" id="search-container">
                       <h2> Search Courses </h2>
-                        {/* <Form noValidate autoComplete="off" method="post" action="/api/search">
-                        
-                            <Form.Group>
-                              <Form.Control 
-                                type="search"
-                                name="outlined-search" 
-                                placeholder="Enter Course Name/Code Here">
-                              </Form.Control>
-                            </Form.Group>
-                        </Form>
-                         */}
                         <div id="div1">
                         <input type="text" id="myInput" onKeyUp={this.classFilter} placeholder="Search for Class" title="Type in a name"></input>
                         <ul id="courses"></ul>
@@ -202,6 +206,9 @@ class Schedule extends Component {
                     </div>
                 </div>
             </div>
+            <Button onClick={this.saveSchedule} variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
+                Save Schedule
+            </Button>
         </div>
     );
   }
