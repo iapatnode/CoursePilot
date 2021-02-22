@@ -109,8 +109,55 @@ def getRequiredCourses():
 
     except error as error:
         print("Could not pull the data" + str(error))
-getRequiredCourses()
 
+
+
+@app.route("/api/MajorPage", methods=["GET"])
+def get_majors():
+
+    cursor = conn.cursor()
+    major_array = []
+    course_array = []
+
+
+    cursor.execute(''' 
+            select ReqCourses.courseCode, ReqCourses.category, ReqCourses.catYear, Requirement.reqDetails, MajorMinor.degreeId, MajorMinor.degreeHrs FROM ReqCourses JOIN 
+                Requirement on ReqCourses.catYear = Requirement.requirementYear AND ReqCourses.category = Requirement.category JOIN
+                MajorMinorRequirements ON Requirement.requirementYear = MajorMinorRequirements.catYear AND Requirement.category = MajorMinorRequirements.category JOIN
+                MajorMinor ON MajorMinorRequirements.degreeId = MajorMinor.degreeId AND MajorMinorRequirements.catYear = MajorMinor.reqYear WHERE isMinor = 0;
+        ''',)
+
+
+    course_table = cursor.fetchall()
+    # print(class_table)
+
+    result_string = ""
+    for row in course_table:
+        course_dict = {
+            "course_code": row[0],
+            "major_category": row[1],
+            "category_year": row[2],
+            "requirement_details": row[3],
+            "degree_id": row[4],
+            "degree_hours": str(row[5])
+        }
+        
+        '[, , , , , , , ]'
+        course_array.append(course_dict)
+
+        for item in row:
+            print(row)
+            #result_string += str(item)
+        
+        
+    
+    # return (result_string)
+    # return (search_val)
+    return {
+        "major": json.dumps(course_array)
+    }
+
+get_majors()
 '''
 REMOVAL
 
