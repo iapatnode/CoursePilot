@@ -320,7 +320,7 @@ def schedule():
         courseArray = []
 
         cursor.execute(''' 
-            SELECT * from Course join Class on Class.courseCode = Course.courseCode order by Course.courseCode;
+            SELECT * from Course join Class on Class.courseCode = Course.courseCode WHERE courseSemester like "fall%" order by Course.courseCode;
         ''',)
 
 
