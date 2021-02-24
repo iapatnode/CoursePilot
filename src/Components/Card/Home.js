@@ -10,6 +10,7 @@ import Link from 'react-router-dom/Link'
 import Image from 'react-bootstrap/Image'
 import Logo from '../static/images/logo.jpg'
 
+global.semester="";
 
 export const Home = ()=> {
 
@@ -18,7 +19,6 @@ export const Home = ()=> {
     const [success, setSuccess] = useState();
     const [show, setShow] = useState(false);
     const [showSemester, setShowSemester] = useState(false);
-    const [semester, setSemester] = useState();
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -30,24 +30,9 @@ export const Home = ()=> {
         });
     }, []);
 
-    const handleSemesterChange = (e) => {
-        setSemester(e.target.value);
-    }
-    const handleSubmit = (e) => {
-        const parameters = {
-             semester: semester
-        }
-    }
 
-    axios.post('/api/signup', parameters).finally(response => {
-        alert("Account Creation Successful!");
-        window.location = '/Home';
-    })
-    .catch(err => {
-        if (err.response) {
-            console.log("BAD!");
-        }
-    })
+
+
     
     if (isLoading) {
         return <div> Loading... </div>
@@ -100,14 +85,14 @@ export const Home = ()=> {
                         <Form method="post" action="/api/home">
                             <Form.Group>
                                 <Form.Control type="text" placeholder="Enter Schedule Name" id="schedule-name" name="schedule-name"></Form.Control>
-                                <Form.Control onChange={handleSemesterChange} as="select" id="schedule-semester" name="schedule-semester">
+                                <Form.Control as="select" id="schedule-semester" name="schedule-semester">
                                     <option value="fall">Fall</option>
                                     <option value="spring">Spring</option>
                                 </Form.Control>
                                 <Button variant="secondary" onClick={handleClose}>
                                     Cancel
                                 </Button>
-                                <Button onClick={handleSubmit} variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
+                                <Button variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
                                     Create Schedule
                                 </Button>
                             </Form.Group>

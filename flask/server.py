@@ -248,9 +248,12 @@ def home():
 
         schedule_name = request.form.get("schedule-name")
         schedule_semester = request.form.get("schedule-semester")
+        semester = request.form.get("schedule-semester")
+        print("Semester in: " + semester)
         created_at = datetime.now()
         formatted_date = created_at.strftime('%Y-%m-%d %H:%M:%S')
         session["schedule_semester"] = schedule_semester #Test to load courses and whatnot
+        # print("Post: " + session["schedule_semester"])
 
         insert_schedule_query = "INSERT INTO Schedule values (%s, %s, %s, %s)"
         cursor.execute(insert_schedule_query, (schedule_name, formatted_date, session["email"], schedule_semester))
@@ -318,11 +321,17 @@ def schedule():
         cursor = conn.cursor()
         classArray = []
         courseArray = []
-
+        # print("Get :" + session["schedule_semester"])
+        selectedSemester = session.get("schedule_semester", None)
+        print("Semester in schedule: " + selectedSemester)
+        
         cursor.execute(''' 
-            SELECT * from Course join Class on Class.courseCode = Course.courseCode WHERE courseSemester like "fall%" order by Course.courseCode;
-        ''',)
+            SELECT * from Course join Class on Class.courseCode = Course.courseCode WHERE courseSemester like %s order by Course.courseCode;
+            ''', (f"%{(selectedSemester)}%",))
 
+        # cursor.execute(''' 
+        #     SELECT * from Course join Class on Class.courseCode = Course.courseCode order by courseName;
+        #     ''')
 
         class_table = cursor.fetchall()
        # print(class_table)

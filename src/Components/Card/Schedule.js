@@ -209,6 +209,9 @@ class Schedule extends Component {
             <Button onClick={this.saveSchedule} variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
                 Save Schedule
             </Button>
+            <Button href="/home" variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
+              Exit
+            </Button>
         </div>
     );
   }
