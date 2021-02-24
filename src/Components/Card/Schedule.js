@@ -98,7 +98,8 @@ class Schedule extends Component {
     }
     if(global.classAdded) { 
       var cont = true;
-      global.courses.push(global.classAdded.text)
+      var tempClassEvents = global.classEvents;
+      // global.courses.push(global.classAdded.text)
       for(var i = 0; i < days.length; i++) {
         var res = "";
         switch(days.charAt(i)) {
@@ -124,7 +125,7 @@ class Schedule extends Component {
           }
         })
         if(!global.conflict) {
-          global.classEvents.push({
+          tempClassEvents.push({
             "id": 1,
             "text": global.classAdded.text,
             "start": "2013-03-25T" + global.classTime,
@@ -133,9 +134,9 @@ class Schedule extends Component {
             "days": days
             },
           )
-          this.setState({
-            events: global.classEvents,
-          })
+          // this.setState({
+          //   events: tempClassEvents,
+          // })
         }
       }
       if(global.conflict) {
@@ -145,7 +146,20 @@ class Schedule extends Component {
       }
       // This is where we are going to check prerequisites
       if(cont) {
-
+        console.log("No time violations: checking prerequisites");
+        axios.post('http://localhost:5000/api/checkPrerequisites', {"class": global.classAdded.text})
+        .then((response) => {
+          let data = response.data;
+          alert(data);
+          if(data == true) {
+            this.setState({
+              events: tempClassEvents,
+            })
+          }
+          else {
+            alert("Error: One or more prerequisites for this course have not been taken");
+          }
+        })
       }
     }
   }

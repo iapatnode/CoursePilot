@@ -1,13 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Link, Redirect } from 'react-router-dom'
 import axios from 'axios'
 import '../static/styles/SignUp-Style.css'
-import AdminFooter from "../Footers/AdminFooter.js";
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import Select from 'react-select'
-import Logo from '../static/images/logo.jpg'
-import Image from 'react-bootstrap/Image'
 
 
 export const SignUp = () => {

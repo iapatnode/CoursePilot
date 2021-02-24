@@ -402,6 +402,35 @@ def get_new_schedule():
     return data
 
 
+@app.route("/api/checkPrerequisites", methods=["GET"])
+def check_prerequisites():
+    if request.method == "GET":
+        cursor = conn.cursor()
+        data = json.loads(request.data.decode("utf-8"))
+        course = data.get("class")
+
+        #Get the course code we want
+        result = ""
+        req = ""
+        count = 0
+        for c in course:
+            if count < 2:
+                result = result + c
+            if count == 2:
+                break
+            if c == ' ':
+                count = count + 1
+
+        prereqQuery = ''' select * from Prerequisite where courseCode = %s; '''
+        cursor.execute(prereqQuery, (result,))
+        prerequisites = cursor.fetchall()
+        for row in prerequisites:
+            print(row)
+            req = req + row + ", "
+        print(result)
+
+        return req
+    return "true"
 
 
 
