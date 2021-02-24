@@ -32,6 +32,9 @@ conn = connection()
 #User Email Variable
 user_email = ""
 
+#Semester Selection Variable
+semester_selection = ""
+
 @app.route("/api/login", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
@@ -227,6 +230,7 @@ def sign_up():
 def home():
     #TODO: Return user data retrieved from database tables as needed
     global user_email
+    global semester_selection
     if request.method == "GET":
         # email = session.get("email")
         # print(email)
@@ -256,8 +260,7 @@ def home():
 
         schedule_name = request.form.get("schedule-name")
         schedule_semester = request.form.get("schedule-semester")
-        semester = request.form.get("schedule-semester")
-        print("Semester in: " + semester)
+        semester_selection = request.form.get("schedule-semester")
         created_at = datetime.now()
         formatted_date = created_at.strftime('%Y-%m-%d %H:%M:%S')
         session["schedule_semester"] = schedule_semester #Test to load courses and whatnot
@@ -329,13 +332,11 @@ def schedule():
         cursor = conn.cursor()
         classArray = []
         courseArray = []
-        # print("Get :" + session["schedule_semester"])
-        selectedSemester = session.get("schedule_semester", None)
-        print("Semester in schedule: " + selectedSemester)
+        print("Selected:" + semester_selection)
         
         cursor.execute(''' 
             SELECT * from Course join Class on Class.courseCode = Course.courseCode WHERE courseSemester like %s order by Course.courseCode;
-            ''', (f"%{(selectedSemester)}%",))
+            ''', (f"%{(semester_selection)}%",))
 
         # cursor.execute(''' 
         #     SELECT * from Course join Class on Class.courseCode = Course.courseCode order by courseName;
