@@ -29,9 +29,11 @@ def connection():
 #Creates global variable that creates connection to database
 conn = connection()
 
+#User Email Variable
+user_email = ""
+
 @app.route("/api/login", methods=["POST", "GET"])
 def login():
-    session["email"] = ""
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
@@ -74,7 +76,8 @@ def login():
         #     conn.close()
 
         if valid:
-            session["email"] = email
+            global user_email
+            user_email = email
             return redirect("http://localhost:3000/home")
         
         #If the user's credentials are not found, redirect them back to the login page
@@ -138,8 +141,6 @@ def sign_up():
             cursor = conn.cursor()
             newStudentQuery = "Insert into Student values (%s, %s, %s)"
             newStudentData = (email, password, graduation_year)
-            session["email"] = email
-            print(session["email"])
 
             #adds student and his/her info to the database
             try:
@@ -190,7 +191,8 @@ def sign_up():
             cursor.close()
             # conn.close()
 
-            session["email"] = email #use this to determine in the future who is logged in
+            global user_email
+            user_email = email
             print("Made it here")
             # return redirect("http://localhost:3000/home")
             return jsonify({'redirect_to_home': True}), 200
@@ -198,7 +200,6 @@ def sign_up():
             return jsonify({'redirect_to_home': False}), 400
 
     if request.method == "GET":
-        print(session.get("email"))
         # Get a list of all majors and minors from the database
         cursor = conn.cursor()
         major_query = "select distinct degreeName from MajorMinor where isMinor = 0"
@@ -225,13 +226,20 @@ def sign_up():
 @app.route("/api/home", methods=["GET", "POST"])
 def home():
     #TODO: Return user data retrieved from database tables as needed
+    global user_email
     if request.method == "GET":
+        # email = session.get("email")
+        # print(email)
         all_schedules = []
         cursor = conn.cursor()
-        get_schedules_query = """ SELECT * FROM Schedule WHERE email = "dybasjt17@gcc.edu" """
-        cursor.execute(get_schedules_query)
+        print(f"email: {user_email}")
+        get_schedules_query = ('''
+            SELECT * FROM Schedule WHERE email = %s;
+            ''')
+        cursor.execute(get_schedules_query, (user_email,))
         result = cursor.fetchall()
         for schedule in result:
+            print(schedule)
             all_schedules.append(
                 {
                     "scheduleName": schedule[0],
@@ -253,10 +261,10 @@ def home():
         created_at = datetime.now()
         formatted_date = created_at.strftime('%Y-%m-%d %H:%M:%S')
         session["schedule_semester"] = schedule_semester #Test to load courses and whatnot
-        # print("Post: " + session["schedule_semester"])
+        print(f"{schedule_name} {formatted_date} {user_email} {schedule_semester}")
 
         insert_schedule_query = "INSERT INTO Schedule values (%s, %s, %s, %s)"
-        cursor.execute(insert_schedule_query, (schedule_name, formatted_date, session["email"], schedule_semester))
+        cursor.execute(insert_schedule_query, (schedule_name, formatted_date, user_email, schedule_semester))
         conn.commit()
 
         return redirect("http://localhost:3000/Schedule")
