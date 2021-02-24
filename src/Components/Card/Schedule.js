@@ -26,6 +26,7 @@ global.classEvents = [];
 global.courses = [];
 global.classTime = "";
 global.endTime = "";
+global.conflict = false;
 
 class Schedule extends Component {
 
@@ -103,16 +104,27 @@ class Schedule extends Component {
             res = "friday";
             break;
         }
-        global.classEvents.push({
-          "id": 1,
-          "text": global.classAdded.text,
-          "start": "2013-03-25T" + global.classTime,
-          "end": "2013-03-25T" + global.endTime,
-          "resource": res
-          },)
-        this.setState({
-          events: global.classEvents,
+        global.classEvents.forEach(element => {
+          if((element.start.value == "2013-03-25T" + global.classTime) && element.resource == res) {
+            global.conflict = true;
+          }
         })
+        if(!global.conflict) {
+          global.classEvents.push({
+            "id": 1,
+            "text": global.classAdded.text,
+            "start": "2013-03-25T" + global.classTime,
+            "end": "2013-03-25T" + global.endTime,
+            "resource": res
+            },)
+          this.setState({
+            events: global.classEvents,
+          })
+        }
+      }
+      if(global.conflict) {
+        global.conflict = false;
+        alert("Error: Adding '" + global.classAdded.text + "' will cause a time conflict.");
       }
     }
   }
