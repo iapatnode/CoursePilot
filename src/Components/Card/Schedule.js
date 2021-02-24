@@ -41,7 +41,19 @@ class Schedule extends Component {
       courseInfo: [],
       myRef: React.createRef(true),
       onEventDeleted: function(args) {
-          this.message("Course Deleted: " + args.e.text());
+        this.message("Course Deleted: " + args.e.text());
+        var newEvents = [];
+        var newCourses = [];
+        global.classEvents.forEach(element => {
+          if(element.text != args.e.text()) {
+            newEvents.push(element);
+            if(newCourses.includes(element.text) == false) {
+              newCourses.push(element.text)
+            }
+          }
+          global.classEvents = newEvents;
+          global.courses = newCourses;
+        });        
       }
     };
   }
@@ -64,6 +76,7 @@ class Schedule extends Component {
     }
   }
 
+  //TODO: Send async request to see if a user is allowed to take the course or not (checking prerequisites)
   addClass(e) {
     if(e.target && e.target.nodeName === "A") {
       var days = e.target.id.substring(e.target.id.indexOf("!") + 1, e.target.id.length);
@@ -84,6 +97,7 @@ class Schedule extends Component {
       var id = 1
     }
     if(global.classAdded) { 
+      var cont = true;
       global.courses.push(global.classAdded.text)
       for(var i = 0; i < days.length; i++) {
         var res = "";
@@ -115,8 +129,10 @@ class Schedule extends Component {
             "text": global.classAdded.text,
             "start": "2013-03-25T" + global.classTime,
             "end": "2013-03-25T" + global.endTime,
-            "resource": res
-            },)
+            "resource": res,
+            "days": days
+            },
+          )
           this.setState({
             events: global.classEvents,
           })
@@ -124,13 +140,19 @@ class Schedule extends Component {
       }
       if(global.conflict) {
         global.conflict = false;
+        cont = false;
         alert("Error: Adding '" + global.classAdded.text + "' will cause a time conflict.");
+      }
+      // This is where we are going to check prerequisites
+      if(cont) {
+
       }
     }
   }
 
   saveSchedule() {
     console.log("Schedule should save when this is clicked");
+    console.log(global.courses);
     var http = new XMLHttpRequest();
     var url = '/api/schedule';
     var params = JSON.stringify({courses: global.courses});
@@ -146,9 +168,8 @@ class Schedule extends Component {
 
   componentDidMount() {
     if(this.state.myRef) {
-      axios.get('http://localhost:5000/api/newSchedule')
+      axios.get('http://localhost:5000/api/getScheduleInfo')
       .then((response) => {
-          console.log(response.data);
           this.setState({
               columns: [
                   { name: "Monday", id: "monday", start: "2013-03-25" },

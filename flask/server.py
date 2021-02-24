@@ -374,6 +374,8 @@ def schedule():
         code_pt_1 = ""
         code_pt_2 = ""
         section = ""
+        codes = []
+        sections = []
         #Do some formatting with the strings
         for course in json_data.get("courses"):
             course_string = course.replace(" ", "-")
@@ -383,13 +385,15 @@ def schedule():
             section = course_string[sec_ind]
             code = code_pt_1.replace("-", " ")
             course_w_section = f"{code} {section}"
-            
-            query = "insert into "
+            codes.append(code)
+            sections.append(section)
+        
+        #TODO: Iterate over all of the codes and sections, add them to the database
 
-        return code
+        return f"{codes} {sections}"
 
 
-@app.route("/api/newSchedule", methods=["GET"])
+@app.route("/api/getScheduleInfo", methods=["GET"])
 def get_new_schedule():
     data = json.dumps(
         []
