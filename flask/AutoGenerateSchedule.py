@@ -32,17 +32,19 @@ def connection():
 conn = connection()
 
 class Student:
-    def __init__(self, name, studentID):
+    def __init__(self, name, studentID, studentMajor):
         self.name = name
         self.studentID = studentID
+        self.studentMajor = studentMajor
+
 
 class Course:
-    def __init__(self, courseCode, prerequisites, timesAvail, semesterAvail, creditHours):
+    def __init__(self, courseCode, semesterAvail, courseName, creditHours, prerequisites):
         self.courseCode = courseCode
-        self.prerequisites = prerequisites
-        self.timesAvail = timesAvail
         self.semesterAvail = semesterAvail
+        self.courseName = courseName
         self.creditHours = creditHours
+        self.prerequisites = prerequisites
 
 
 
@@ -102,14 +104,32 @@ def getTakenCourses():
 def getRequiredCourses():
     cursor = conn.cursor()
     try:
-        cursor.execute("SELECT Course.courseCode, Course.courseSemester, Course.courseName, Course.creditHours FROM Course JOIN ReqCourses ON Course.courseCode = ReqCourses.courseCode JOIN MajorMinor ON ReqCourses.reqGroup = MajorMinor.degreeId WHERE MajorMinor.degreeId = 1;")
+        cursor.execute("SELECT Course.courseCode, Course.courseSemester, Course.courseName, Course.creditHours, MajorMinor.degreeId from Course JOIN ReqCourses ON Course.courseCode = ReqCourses.courseCode JOIN MajorMinorRequirements ON ReqCourses.category = MajorMinorRequirements.category JOIN MajorMinor ON MajorMinorRequirements.degreeId = MajorMinor.degreeId WHERE MajorMinor.degreeId = 1;")
 
         info = cursor.fetchall()
-        print(info)
+
+        requiredCourses = []
+
+        for val in info:
+            newCourse = Course(val[0], val[1], val[2], val[3], [])
+            requiredCourses.append(newCourse)
+        print(requiredCourses)
+
+        cursor.execute("SELECT * FROM Prerequisite;")
+
+        prereqs = cursor.fetchall()
+
+
+        # add the prereqs to the user
+        for prereq in prereqs:
+            for course in requiredCourses:
+                if course[0] == prereq[2]
+                    course[4].append(prereq[1])
 
     except error as error:
         print("Could not pull the data" + str(error))
 
+getRequiredCourses()
 
 
 @app.route("/api/MajorPage", methods=["GET"])
@@ -157,7 +177,7 @@ def get_majors():
         "major": json.dumps(course_array)
     }
 
-get_majors()
+#get_majors()
 '''
 REMOVAL
 

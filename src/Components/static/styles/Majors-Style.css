@@ -1,19 +1,18 @@
 .tab {
     flex: 1;
+    justify-content: center;
     overflow: hidden;
     border: 1px solid #ccc;
     background-color: #f1f1f1;
+    
 }
 
-.tab button {
-    background-color: inherit;
-    float: left;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    padding: 14px 16px;
-    transition: 0.3s;
-    font-size: 17px;
+.inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 10px;
 }
 
 .tab button:hover {
@@ -31,3 +30,4 @@
 .req-content {
     display: flex;
 }
+

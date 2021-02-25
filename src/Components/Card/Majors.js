@@ -3,13 +3,16 @@ import axios from 'axios'
 import '../static/styles/Majors-Style.css'
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
-import '@material/react-tab-bar/dist/tab-bar.css';
-import '@material/react-tab-scroller/dist/tab-scroller.css';
-import '@material/react-tab/dist/tab.css';
-import '@material/react-tab-indicator/dist/tab-indicator.css';
 
-import Tab from '@material/react-tab';
-import TabBar from '@material/react-tab-bar';
+import {Tabs, Tab} from 'react-bootstrap-tabs'
+
+//import '@material/react-tab-bar/dist/tab-bar.css';
+//import '@material/react-tab-scroller/dist/tab-scroller.css';
+//import '@material/react-tab/dist/tab.css';
+//import '@material/react-tab-indicator/dist/tab-indicator.css';
+
+//import Tab from '@material/react-tab';
+//import TabBar from '@material/react-tab-bar';
 
 export const Majors = () => {
 
@@ -54,19 +57,11 @@ export const Majors = () => {
             <div class="reqYear">
                 Requirement Year
             </div>
-            <div>
-                <TabBar
-                  //state = {activeIndex: 0};
- 
-                  //handleActiveIndexUpdate = (activeIndex) => this.setState({activeIndex});
-                >
-                <Tab>
-                    <span className='mdc-tab__text-label'>Majors</span>
-                </Tab>
-                <Tab>
-                <span className='mdc-tab__text-label'>Minors</span>
-                </Tab>
-                </TabBar>
+            <div class="tab">
+                <Tabs>
+                    <Tab label="Majors">Majors</Tab>
+                    <Tab label="Minors">Minors</Tab>
+                </Tabs>
             </div>
             <div>
                 
