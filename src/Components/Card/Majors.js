@@ -25,17 +25,30 @@ export const Majors = () => {
  
     var handleActiveIndexUpdate = (activeIndex) => this.setState({activeIndex});
 
-    useEffect(() => {
-        axios.get("/api/MajorPage").then(response => {
-            setSuccess(response.data);
+    // useEffect(() => {
+    //     axios.get("/api/MajorPage").then(response => {
+    //         setSuccess(response.data);
             
-            console.log(response.data)
-        })
-    }, []);
+    //         console.log(response.data)
+    //     })
+    // }, []);
 
     //console.log(success.data)
     //success.major.foreach(element => majorCourses.push({"value": element, "label": element}))
     
+    axios.get('http://localhost:5000/api/getMinors').then((response) => {
+        console.log(response.data);
+        response.data.forEach(element => {
+            var name = element.name;
+            var para = document.createElement("li");
+            var tag = document.createElement("a");
+            para.setAttribute("id", name);
+            var node = document.createTextNode(name);
+            tag.appendChild(node);
+            var element = document.getElementById("MinorList");
+            element.appendChild(para);
+        });
+    })
 
     return (
         <div id="main-content">
@@ -57,6 +70,7 @@ export const Majors = () => {
             <div class="reqYear">
                 Requirement Year
             </div>
+<<<<<<< Updated upstream
             <div class="tab">
                 <Tabs>
                     <Tab label="Majors">Majors</Tab>
@@ -66,6 +80,13 @@ export const Majors = () => {
             <div>
                 
             </div>
+=======
+
+            <div id="MinorList">
+                </div> 
+
+
+>>>>>>> Stashed changes
         </div>
         
         </div>
