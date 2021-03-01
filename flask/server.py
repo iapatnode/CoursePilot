@@ -270,7 +270,11 @@ def home():
         cursor.execute(insert_schedule_query, (schedule_name, formatted_date, user_email, schedule_semester))
         conn.commit()
 
-        return redirect("http://localhost:3000/Schedule")
+        schedule_url = "http://localhost:3000/Schedule"
+
+        url = '{}?{}'.format(schedule_url, schedule_name)
+
+        return redirect(url)
 
 @app.route("/api/search", methods=["GET","POST"])
 def search():
@@ -333,17 +337,12 @@ def schedule():
         classArray = []
         courseArray = []
         print("Selected:" + semester_selection)
-        
         cursor.execute(''' 
             SELECT * from Course join Class on Class.courseCode = Course.courseCode WHERE courseSemester like %s order by Course.courseCode;
             ''', (f"%{(semester_selection)}%",))
 
-        # cursor.execute(''' 
-        #     SELECT * from Course join Class on Class.courseCode = Course.courseCode order by courseName;
-        #     ''')
 
         class_table = cursor.fetchall()
-       # print(class_table)
 
         result_string = ""
         for row in class_table:
@@ -369,7 +368,10 @@ def schedule():
         return json.dumps(courseArray)
     
     if request.method == "POST":
+        cursor = conn.cursor()
         data = request.data.decode("utf-8")
+        print("data: ")
+        print(data)
         json_data = json.loads(data)
         code_pt_1 = ""
         code_pt_2 = ""
@@ -379,17 +381,33 @@ def schedule():
         #Do some formatting with the strings
         for course in json_data.get("courses"):
             course_string = course.replace(" ", "-")
+            # print(course_string)
             index = course_string.index('-')
+            # print(index)
             code_pt_1 = course_string[0: index + 4]
+            # print(code_pt_1)
             sec_ind = len(course_string) - 1
+            # print(sec_ind)
             section = course_string[sec_ind]
+            # print(section)
             code = code_pt_1.replace("-", " ")
+            # print(code)
             course_w_section = f"{code} {section}"
             codes.append(code)
             sections.append(section)
+
+            cursor.execute(''' 
+            SELECT * from Class WHERE courseCode like %s AND courseSection like %s;
+            ''', (f"%{(code)}%", f"%{(section)}",))
+
+            schedule_class = cursor.fetchall()
+            print("this is from the database")
+            print(schedule_class)
         
         #TODO: Iterate over all of the codes and sections, add them to the database
 
+
+        # print(f"{codes}{sections}")
         return f"{codes} {sections}"
 
 

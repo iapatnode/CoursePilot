@@ -191,8 +191,8 @@ class Schedule extends Component {
             var course = document.createTextNode(element["course_code"] + "\n");
             var time = document.createTextNode(" " + element["course_time"] + " - " + element["course_end"])
             tag.appendChild(course);
-            tag.appendChild(node);
             tag.appendChild(time);
+            tag.appendChild(node);
             tag.setAttribute("id", element["course_name"] + "*" + element["course_section"] + "*" + element["course_time"] + "*" + element["course_end"] + "!" + element["days"]);
             var element = document.getElementById("courses");
             element.appendChild(para);
