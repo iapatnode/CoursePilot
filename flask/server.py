@@ -260,6 +260,7 @@ def home():
 
     if request.method == "POST":
         cursor = conn.cursor()
+        global schedule_name
         schedule_name = request.form.get("schedule-name")
         schedule_semester = request.form.get("schedule-semester")
         semester_selection = request.form.get("schedule-semester")
@@ -334,14 +335,27 @@ def search():
 
 @app.route('/api/schedule', methods=["GET", "POST"])
 def schedule():
+    global schedule_name
+    global user_email
     if request.method == "GET":
+        
         cursor = conn.cursor()
         classArray = []
         courseArray = []
-        print("Selected:" + semester_selection)
+        
+
+        cursor.execute('''
+            SELECT scheduleSemester from Schedule WHERE scheduleName like %s AND email like %s;
+            ''', (f"%{(schedule_name)}%", f"%{(user_email)}%",))
+
+        semester = cursor.fetchall()
+        semester_current = ""
+        for result in semester:
+            semester_current = result[0]
+
         cursor.execute(''' 
             SELECT * from Course join Class on Class.courseCode = Course.courseCode WHERE courseSemester like %s order by Course.courseCode;
-            ''', (f"%{(semester_selection)}%",))
+            ''', (f"%{(semester_current)}%",))
 
 
         class_table = cursor.fetchall()
@@ -370,6 +384,10 @@ def schedule():
         return json.dumps(courseArray)
     
     if request.method == "POST":
+        # global schedule_name
+        # global user_email
+        # global semester_selection
+        print(schedule_name)
         cursor = conn.cursor()
         data = request.data.decode("utf-8")
         print("data: ")
@@ -399,11 +417,20 @@ def schedule():
             sections.append(section)
 
             cursor.execute(''' 
-            SELECT * from Class WHERE courseCode like %s AND courseSection like %s;
-            ''', (f"%{(code)}%", f"%{(section)}",))
+                SELECT * from Class WHERE courseCode like %s AND courseSection like %s;
+                ''', (f"%{(code)}%", f"%{(section)}",))
 
             schedule_class = cursor.fetchall()
+
+            cursor.execute('''
+                SELECT scheduleSemester from Schedule WHERE scheduleName like %s AND email like %s;
+            ''', (f"%{(schedule_name)}%", f"%{(user_email)}%",))
+
+            semester = cursor.fetchall()
+
             print("this is from the database")
+            print(semester)
+            
             print(schedule_class)
         
         #TODO: Iterate over all of the codes and sections, add them to the database
