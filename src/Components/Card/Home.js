@@ -23,6 +23,21 @@ export const Home = ()=> {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
+    function clickListener(e) {
+        console.log(e.target.innerText);
+        let params = {
+            "name": e.target.innerText
+        }
+        axios.post('/api/existingSchedule', params).finally(response => {
+            window.location = "/Schedule";
+        })
+        .catch(err => {
+            if (err.response) {
+                console.log("BAD!");
+            }
+        })
+    }
+
     useEffect(() => {
         axios.get("/api/home").then(response => {
             setSuccess(response.data);
@@ -30,10 +45,6 @@ export const Home = ()=> {
         });
     }, []);
 
-
-
-
-    
     if (isLoading) {
         return <div> Loading... </div>
     }
@@ -61,8 +72,8 @@ export const Home = ()=> {
                         <ul>
                             {success.map((value, index) => {
                                 let schedule_url = "http://localhost:3000/Schedule"
-
-                                return <Link id="link" to='/Schedule' key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></Link>
+                                return <li onClick={clickListener} key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></li>
+                                // return <Link id="link" to='/Schedule' key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></Link>
                             })}
                         </ul>
                     </div>

@@ -35,6 +35,9 @@ user_email = ""
 #Semester Selection Variable
 semester_selection = ""
 
+#Get schedule name
+schedule_name = ""
+
 @app.route("/api/login", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
@@ -412,13 +415,23 @@ def schedule():
 
 @app.route("/api/getScheduleInfo", methods=["GET"])
 def get_new_schedule():
+    global schedule_name
+    print(schedule_name)
     data = json.dumps(
         []
     )
-
     return data
 
-
+@app.route("/api/existingSchedule", methods=["POST"])
+def get_existing_schedule():
+    if request.method == "POST":
+        data = request.data.decode("utf-8")
+        json_data = json.loads(data)
+        global schedule_name
+        schedule_name = json_data.get("name").rstrip()
+        return "good"
+    else:
+        return "blah"
 
 
 
