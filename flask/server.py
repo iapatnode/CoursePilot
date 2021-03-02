@@ -439,19 +439,17 @@ def schedule():
             classes.append(schedule_class[0])
 
         # Insert in to ScheduleClass query
-        classInsert = "INSERT into ScheduleClass (scheduleName, email, courseSection, courseCode, meetingDays, classSemester) VALUES (%s, %s, %s, %s, %s, %s);",
+        classInsert = "INSERT into ScheduleClass (scheduleName, email, courseSection, courseCode, meetingDays, classSemester) VALUES (%s, %s, %s, %s, %s, %s)"
 
         #TODO: Iterate over all of the codes and sections, add them to the database
         # Loop that assigns all neccesary items for a class to an array
         for result in classes:
-            schedule_items = [schedule_name, str(user_email), result[0], result[5], result[4], result[1]]
+            schedule_items = [schedule_name, user_email, result[0], result[5], result[4], result[1]]
             print(schedule_items)
 
-            # Loop to add classes to database
-            for item in schedule_items:
-                print(item)
-                cursor.execute(classInsert, item)
 
+            cursor.execute(classInsert, (schedule_name, user_email, result[0], result[5], result[4], result[1]))
+        conn.commit()
         # print(f"{codes}{sections}")
         return f"{codes} {sections}"
 
