@@ -338,7 +338,8 @@ def schedule():
     global schedule_name
     global user_email
     if request.method == "GET":
-        
+        print("Method is get")
+        print(user_email)
         cursor = conn.cursor()
         classArray = []
         courseArray = []
@@ -387,7 +388,8 @@ def schedule():
         # global schedule_name
         # global user_email
         # global semester_selection
-        print(schedule_name)
+        print("method is post")
+        print(user_email)
         cursor = conn.cursor()
         data = request.data.decode("utf-8")
         # print("data: ")
@@ -398,6 +400,7 @@ def schedule():
         section = ""
         codes = []
         sections = []
+        classes = []
 
         #Get the appropriate semester from the Schedule table
         cursor.execute('''
@@ -432,10 +435,22 @@ def schedule():
                 ''', (f"%{(code)}%", f"%{(section)}",))
 
             schedule_class = cursor.fetchall()
-            print(schedule_class)
-        
-        #TODO: Iterate over all of the codes and sections, add them to the database
+            print(schedule_class[0])
+            classes.append(schedule_class[0])
 
+        # Insert in to ScheduleClass query
+        classInsert = "INSERT into ScheduleClass (scheduleName, email, courseSection, courseCode, meetingDays, classSemester) VALUES (%s, %s, %s, %s, %s, %s);",
+
+        #TODO: Iterate over all of the codes and sections, add them to the database
+        # Loop that assigns all neccesary items for a class to an array
+        for result in classes:
+            schedule_items = [schedule_name, str(user_email), result[0], result[5], result[4], result[1]]
+            print(schedule_items)
+
+            # Loop to add classes to database
+            for item in schedule_items:
+                print(item)
+                cursor.execute(classInsert, item)
 
         # print(f"{codes}{sections}")
         return f"{codes} {sections}"
