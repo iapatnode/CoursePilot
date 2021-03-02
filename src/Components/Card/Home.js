@@ -60,6 +60,8 @@ export const Home = ()=> {
                         <h2> Name </h2>
                         <ul>
                             {success.map((value, index) => {
+                                let schedule_url = "http://localhost:3000/Schedule"
+
                                 return <Link id="link" to='/Schedule' key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></Link>
                             })}
                         </ul>

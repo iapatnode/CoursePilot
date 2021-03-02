@@ -257,7 +257,6 @@ def home():
 
     if request.method == "POST":
         cursor = conn.cursor()
-
         schedule_name = request.form.get("schedule-name")
         schedule_semester = request.form.get("schedule-semester")
         semester_selection = request.form.get("schedule-semester")
@@ -274,7 +273,7 @@ def home():
 
         url = '{}?{}'.format(schedule_url, schedule_name)
 
-        return redirect(url)
+        return redirect("http://localhost:3000/Schedule")
 
 @app.route("/api/search", methods=["GET","POST"])
 def search():
