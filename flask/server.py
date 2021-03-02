@@ -246,7 +246,7 @@ def home():
         cursor.execute(get_schedules_query, (user_email,))
         result = cursor.fetchall()
         for schedule in result:
-            print(schedule)
+            # print(schedule)
             all_schedules.append(
                 {
                     "scheduleName": schedule[0],
@@ -255,7 +255,7 @@ def home():
                     "scheduleSemester": schedule[3]
                 }
             )
-        print(all_schedules)
+        # print(all_schedules)
         return json.dumps(all_schedules)
 
     if request.method == "POST":
@@ -390,14 +390,24 @@ def schedule():
         print(schedule_name)
         cursor = conn.cursor()
         data = request.data.decode("utf-8")
-        print("data: ")
-        print(data)
+        # print("data: ")
+        # print(data)
         json_data = json.loads(data)
         code_pt_1 = ""
         code_pt_2 = ""
         section = ""
         codes = []
         sections = []
+
+        #Get the appropriate semester from the Schedule table
+        cursor.execute('''
+            SELECT scheduleSemester from Schedule WHERE scheduleName like %s AND email like %s;
+            ''', (f"%{(schedule_name)}%", f"%{(user_email)}%",))
+
+        semester = cursor.fetchall()
+        for result in semester:
+            semester_current = result[0]
+
         #Do some formatting with the strings
         for course in json_data.get("courses"):
             course_string = course.replace(" ", "-")
@@ -416,21 +426,12 @@ def schedule():
             codes.append(code)
             sections.append(section)
 
+            #Get class info from Class table using code and section as keys
             cursor.execute(''' 
                 SELECT * from Class WHERE courseCode like %s AND courseSection like %s;
                 ''', (f"%{(code)}%", f"%{(section)}",))
 
             schedule_class = cursor.fetchall()
-
-            cursor.execute('''
-                SELECT scheduleSemester from Schedule WHERE scheduleName like %s AND email like %s;
-            ''', (f"%{(schedule_name)}%", f"%{(user_email)}%",))
-
-            semester = cursor.fetchall()
-
-            print("this is from the database")
-            print(semester)
-            
             print(schedule_class)
         
         #TODO: Iterate over all of the codes and sections, add them to the database
