@@ -456,8 +456,95 @@ def schedule():
 
 @app.route("/api/getScheduleInfo", methods=["GET"])
 def get_new_schedule():
-    global schedule_name
-    print(schedule_name)
+    if request.method == "GET":
+        global schedule_name
+        global user_email
+        global semester_selection
+        print(schedule_name)
+        if schedule_name != "":
+            query = "select * from ScheduleClass where scheduleName = %s and email = %s"
+            cursor = conn.cursor()
+            cursor.execute(query, (schedule_name, user_email,))
+            course_code_list = []
+            course_section_list = []
+            course_meeting_days = []
+            course_start_times = []
+            course_end_times = []
+            start_string = []
+            end_string = []
+            return_list = []
+            semester = ""
+            result = cursor.fetchall()
+            for row in result:
+                course_code_list.append(row[3])
+                course_section_list.append(row[2])
+                course_meeting_days.append(row[4])
+                semester = row[5]
+            course_info_query = "select startTime, endTime from Class where courseSection = %s and courseCode = %s and classSemester = %s"
+            for i in range(len(course_code_list)):
+                cursor.execute(course_info_query, (course_section_list[i], course_code_list[i], semester))
+                result = cursor.fetchall()
+                for row in result:
+                    course_start_times.append(row[0])
+                    course_end_times.append(row[1])
+            i = 0
+            for time in course_start_times:
+                if len(str(time)) < 8:
+                    time = f"0{str(time)}"
+            for time in course_end_times:
+                if len(str(time)) < 8:
+                    time = f"0{str(time)}"
+            for entry in course_meeting_days:
+                for day in entry:
+                    resource = ""
+                    if day == 'M':
+                        resource = "monday"
+                    if day == 'T':
+                        resource = "tuesday"
+                    if day == 'W':
+                        resource = "wednesday"
+                    if day == 'R':
+                        resource = "thursday"
+                    if day == 'F':
+                        resource = "friday"
+                    print("Made ie here")
+                    start_time = ""
+                    end_time = ""
+                    if len(str(course_start_times[i])) < 8:
+                        start_time = f"0{course_start_times[i]}"
+                    else:
+                        start_time = course_start_times[i]
+                    if len(str(course_end_times[i])) < 8:
+                        end_time = f"0{course_end_times[i]}"
+                    else:
+                        end_time = course_end_times[i]
+                    entry = {
+                            "id": 1,
+                            "text": f"{course_code_list[i]} {course_section_list[i]}",
+                            "start": f"2013-03-25T{start_time}",
+                            "end": f"2013-03-25T{end_time}",
+                            "resource": resource,
+                            "days": course_meeting_days[i]
+                    }
+                    print(entry)
+                    return_list.append(entry)
+                    # return_list = [entry]
+                    # return json.dumps(return_list)
+                i = i + 1
+            print(return_list)
+            return json.dumps(return_list)
+            # global.classEvents.push({
+            # "id": 1,
+            # "text": global.classAdded.text,
+            # "start": "2013-03-25T" + global.classTime,
+            # "end": "2013-03-25T" + global.endTime,
+            # "resource": res,
+            # "days": days
+            # },
+
+    #         if(global.endTime.length < 8) {
+    #     global.endTime = "0" + global.endTime;
+    #   }
     data = json.dumps(
         []
     )

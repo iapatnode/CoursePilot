@@ -18,24 +18,37 @@ export const Home = ()=> {
     const [isLoading, setLoading] = useState(true);
     const [success, setSuccess] = useState();
     const [show, setShow] = useState(false);
-    const [showSemester, setShowSemester] = useState(false);
+    const [redirect, setRedirect] = useState(false);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    function clickListener(e) {
+    function makePostRequest(path, params) {
+        return new Promise(function (resolve, reject) {
+            axios.post(path, params).then(
+                (response) => {
+                    var result = response.data;
+                    console.log('Processing request');
+                    resolve(result)
+                },
+                    (error) => {
+                        reject(error)
+                    }
+            );
+        });
+    }
+
+    async function clickListener(e) {
         console.log(e.target.innerText);
         let params = {
             "name": e.target.innerText
         }
-        axios.post('/api/existingSchedule', params).finally(response => {
+        var result = await makePostRequest('/api/existingSchedule', params);
+        console.log(result);
+        if(result == "good") {
+            alert("Schedule Loaded... Take me to my schedule!");
             window.location = "/Schedule";
-        })
-        .catch(err => {
-            if (err.response) {
-                console.log("BAD!");
-            }
-        })
+        }
     }
 
     useEffect(() => {

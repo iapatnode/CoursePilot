@@ -166,9 +166,9 @@ class Schedule extends Component {
     http.send(params);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     if(this.state.myRef) {
-      axios.get('http://localhost:5000/api/getScheduleInfo')
+      await axios.get('http://localhost:5000/api/getScheduleInfo')
       .then((response) => {
           this.setState({
               columns: [
@@ -181,7 +181,7 @@ class Schedule extends Component {
               events: response.data,
           })
       })
-      axios.get('http://localhost:5000/api/schedule')
+      await axios.get('http://localhost:5000/api/schedule')
       .then((response) => {
           response.data.forEach(element => {
             var para = document.createElement("li");
