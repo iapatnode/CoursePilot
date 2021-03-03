@@ -2,6 +2,17 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
+import Button from 'react-bootstrap/Button'
+
+
+global.loggedOut = false;
+
+function signOut() {
+    if(global.loggedOut == false) {
+        global.loggedOut = true;
+        window.location = "/";
+    }
+}
 
 export const Profile = () => {
     return (
@@ -18,6 +29,16 @@ export const Profile = () => {
         </Nav>
         </Navbar.Collapse>
         </Navbar>
+
+        <div className="container">
+            <div className="row">
+                <div className="col">
+                    <Button onClick={signOut} variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
+                        Log Out
+                    </Button>
+                </div>
+            </div>
+        </div>
         </div>
     );
 }
