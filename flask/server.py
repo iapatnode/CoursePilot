@@ -460,7 +460,6 @@ def get_new_schedule():
         global schedule_name
         global user_email
         global semester_selection
-        print(schedule_name)
         if schedule_name != "":
             query = "select * from ScheduleClass where scheduleName = %s and email = %s"
             cursor = conn.cursor()
@@ -470,6 +469,7 @@ def get_new_schedule():
             course_meeting_days = []
             course_start_times = []
             course_end_times = []
+            course_name_list = []
             start_string = []
             end_string = []
             return_list = []
@@ -488,6 +488,13 @@ def get_new_schedule():
                     course_start_times.append(row[0])
                     course_end_times.append(row[1])
             i = 0
+            course_name_query = "select courseName from Course where courseSemester = %s and courseCode = %s"
+            for code in course_code_list:
+                cursor.execute(course_name_query, (semester, code,))
+                result = cursor.fetchall()
+                for row in result:
+                    course_name_list.append(row[0])
+            print(course_name_list)
             for time in course_start_times:
                 if len(str(time)) < 8:
                     time = f"0{str(time)}"
@@ -507,7 +514,6 @@ def get_new_schedule():
                         resource = "thursday"
                     if day == 'F':
                         resource = "friday"
-                    print("Made ie here")
                     start_time = ""
                     end_time = ""
                     if len(str(course_start_times[i])) < 8:
@@ -520,31 +526,16 @@ def get_new_schedule():
                         end_time = course_end_times[i]
                     entry = {
                             "id": 1,
-                            "text": f"{course_code_list[i]} {course_section_list[i]}",
+                            "text": f"{course_code_list[i]} {start_time} - {end_time}{course_name_list[i]} {course_section_list[i]}",
                             "start": f"2013-03-25T{start_time}",
                             "end": f"2013-03-25T{end_time}",
                             "resource": resource,
                             "days": course_meeting_days[i]
                     }
-                    print(entry)
                     return_list.append(entry)
-                    # return_list = [entry]
-                    # return json.dumps(return_list)
                 i = i + 1
             print(return_list)
             return json.dumps(return_list)
-            # global.classEvents.push({
-            # "id": 1,
-            # "text": global.classAdded.text,
-            # "start": "2013-03-25T" + global.classTime,
-            # "end": "2013-03-25T" + global.endTime,
-            # "resource": res,
-            # "days": days
-            # },
-
-    #         if(global.endTime.length < 8) {
-    #     global.endTime = "0" + global.endTime;
-    #   }
     data = json.dumps(
         []
     )

@@ -148,6 +148,7 @@ class Schedule extends Component {
 
       }
     }
+    console.log(global.courses);
   }
 
   saveSchedule() {
@@ -180,6 +181,12 @@ class Schedule extends Component {
               ],
               events: response.data,
           })
+          console.log(response.data);
+          response.data.forEach(element => {
+            global.courses.push(element.text);
+          })
+          global.classEvents = response.data;
+          console.log(global.courses);
       })
       await axios.get('http://localhost:5000/api/schedule')
       .then((response) => {
