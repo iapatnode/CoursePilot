@@ -31,6 +31,15 @@ def connection():
 #Creates global variable that creates connection to database
 conn = connection()
 
+#User Email Variable
+user_email = ""
+
+#Semester Selection Variable
+semester_selection = ""
+
+#Get schedule name
+schedule_name = ""
+
 @app.route("/api/login", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
@@ -55,9 +64,8 @@ def login():
             valid = db_queries.validLogin(email, password)
 
         if valid:
-            db_queries.validLogin(email, password)
-        
-            session["email"] = email
+            global user_email
+            user_email = email
             return redirect("http://localhost:3000/home")
         
         #If the user's credentials are not found, redirect them back to the login page
@@ -117,32 +125,110 @@ def sign_up():
         print(valid)
 
         if valid:
-            db_queries.validPostSignUp(email, password, graduation_year, requirement_year, major, minor)
+            # conn = connection()
+            cursor = conn.cursor()
+            newStudentQuery = "Insert into Student values (%s, %s, %s)"
+            newStudentData = (email, password, graduation_year)
 
-            if valid:
-                session["email"] = email #use this to determine in the future who is logged in
-                print(session["email"])
-                print("Made it here")
-                return jsonify({'redirect_to_home': True}), 200
-            else:
+            #adds student and his/her info to the database
+            try:
+                cursor.execute(newStudentQuery, newStudentData)
+                print("Inserted student into the database")
+
+                conn.commit()
+            except Error as error:
+                #If you cannot insert the invidual into the database, print error and reroute
+                print("Insertion in database unsuccessful: " + str(error))
                 return redirect("http//localhost:3000/SignUp")
+            
+            #Adds student major information to database
+            try:
+                studentDegreeQuery = "select degreeID from MajorMinor where degreeName = %s and reqYear = %s and isMinor = %s"
+                for m in major:
+                    mid = 0
+                    cursor.execute(studentDegreeQuery, (m, requirement_year, 0))
+                    result = cursor.fetchall()
+                    for row in result:
+                        mid = row[0]
+                    
+                        addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
+                        cursor.execute(addToMajorMinor, (email, mid))
+                        print("Inserted one major")
+                        conn.commit()
+                
+                for mm in minor:
+                    mid = 0
+                    cursor.execute(studentDegreeQuery, (mm, requirement_year, 1))
+                    result = cursor.fetchall()
+                    for row in result:
+                        mid = row[0]
+                    
+                        addToMinor = "insert into StudentMajorMinor values (%s, %s)"
+                        cursor.execute(addToMinor, (email, mid))
+                        print("Inserted one minor")
+                        conn.commit()
+
+                print("Added majo/minorr to the database")
+            
+            except Error as error:
+                #If you cannot insert the major/minor into the database, print error and reroute
+                print("Insertion in database unsuccessful: " + str(error))
+                return redirect("http//localhost:3000/SignUp")
+
+            #DBMS connection cleanup
+            cursor.close()
+            # conn.close()
+
+            global user_email
+            user_email = email
+            print("Made it here")
+            # return redirect("http://localhost:3000/home")
+            return jsonify({'redirect_to_home': True}), 200
         else:
             return jsonify({'redirect_to_home': False}), 400
 
     if request.method == "GET":
-        print(session.get("email"))
-        return db_queries.validGetSignUp()
+        # Get a list of all majors and minors from the database
+        cursor = conn.cursor()
+        major_query = "select distinct degreeName from MajorMinor where isMinor = 0"
+        cursor.execute(major_query)
+        result = cursor.fetchall()
+        all_majors = []
+        for entry in result:
+            all_majors.append(entry[0])
+    
+        minor_query = "select distinct degreeName from MajorMinor where isMinor = 1"
+        cursor.execute(minor_query)
+        result = cursor.fetchall()
+        all_minors = []
+        for entry in result:
+            all_minors.append(entry[0])
+        
+        cursor.close()
+
+        return {
+            "majors": all_majors,
+            "minors": all_minors
+        }
 
 @app.route("/api/home", methods=["GET", "POST"])
 def home():
     #TODO: Return user data retrieved from database tables as needed
+    global user_email
+    global semester_selection
     if request.method == "GET":
+        # email = session.get("email")
+        # print(email)
         all_schedules = []
         cursor = conn.cursor()
-        get_schedules_query = """ SELECT * FROM Schedule WHERE email = "dybasjt17@gcc.edu" """
-        cursor.execute(get_schedules_query)
+        print(f"email: {user_email}")
+        get_schedules_query = ('''
+            SELECT * FROM Schedule WHERE email = %s;
+            ''')
+        cursor.execute(get_schedules_query, (user_email,))
         result = cursor.fetchall()
         for schedule in result:
+            # print(schedule)
             all_schedules.append(
                 {
                     "scheduleName": schedule[0],
@@ -151,20 +237,27 @@ def home():
                     "scheduleSemester": schedule[3]
                 }
             )
-        print(all_schedules)
+        # print(all_schedules)
         return json.dumps(all_schedules)
 
     if request.method == "POST":
         cursor = conn.cursor()
-
+        global schedule_name
         schedule_name = request.form.get("schedule-name")
         schedule_semester = request.form.get("schedule-semester")
+        semester_selection = request.form.get("schedule-semester")
         created_at = datetime.now()
         formatted_date = created_at.strftime('%Y-%m-%d %H:%M:%S')
+        session["schedule_semester"] = schedule_semester #Test to load courses and whatnot
+        print(f"{schedule_name} {formatted_date} {user_email} {schedule_semester}")
 
         insert_schedule_query = "INSERT INTO Schedule values (%s, %s, %s, %s)"
-        cursor.execute(insert_schedule_query, (schedule_name, formatted_date, session["email"], schedule_semester))
+        cursor.execute(insert_schedule_query, (schedule_name, formatted_date, user_email, schedule_semester))
         conn.commit()
+
+        schedule_url = "http://localhost:3000/Schedule"
+
+        url = '{}?{}'.format(schedule_url, schedule_name)
 
         return redirect("http://localhost:3000/Schedule")
 
@@ -188,13 +281,15 @@ def search():
 
         result_string = ""
         for row in class_table:
+            print(row)
             course_dict = {
                 "course_code": row[0],
                 "course_semester": row[1],
                 "course_name": row[2],
                 "course_credits": row[3],
                 "course_section": row[4],
-                "course_time": str(row[6])
+                "course_time": str(row[6]),
+                "course_end": str(row[7]),
             }
             courseArray.append(course_dict)
 
@@ -209,14 +304,28 @@ def search():
 
 @app.route('/api/schedule', methods=["GET", "POST"])
 def schedule():
-     if request.method == "GET":
+    global schedule_name
+    global user_email
+    if request.method == "GET":
+        print("Method is get")
+        print(user_email)
         cursor = conn.cursor()
         classArray = []
         courseArray = []
+        
+
+        cursor.execute('''
+            SELECT scheduleSemester from Schedule WHERE scheduleName like %s AND email like %s;
+            ''', (f"%{(schedule_name)}%", f"%{(user_email)}%",))
+
+        semester = cursor.fetchall()
+        semester_current = ""
+        for result in semester:
+            semester_current = result[0]
 
         cursor.execute(''' 
-            SELECT * from Course join Class on Class.courseCode = Course.courseCode order by Course.courseCode;
-        ''',)
+            SELECT * from Course join Class on Class.courseCode = Course.courseCode WHERE courseSemester like %s order by Course.courseCode;
+            ''', (f"%{(semester_current)}%",))
 
         class_table = cursor.fetchall()
 
@@ -228,7 +337,9 @@ def schedule():
                 "course_name": row[2],
                 "course_credits": row[3],
                 "course_section": row[4],
-                "course_time": str(row[6])
+                "course_time": str(row[6]),
+                "course_end": str(row[7]),
+                "days": row[8]
             }
             courseArray.append(course_dict)
 
@@ -237,42 +348,175 @@ def schedule():
 
         for row in classArray:
             print(row)
-            
         return json.dumps(courseArray)
+    
+    if request.method == "POST":
+        # global schedule_name
+        # global user_email
+        # global semester_selection
+        print("method is post")
+        print(user_email)
+        cursor = conn.cursor()
+        data = request.data.decode("utf-8")
+        # print("data: ")
+        # print(data)
+        json_data = json.loads(data)
+        code_pt_1 = ""
+        code_pt_2 = ""
+        section = ""
+        codes = []
+        sections = []
+        classes = []
 
-@app.route("/api/filledSchedule", methods=["GET"])
-def get_filled_schedule():
+        #Get the appropriate semester from the Schedule table
+        cursor.execute('''
+            SELECT scheduleSemester from Schedule WHERE scheduleName like %s AND email like %s;
+            ''', (f"%{(schedule_name)}%", f"%{(user_email)}%",))
+
+        semester = cursor.fetchall()
+        for result in semester:
+            semester_current = result[0]
+
+        #Do some formatting with the strings
+        for course in json_data.get("courses"):
+            course_string = course.replace(" ", "-")
+            # print(course_string)
+            index = course_string.index('-')
+            # print(index)
+            code_pt_1 = course_string[0: index + 4]
+            # print(code_pt_1)
+            sec_ind = len(course_string) - 1
+            # print(sec_ind)
+            section = course_string[sec_ind]
+            # print(section)
+            code = code_pt_1.replace("-", " ")
+            # print(code)
+            course_w_section = f"{code} {section}"
+            codes.append(code)
+            sections.append(section)
+
+            #Get class info from Class table using code and section as keys
+            cursor.execute(''' 
+                SELECT * from Class WHERE courseCode like %s AND courseSection like %s;
+                ''', (f"%{(code)}%", f"%{(section)}",))
+
+            schedule_class = cursor.fetchall()
+            print(schedule_class[0])
+            classes.append(schedule_class[0])
+
+        # Insert in to ScheduleClass query
+        classInsert = "INSERT into ScheduleClass (scheduleName, email, courseSection, courseCode, meetingDays, classSemester) VALUES (%s, %s, %s, %s, %s, %s)"
+
+        #TODO: Iterate over all of the codes and sections, add them to the database
+        # Loop that assigns all neccesary items for a class to an array
+        for result in classes:
+            schedule_items = [schedule_name, user_email, result[0], result[5], result[4], result[1]]
+            print(schedule_items)
+
+
+            cursor.execute(classInsert, (schedule_name, user_email, result[0], result[5], result[4], result[1]))
+        conn.commit()
+        # print(f"{codes}{sections}")
+        return f"{codes} {sections}"
+
+
+@app.route("/api/getScheduleInfo", methods=["GET"])
+def get_new_schedule():
+    if request.method == "GET":
+        global schedule_name
+        global user_email
+        global semester_selection
+        if schedule_name != "":
+            query = "select * from ScheduleClass where scheduleName = %s and email = %s"
+            cursor = conn.cursor()
+            cursor.execute(query, (schedule_name, user_email,))
+            course_code_list = []
+            course_section_list = []
+            course_meeting_days = []
+            course_start_times = []
+            course_end_times = []
+            course_name_list = []
+            start_string = []
+            end_string = []
+            return_list = []
+            semester = ""
+            result = cursor.fetchall()
+            for row in result:
+                course_code_list.append(row[3])
+                course_section_list.append(row[2])
+                course_meeting_days.append(row[4])
+                semester = row[5]
+            course_info_query = "select startTime, endTime from Class where courseSection = %s and courseCode = %s and classSemester = %s"
+            for i in range(len(course_code_list)):
+                cursor.execute(course_info_query, (course_section_list[i], course_code_list[i], semester))
+                result = cursor.fetchall()
+                for row in result:
+                    course_start_times.append(row[0])
+                    course_end_times.append(row[1])
+            i = 0
+            course_name_query = "select courseName from Course where courseSemester = %s and courseCode = %s"
+            for code in course_code_list:
+                cursor.execute(course_name_query, (semester, code,))
+                result = cursor.fetchall()
+                for row in result:
+                    course_name_list.append(row[0])
+            print(course_name_list)
+            for time in course_start_times:
+                if len(str(time)) < 8:
+                    time = f"0{str(time)}"
+            for time in course_end_times:
+                if len(str(time)) < 8:
+                    time = f"0{str(time)}"
+            for entry in course_meeting_days:
+                for day in entry:
+                    resource = ""
+                    if day == 'M':
+                        resource = "monday"
+                    if day == 'T':
+                        resource = "tuesday"
+                    if day == 'W':
+                        resource = "wednesday"
+                    if day == 'R':
+                        resource = "thursday"
+                    if day == 'F':
+                        resource = "friday"
+                    start_time = ""
+                    end_time = ""
+                    if len(str(course_start_times[i])) < 8:
+                        start_time = f"0{course_start_times[i]}"
+                    else:
+                        start_time = course_start_times[i]
+                    if len(str(course_end_times[i])) < 8:
+                        end_time = f"0{course_end_times[i]}"
+                    else:
+                        end_time = course_end_times[i]
+                    entry = {
+                            "id": 1,
+                            "text": f"{course_code_list[i]} {start_time} - {end_time}{course_name_list[i]} {course_section_list[i]}",
+                            "start": f"2013-03-25T{start_time}",
+                            "end": f"2013-03-25T{end_time}",
+                            "resource": resource,
+                            "days": course_meeting_days[i]
+                    }
+                    return_list.append(entry)
+                i = i + 1
+            print(return_list)
+            return json.dumps(return_list)
     data = json.dumps(
-        [           
-            {
-            "id": 1,
-            "text": "SOCI 101",
-            "start": "2013-03-25T12:00:00",
-            "end": "2013-03-25T14:00:00",
-            "resource": "monday"
-            },
-            {
-            "id": 2,
-            "text": "COMP 141",
-            "start": "2013-03-25T15:00:00",
-            "end": "2013-03-25T17:00:00",
-            "resource": "wednesday"
-            },
-            {
-            "id": 3,
-            "text": "Event 3",
-            "start": "2013-03-25T18:00:00",
-            "end": "2013-03-25T19:00:00",
-            "resource": "friday"
-            },
-        ]
+        []
     )
-
     return data
 
-
-@app.route("/api/degreereport", methods=["GET", "POST"])
-def report():
+@app.route("/api/existingSchedule", methods=["POST"])
+def get_existing_schedule():
+    if request.method == "POST":
+        data = request.data.decode("utf-8")
+        json_data = json.loads(data)
+        global schedule_name
+        schedule_name = json_data.get("name").rstrip()
+        return "good"
+    else:
+        return "blah"
 
     if request.method == "GET":
         #TODO: FIX WHEN THEY FIX SESSION  
