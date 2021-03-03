@@ -401,7 +401,7 @@ def schedule():
         codes = []
         sections = []
         classes = []
-
+        
         #Get the appropriate semester from the Schedule table
         cursor.execute('''
             SELECT scheduleSemester from Schedule WHERE scheduleName like %s AND email like %s;
@@ -446,8 +446,6 @@ def schedule():
         for result in classes:
             schedule_items = [schedule_name, user_email, result[0], result[5], result[4], result[1]]
             print(schedule_items)
-
-
             cursor.execute(classInsert, (schedule_name, user_email, result[0], result[5], result[4], result[1]))
         conn.commit()
         # print(f"{codes}{sections}")
