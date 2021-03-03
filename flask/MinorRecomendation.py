@@ -89,6 +89,53 @@ def getMinorsByRequirementYear(requirementYear):
     cursor.close()
     return minors
 
+
+def getMinorsByRequirementYearJSON(requirementYear):
+    cursor = conn.cursor()
+    cursor.execute(''' SELECT * FROM MajorMinor WHERE isMinor=1 AND reqYear=%s;''', (requirementYear, ))
+    result = cursor.fetchall()
+    minors = []
+    for entry in result:
+        course_dict = {
+            "name": entry[3],
+            "requiredClasses": getRequiredClassesJSON(entry[1], requirementYear),
+            "hoursRemaining": entry[4],
+            "requirementYear": entry[0]
+        }
+        minors.append(course_dict)
+    cursor.close()
+    return minors
+
+def getRequiredClassesJSON(degreeId, reqYear):
+    requiredCourses = []
+    cursor = conn.cursor()
+    cursor.execute(''' SELECT * FROM MajorMinorRequirements WHERE degreeId=%s AND catYear=%s;''', (degreeId, reqYear))
+    result = cursor.fetchall()
+    for entry in result:
+        courseList = []
+        category = entry[1]
+        cursor.execute(''' SELECT * FROM Requirement WHERE category=%s AND requirementYear=%s;''', (category, reqYear))
+        categoryResult = cursor.fetchall()
+        categoryResult = categoryResult[0]
+        numHoursRequired = categoryResult[3]
+        totalHours = categoryResult[4]
+        hoursRemaining = numHoursRequired
+        requirementMet = False
+        cursor.execute(''' SELECT * FROM ReqCourses WHERE category=%s AND catYear=%s;''', (category, reqYear))
+        courseResult = cursor.fetchall()
+        for course in courseResult:
+            courseList.append(course[1])
+        requiredCourseDict = {
+            "courseList": courseList,
+            "numHoursRequired": numHoursRequired,
+            "totalHours": totalHours,
+            "hoursRemaining": hoursRemaining,
+            "requirementMet": requirementMet
+        }
+        requiredCourses.append(requiredCourseDict)
+    cursor.close()
+    return requiredCourses
+
 """
 Once we obtain the list of minors, we need to get the classes required for each of those minors.
 This will most likely be stored in a tree structure or something similar because we need to account for
@@ -139,7 +186,6 @@ def populateAllMajors(majors, reqYear, classesTaken):
         majorList.append(getMajorClasses(major, reqYear, classesTaken))
     
     return majorList
-
 
 
 

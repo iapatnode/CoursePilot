@@ -39,12 +39,13 @@ export const Majors = () => {
     axios.get('http://localhost:5000/api/getMinors').then((response) => {
         console.log(response.data);
         response.data.forEach(element => {
-            var name = element.name;
+            var name = element["name"];
             var para = document.createElement("li");
             var tag = document.createElement("a");
             para.setAttribute("id", name);
             var node = document.createTextNode(name);
             tag.appendChild(node);
+            para.appendChild(tag);
             var element = document.getElementById("MinorList");
             element.appendChild(para);
         });
@@ -70,23 +71,22 @@ export const Majors = () => {
             <div class="reqYear">
                 Requirement Year
             </div>
-<<<<<<< Updated upstream
             <div class="tab">
                 <Tabs>
                     <Tab label="Majors">Majors</Tab>
-                    <Tab label="Minors">Minors</Tab>
+                    <Tab label="Minors">Minors
+                        <div id="MinorList">
+                    </div> 
+                    
+                    </Tab>
                 </Tabs>
             </div>
             <div>
                 
             </div>
-=======
-
-            <div id="MinorList">
-                </div> 
 
 
->>>>>>> Stashed changes
+
         </div>
         
         </div>
