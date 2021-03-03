@@ -1,9 +1,11 @@
 from flask import Flask, request, render_template, redirect, session, Response, jsonify
 from flask_cors import CORS
-import os
-import re, json
-from mysql.connector import connect, Error
+import os, re, json
 from datetime import datetime
+from mysql.connector import connect, Error
+
+import dbQueries as db_queries
+import degreeReport as degree_report
 
 #Flask App Setup
 app = Flask(__name__)
@@ -13,7 +15,7 @@ app.config["SECRET_KEY"] = os.urandom(32)
 #Settings for testing
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
-#Credentails for database connection
+#Credentials for database connection
 scriptdir = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(scriptdir, "config.json")) as text:
     config = json.load(text)
@@ -50,29 +52,11 @@ def login():
         
         #Checks if student's credentials are in the database
         if valid:
-            # conn = connection()
-            cursor = conn.cursor(buffered=True)
-            studentQuery = "select * from Student where email = %s and passwrd = %s"
-            studentCredentials = (email, password)
-
-            try:
-                cursor.execute(studentQuery, studentCredentials)
-                conn.commit()
-
-                #Checks if user with credentials exists
-                if cursor.rowcount == 0:
-                    print("User not found")
-                    valid = False
-                
-            except Error as error:
-                print("Query did not work: " + str(error))
-                valid = False
-            
-            #DBMS connection cleanup
-            cursor.close()
-        #     conn.close()
+            valid = db_queries.validLogin(email, password)
 
         if valid:
+            db_queries.validLogin(email, password)
+        
             session["email"] = email
             return redirect("http://localhost:3000/home")
         
@@ -133,93 +117,21 @@ def sign_up():
         print(valid)
 
         if valid:
-            # conn = connection()
-            cursor = conn.cursor()
-            newStudentQuery = "Insert into Student values (%s, %s, %s)"
-            newStudentData = (email, password, graduation_year)
-            session["email"] = email
-            print(session["email"])
+            db_queries.validPostSignUp(email, password, graduation_year, requirement_year, major, minor)
 
-            #adds student and his/her info to the database
-            try:
-                cursor.execute(newStudentQuery, newStudentData)
-                print("Inserted student into the database")
-
-                conn.commit()
-            except Error as error:
-                #If you cannot insert the invidual into the database, print error and reroute
-                print("Insertion in database unsuccessful: " + str(error))
+            if valid:
+                session["email"] = email #use this to determine in the future who is logged in
+                print(session["email"])
+                print("Made it here")
+                return jsonify({'redirect_to_home': True}), 200
+            else:
                 return redirect("http//localhost:3000/SignUp")
-            
-            #Adds student major information to database
-            try:
-                studentDegreeQuery = "select degreeID from MajorMinor where degreeName = %s and reqYear = %s and isMinor = %s"
-                for m in major:
-                    mid = 0
-                    cursor.execute(studentDegreeQuery, (m, requirement_year, 0))
-                    result = cursor.fetchall()
-                    for row in result:
-                        mid = row[0]
-                    
-                        addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
-                        cursor.execute(addToMajorMinor, (email, mid))
-                        print("Inserted one major")
-                        conn.commit()
-                
-                for mm in minor:
-                    mid = 0
-                    cursor.execute(studentDegreeQuery, (mm, requirement_year, 1))
-                    result = cursor.fetchall()
-                    for row in result:
-                        mid = row[0]
-                    
-                        addToMinor = "insert into StudentMajorMinor values (%s, %s)"
-                        cursor.execute(addToMinor, (email, mid))
-                        print("Inserted one minor")
-                        conn.commit()
-
-                print("Added majo/minorr to the database")
-            
-            except Error as error:
-                #If you cannot insert the major/minor into the database, print error and reroute
-                print("Insertion in database unsuccessful: " + str(error))
-                return redirect("http//localhost:3000/SignUp")
-
-            #DBMS connection cleanup
-            cursor.close()
-            # conn.close()
-
-            session["email"] = email #use this to determine in the future who is logged in
-            print("Made it here")
-            # return redirect("http://localhost:3000/home")
-            return jsonify({'redirect_to_home': True}), 200
         else:
             return jsonify({'redirect_to_home': False}), 400
 
     if request.method == "GET":
         print(session.get("email"))
-        # Get a list of all majors and minors from the database
-        cursor = conn.cursor()
-        major_query = "select distinct degreeName from MajorMinor where isMinor = 0"
-        cursor.execute(major_query)
-        result = cursor.fetchall()
-        all_majors = []
-        for entry in result:
-            all_majors.append(entry[0])
-    
-        minor_query = "select distinct degreeName from MajorMinor where isMinor = 1"
-        cursor.execute(minor_query)
-        result = cursor.fetchall()
-        all_minors = []
-        for entry in result:
-            all_minors.append(entry[0])
-        
-        cursor.close()
-
-        return {
-            "majors": all_majors,
-            "minors": all_minors
-        }
+        return db_queries.validGetSignUp()
 
 @app.route("/api/home", methods=["GET", "POST"])
 def home():
@@ -256,25 +168,6 @@ def home():
 
         return redirect("http://localhost:3000/Schedule")
 
-#attempt at using AJAX to load data from search bar        
-# @app.route("/search-auto/", methods=["POST"])
-# def autoSearch():
-#     cursor = conn.cursor()
-#     search_val = request.form.get("outlined-search")
-#     request_json = request.get_json()
-
-#     search_item = request_json["outlined-search"]
-#     print(search_val)
-#     if search_item:
-#         sets = cursor.execute(''' 
-#             SELECT * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like %s;
-#         ''', (f"%{(search_val)}%",))
-    
-#     else:
-#         sets = []
-    
-#     return jsonify(sets), 200
-
 @app.route("/api/search", methods=["GET","POST"])
 def search():
     if request.method == "POST":
@@ -283,22 +176,12 @@ def search():
         cursor = conn.cursor()
         classArray = []
         courseArray = []
-        #request_json = request.get_json()
-        # class_query = "select * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like ?;", (f"%{(search_val)}%",)
-        
-       # search_item = request_json["outlined-search"]
-        #print("search Item:" + search_item)
 
         print(search_val)
-        # cursor.execute(class_query)
 
         cursor.execute(''' 
             SELECT * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like %s;
         ''', (f"%{(search_val)}%",))
-
-        # cursor.execute('''
-        #     SELECT * from Course where Course.courseCode like %s;
-        # ''', (f"%{(search_val)}%",))
 
         class_table = cursor.fetchall()
         print(class_table)
@@ -316,40 +199,26 @@ def search():
             courseArray.append(course_dict)
 
             for item in row:
-                # print(row)
                 result_string += str(item)
 
         for row in classArray:
             print(row)
-            
-        
-        # return (result_string)
-        # return (search_val)
+
+
         return json.dumps(courseArray)
 
 @app.route('/api/schedule', methods=["GET", "POST"])
 def schedule():
      if request.method == "GET":
-        # search_val = ""
-        # search_val = request.form.get("outlined-search")
         cursor = conn.cursor()
         classArray = []
         courseArray = []
-        #request_json = request.get_json()
-        # class_query = "select * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like ?;", (f"%{(search_val)}%",)
-        
-       # search_item = request_json["outlined-search"]
-        #print("search Item:" + search_item)
-
-        # print(search_val)
 
         cursor.execute(''' 
             SELECT * from Course join Class on Class.courseCode = Course.courseCode order by Course.courseCode;
         ''',)
 
-
         class_table = cursor.fetchall()
-       # print(class_table)
 
         result_string = ""
         for row in class_table:
@@ -364,45 +233,12 @@ def schedule():
             courseArray.append(course_dict)
 
             for item in row:
-                # print(row)
                 result_string += str(item)
 
         for row in classArray:
             print(row)
             
-        
-        # return (result_string)
-        # return (search_val)
         return json.dumps(courseArray)
-
-
-    #     data = json.dumps(
-    #         [           
-    #             {
-    #             "id": 1,
-    #             "text": "SOCI 101",
-    #             "start": "2013-03-25T12:00:00",
-    #             "end": "2013-03-25T14:00:00",
-    #             "resource": "monday"
-    #             },
-    #             {
-    #             "id": 2,
-    #             "text": "COMP 141",
-    #             "start": "2013-03-25T15:00:00",
-    #             "end": "2013-03-25T17:00:00",
-    #             "resource": "wednesday"
-    #             },
-    #             {
-    #             "id": 3,
-    #             "text": "Event 3",
-    #             "start": "2013-03-25T18:00:00",
-    #             "end": "2013-03-25T19:00:00",
-    #             "resource": "friday"
-    #             },
-    #         ]
-    #     )
-
-    #     return data
 
 @app.route("/api/filledSchedule", methods=["GET"])
 def get_filled_schedule():
@@ -435,15 +271,21 @@ def get_filled_schedule():
     return data
 
 
+@app.route("/api/degreereport", methods=["GET", "POST"])
+def report():
 
+    if request.method == "GET":
+        #TODO: FIX WHEN THEY FIX SESSION  
+        degreeIds = degree_report.getStudentMajors(session['email'])
+        
+        studentDegreeReqs = degree_report.getMajorRequirements(degreeIds[0][0])
 
+        #TODO: GET CLASSES THAT THEY HAVE ALREADY TAKEN
+        #format stays the same
+        return json.dumps(studentDegreeReqs)
+    else:
+        return "POST FUCKED!"
 
-
-
-
-#def getTakenCourses():
-#    takenCourses = []
-#    return takenCourses
 
 def getClasses():
     cursor = conn.cursor()
