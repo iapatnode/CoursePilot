@@ -10,6 +10,7 @@ import Link from 'react-router-dom/Link'
 import Image from 'react-bootstrap/Image'
 import Logo from '../static/images/logo.jpg'
 
+global.semester="";
 
 export const Home = ()=> {
 
@@ -17,10 +18,38 @@ export const Home = ()=> {
     const [isLoading, setLoading] = useState(true);
     const [success, setSuccess] = useState();
     const [show, setShow] = useState(false);
-    const [showSemester, setShowSemester] = useState(false)
+    const [redirect, setRedirect] = useState(false);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+
+    function makePostRequest(path, params) {
+        return new Promise(function (resolve, reject) {
+            axios.post(path, params).then(
+                (response) => {
+                    var result = response.data;
+                    console.log('Processing request');
+                    resolve(result)
+                },
+                    (error) => {
+                        reject(error)
+                    }
+            );
+        });
+    }
+
+    async function clickListener(e) {
+        console.log(e.target.innerText);
+        let params = {
+            "name": e.target.innerText
+        }
+        var result = await makePostRequest('/api/existingSchedule', params);
+        console.log(result);
+        if(result == "good") {
+            alert("Schedule Loaded... Take me to my schedule!");
+            window.location = "/Schedule";
+        }
+    }
 
     useEffect(() => {
         axios.get("/api/home").then(response => {
@@ -28,7 +57,7 @@ export const Home = ()=> {
             setLoading(false);
         });
     }, []);
-    
+
     if (isLoading) {
         return <div> Loading... </div>
     }
@@ -55,7 +84,9 @@ export const Home = ()=> {
                         <h2> Name </h2>
                         <ul>
                             {success.map((value, index) => {
-                                return <Link id="link" to='/Schedule' key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></Link>
+                                let schedule_url = "http://localhost:3000/Schedule"
+                                return <li onClick={clickListener} key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></li>
+                                // return <Link id="link" to='/Schedule' key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></Link>
                             })}
                         </ul>
                     </div>
