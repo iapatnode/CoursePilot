@@ -174,6 +174,25 @@ class Schedule extends Component {
     http.send(params);
   }
 
+  deleteSchedule() {
+    var http = new XMLHttpRequest();
+    var url = '/api/schedule';
+    var params = JSON.stringify(
+      {
+        courses: global.courses,
+        removed: global.removedCourses,
+      }
+    );
+    http.open("POST", url, true);
+
+    http.onreadystatechange = function() {
+      if(http.readyState === 4) {
+        alert("Schedule Deleted Successfully");
+      }
+    }
+    http.send(params);
+  }
+
   async componentDidMount() {
     if(this.state.myRef) {
       await axios.get('http://localhost:5000/api/getScheduleInfo')
@@ -256,6 +275,9 @@ class Schedule extends Component {
             </Button>
             <Button href="/home" variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
               Exit
+            </Button>
+            <Button onClick={this.deleteSchedule} variant="secondary" type="submit" id="delete-schedule" className="signup-form-field">
+              Delete Schedule
             </Button>
         </div>
     );
