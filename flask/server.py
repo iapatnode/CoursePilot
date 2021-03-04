@@ -337,6 +337,7 @@ def search():
 def schedule():
     global schedule_name
     global user_email
+    global semester_selection
     if request.method == "GET":
         print("Method is get")
         print(user_email)
@@ -437,6 +438,10 @@ def schedule():
             schedule_class = cursor.fetchall()
             print(schedule_class[0])
             classes.append(schedule_class[0])
+        
+        delete = "delete from ScheduleClass where email = %s and scheduleName = %s"
+        cursor.execute(delete, (user_email, schedule_name))
+        conn.commit()
 
         # Insert in to ScheduleClass query
         classInsert = "INSERT into ScheduleClass (scheduleName, email, courseSection, courseCode, meetingDays, classSemester) VALUES (%s, %s, %s, %s, %s, %s)"

@@ -46,7 +46,7 @@ export const Home = ()=> {
         var result = await makePostRequest('/api/existingSchedule', params);
         console.log(result);
         if(result == "good") {
-            alert("Schedule Loaded... Take me to my schedule!");
+            // alert("Schedule Loaded... Take me to my schedule!");
             window.location = "/Schedule";
         }
     }
