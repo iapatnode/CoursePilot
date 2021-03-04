@@ -5,7 +5,7 @@ from datetime import datetime
 from mysql.connector import connect, Error
 
 import dbQueries as db_queries
-import degreeReport as degree_report
+import degreeReport as report
 
 #Flask App Setup
 app = Flask(__name__)
@@ -518,11 +518,13 @@ def get_existing_schedule():
     else:
         return "blah"
 
+@app.route("/api/degreereport", methods=["GET", "POST"])
+def degree_report():
     if request.method == "GET":
-        #TODO: FIX WHEN THEY FIX SESSION  
-        degreeIds = degree_report.getStudentMajors(session['email'])
+        global user_email
+        degreeIds = report.getStudentMajors(user_email)
         
-        studentDegreeReqs = degree_report.getMajorRequirements(degreeIds[0][0])
+        studentDegreeReqs = report.getMajorRequirements(degreeIds[0][0])
 
         #TODO: GET CLASSES THAT THEY HAVE ALREADY TAKEN
         #format stays the same
