@@ -402,6 +402,7 @@ def schedule():
         codes = []
         sections = []
         classes = []
+        print(json_data.get("removed"))
         
         #Get the appropriate semester from the Schedule table
         cursor.execute('''
@@ -491,9 +492,9 @@ def get_new_schedule():
                     course_start_times.append(row[0])
                     course_end_times.append(row[1])
             i = 0
-            course_name_query = "select courseName from Course where courseSemester = %s and courseCode = %s"
+            course_name_query = "select courseName from Course where (courseSemester = %s or courseSemester = %s or courseSemester = %s) and courseCode = %s"
             for code in course_code_list:
-                cursor.execute(course_name_query, (semester, code,))
+                cursor.execute(course_name_query, (semester, "both", "alternate", code,))
                 result = cursor.fetchall()
                 for row in result:
                     course_name_list.append(row[0])
@@ -529,7 +530,7 @@ def get_new_schedule():
                         end_time = course_end_times[i]
                     entry = {
                             "id": 1,
-                            "text": f"{course_code_list[i]} {start_time} - {end_time}{course_name_list[i]} {course_section_list[i]}",
+                            "text": f"{course_code_list[i]}",
                             "start": f"2013-03-25T{start_time}",
                             "end": f"2013-03-25T{end_time}",
                             "resource": resource,

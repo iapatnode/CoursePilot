@@ -28,6 +28,7 @@ global.classTime = "";
 global.endTime = "";
 global.conflict = false;
 global.removedCourses = []
+global.className = "";
 
 class Schedule extends Component {
 
@@ -98,6 +99,7 @@ class Schedule extends Component {
       var text = e.target.innerText
       global.addedClass = true;
       global.classAdded = {text};
+      global.className = text.substring(0, text.indexOf("-") - 9);
 
       var id = 1
     }
@@ -131,7 +133,7 @@ class Schedule extends Component {
         if(!global.conflict) {
           global.classEvents.push({
             "id": 1,
-            "text": global.classAdded.text,
+            "text": global.className,
             "start": "2013-03-25T" + global.classTime,
             "end": "2013-03-25T" + global.endTime,
             "resource": res,
