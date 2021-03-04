@@ -633,7 +633,6 @@ def get_new_schedule():
             semester = ""
             result = cursor.fetchall()
             for row in result:
-                print(row)
                 course_code_list.append(row[3])
                 course_section_list.append(row[2])
                 course_meeting_days.append(row[4])
@@ -643,16 +642,16 @@ def get_new_schedule():
                 cursor.execute(course_info_query, (course_section_list[i], course_code_list[i], semester))
                 result = cursor.fetchall()
                 for row in result:
-                    print(row)
                     course_start_times.append(row[0])
                     course_end_times.append(row[1])
             i = 0
-            course_name_query = "select courseName from Course where courseSemester = %s and courseCode = %s"
+            print(f"{course_code_list}, {course_section_list}, {course_code_list}")
+            course_name_query = "select courseName from Course where (courseSemester = %s or courseSemester = %s or courseSemester = %s) and courseCode = %s"
             for code in course_code_list:
-                cursor.execute(course_name_query, (semester, code,))
+                cursor.execute(course_name_query, (semester, "both", "alternate", code,))
                 result = cursor.fetchall()
                 for row in result:
-                    print(row)
+                    print(f"COURSE NAME: {row}")
                     course_name_list.append(row[0])
             print(course_name_list)
             for time in course_start_times:
@@ -693,6 +692,7 @@ def get_new_schedule():
                             "days": course_meeting_days[i]
                     }
                     return_list.append(entry)
+                print(course_code_list[i])
                 i = i + 1
             print(return_list)
             return json.dumps(return_list)
