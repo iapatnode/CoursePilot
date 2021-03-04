@@ -181,10 +181,6 @@ class Schedule extends Component {
               ],
               events: response.data,
           })
-          console.log(response.data);
-          response.data.forEach(element => {
-            global.courses.push(element.text);
-          })
           global.classEvents = response.data;
           console.log(global.courses);
       })
