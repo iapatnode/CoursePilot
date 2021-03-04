@@ -126,6 +126,31 @@ export const Home = ()=> {
                     </Modal.Body>
                 </Modal>
             </div>
+            <div id="button-container">
+                <Button variant="primary" onClick={handleShow}> Auto Gen Schedule </Button>
+                <Modal show={show} onHide={handleClose}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Create New Schedule - Enter Name</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form method="post" action="/api/autoGenerate">
+                            <Form.Group>
+                                <Form.Control type="text" placeholder="Enter Schedule Name" id="schedule-name" name="schedule-name"></Form.Control>
+                                <Form.Control as="select" id="schedule-semester" name="schedule-semester">
+                                    <option value="fall">Fall</option>
+                                    <option value="spring">Spring</option>
+                                </Form.Control>
+                                <Button variant="secondary" onClick={handleClose}>
+                                    Cancel
+                                </Button>
+                                <Button variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
+                                    Create Schedule
+                                </Button>
+                            </Form.Group>
+                        </Form>
+                    </Modal.Body>
+                </Modal>
+            </div>
         </div>     
     );
 }

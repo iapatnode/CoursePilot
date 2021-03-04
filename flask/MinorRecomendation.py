@@ -195,8 +195,9 @@ allMinors = getMinorsByRequirementYear(2017)
 
 
 for minorVal in allMinors:
-    print(minorVal.name + ", Remaining Hours: " + str(minorVal.hoursRemaining))
-print("*************")
+    break
+    #print(minorVal.name + ", Remaining Hours: " + str(minorVal.hoursRemaining))
+#print("*************")
 #1st Pass
 """
 for each classTaken:
@@ -226,15 +227,17 @@ for remainingClass in remainingClassesInMajor:
 
 
 for minorVal in allMinors:
-    print(minorVal.name + ", Remaining Hours: " + str(minorVal.hoursRemaining))
+    break
+    #print(minorVal.name + ", Remaining Hours: " + str(minorVal.hoursRemaining))
 
 
-print("--------------")
+#print("--------------")
 # SORT
 allMinors.sort(key=lambda x: x.hoursRemaining, reverse=False)
 
 for minorVal in allMinors:
-    print(minorVal.name + ", Remaining Hours: " + str(minorVal.hoursRemaining))
+    break
+    #print(minorVal.name + ", Remaining Hours: " + str(minorVal.hoursRemaining))
 """
 JSON?
 Minors = ["Mathematics":[1:["MATH101","MATH202"], 2:["MATH365","MATH475"]]]

@@ -4,7 +4,7 @@ import '../static/styles/Majors-Style.css'
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 
-import {Tabs, Tab} from 'react-bootstrap-tabs'
+//import {Tabs, Tab} from 'react-bootstrap-tabs'
 
 //import '@material/react-tab-bar/dist/tab-bar.css';
 //import '@material/react-tab-scroller/dist/tab-scroller.css';
@@ -72,14 +72,7 @@ export const Majors = () => {
                 Requirement Year
             </div>
             <div class="tab">
-                <Tabs>
-                    <Tab label="Majors">Majors</Tab>
-                    <Tab label="Minors">Minors
-                        <div id="MinorList">
-                    </div> 
-                    
-                    </Tab>
-                </Tabs>
+                
             </div>
             <div>
                 
