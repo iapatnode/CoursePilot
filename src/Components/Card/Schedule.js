@@ -86,6 +86,7 @@ class Schedule extends Component {
   addClass(e) {
     if(e.target && e.target.nodeName === "A") {
       var days = e.target.id.substring(e.target.id.indexOf("!") + 1, e.target.id.length);
+      console.log(days);
       var section_and_time = e.target.id.substring(e.target.id.indexOf("*") + 1, e.target.id.indexOf("!"));
       var start_end_times = section_and_time.substring(section_and_time.indexOf("*") + 1, section_and_time.length);
       global.classTime = start_end_times.substring(0, start_end_times.indexOf("*"));
