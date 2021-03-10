@@ -46,7 +46,6 @@ class Schedule extends Component {
         if(!global.removedCourses.includes(args.e.text())) {
           global.removedCourses.push(args.e.text());
         }
-        console.log(global.removedCourses);
         this.message("Course Deleted: " + args.e.text());
         var newEvents = [];
         var newCourses = [];
@@ -62,6 +61,8 @@ class Schedule extends Component {
         });        
       }
     };
+    console.log(global.removedCourses);
+    console.log(global.courses)
   }
   
   classFilter() {
@@ -86,7 +87,6 @@ class Schedule extends Component {
   addClass(e) {
     if(e.target && e.target.nodeName === "A") {
       var days = e.target.id.substring(e.target.id.indexOf("!") + 1, e.target.id.length);
-      console.log(days);
       var section_and_time = e.target.id.substring(e.target.id.indexOf("*") + 1, e.target.id.indexOf("!"));
       var start_end_times = section_and_time.substring(section_and_time.indexOf("*") + 1, section_and_time.length);
       global.classTime = start_end_times.substring(0, start_end_times.indexOf("*"));
@@ -167,6 +167,7 @@ class Schedule extends Component {
         removed: global.removedCourses,
       }
     );
+    console.log(global.courses);
     http.open("POST", url, true);
 
     http.onreadystatechange = function() {
@@ -175,6 +176,7 @@ class Schedule extends Component {
       }
     }
     http.send(params);
+    global.courses = [];
   }
 
   async componentDidMount() {
