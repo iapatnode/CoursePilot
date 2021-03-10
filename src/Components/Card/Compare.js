@@ -9,7 +9,8 @@ import Button from 'react-bootstrap/Button'
 import Image from 'react-bootstrap/Image'
 import Logo from '../static/images/logo.jpg'
 
-
+global.classEvents = [];
+global.courses = [];
 
 class Schedule extends Component {
 
@@ -24,16 +25,19 @@ class Schedule extends Component {
   }
   
   async componentDidMount() {
-    this.setState({
-        columns: [
-            { name: "Monday", id: "monday", start: "2013-03-25" },
-            { name: "Tuesday", id: "tuesday", start: "2013-03-25" },
-            { name: "Wednesday", id: "wednesday", start: "2013-03-25" },
-            { name: "Thursday", id: "thursday", start: "2013-03-25" },
-            { name: "Friday", id: "friday", start: "2013-03-25" },
-        ],
-        events: [],
-    })
+    await axios.get('http://localhost:5000/api/loadComparedSchedules')
+      .then((response) => {
+        this.setState({
+            columns: [
+                { name: "Monday", id: "monday", start: "2013-03-25" },
+                { name: "Tuesday", id: "tuesday", start: "2013-03-25" },
+                { name: "Wednesday", id: "wednesday", start: "2013-03-25" },
+                { name: "Thursday", id: "thursday", start: "2013-03-25" },
+                { name: "Friday", id: "friday", start: "2013-03-25" },
+            ],
+            events: response.data,
+        })       
+      })
   }
 
   render() {
@@ -65,14 +69,8 @@ class Schedule extends Component {
 
                 </div>
             </div>
-            <Button onClick={this.saveSchedule} variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
-                Save Schedule
-            </Button>
             <Button href="/home" variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
               Exit
-            </Button>
-            <Button onClick={this.deleteSchedule} variant="secondary" type="submit" id="delete-schedule" className="signup-form-field">
-              Delete Schedule
             </Button>
         </div>
     );

@@ -137,22 +137,22 @@ export const Home = ()=> {
                         <Modal.Title>Compare Two Schedules</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Form method="post" action="/api/home">
+                        <Form method="post" action="/api/compare">
                             <Form.Group>
                                 
-                                <Form.Control as="select" id="schedule-semester" name="schedule-semester">
+                                <Form.Control as="select" id="schedule-semester" name="schedule-one">
                                     {success.map((value, index) => {
-                                    let schedule_url = "http://localhost:3000/Schedule"
-                                    return <option onClick={clickListener} key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
+
+                                    return <option key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
                                         })}
                                 </Form.Control>
-                                <Form.Control as="select" id="schedule-semester" name="schedule-semester">
+                                <Form.Control as="select" id="schedule-semester" name="schedule-two">
                                     {success.map((value, index) => {
-                                    let schedule_url = "http://localhost:3000/Schedule"
-                                    return <option onClick={clickListener} key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
+
+                                    return <option key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
                                         })}
                                 </Form.Control>
-                                <Button variant="secondary" onClick={handleClose}>
+                                <Button variant="secondary" onClick={handleCloseCompare}>
                                     Cancel
                                 </Button>
                                 <Button variant="primary" type="submit" id="compare-schedule" className="signup-form-field">

@@ -39,6 +39,10 @@ semester_selection = ""
 #Get schedule name
 schedule_name = ""
 
+#Schedule Names when we compare schedules
+compare_schedule_one = ""
+compare_schedule_two = ""
+
 @app.route("/api/login", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
@@ -466,6 +470,114 @@ def schedule():
 
             return f"{return_text}"
     return "Successfully Saved Schedule"
+
+@app.route("/api/compare", methods=["GET", "POST"])
+def compare_schedules():
+    cursor = conn.cursor()
+    if request.method == "POST":
+        global compare_schedule_one
+        global compare_schedule_two
+        data = request.form
+        compare_schedule_one = data.get('schedule-one')
+        compare_schedule_two = data.get('schedule-two')
+        print(f"{compare_schedule_two}, {compare_schedule_one}")
+        return redirect("http://localhost:3000/compare")
+    return ""
+
+@app.route("/api/loadComparedSchedules", methods=["GET"])
+def get_data_compare():
+    cursor = conn.cursor()
+    if request.method == "GET":
+        return_list = []
+        course_codes = []
+        global schedule_name
+        global user_email
+        global semester_selection
+        global compare_schedule_one
+        global compare_schedule_two
+        backColor = ""
+        if schedule_name != "" or schedule_name == "":
+            schedule_info_query = "select * from ScheduleClass where email = %s and scheduleName = %s or scheduleName = %s"
+            cursor.execute(schedule_info_query, (user_email, compare_schedule_one, compare_schedule_two,))
+            results = cursor.fetchall()
+            for row in results:
+                if row[0] == compare_schedule_one:
+                    backColor = "#cc4125"
+                else:
+                    backColor = "blue"
+                print(f"Class: {row}")
+                start_time = ""
+                end_time = ""
+                if row[3] not in course_codes:
+                    course_codes.append(row[3])
+                    start_time = str(row[6])
+                    end_time = str(row[7])
+                    if(len(start_time) < 8):
+                        start_time = f"0{start_time}"
+                    if(len(end_time) < 8):
+                        end_time = f"0{end_time}"
+                    for day in row[4]:
+                        resource = ""
+                        if day == 'M':
+                            resource = "monday"
+                        if day == 'T':
+                            resource = "tuesday"
+                        if day == 'W':
+                            resource = "wednesday"
+                        if day == 'R':
+                            resource = "thursday"
+                        if day == 'F':
+                            resource = "friday"
+                        entry = {
+                                "id": 1,
+                                "text": f"{row[3]}",
+                                "start": f"2013-03-25T{start_time}",
+                                "end": f"2013-03-25T{end_time}",
+                                "resource": resource,
+                                "days": row[4],
+                                "backColor": backColor
+                        }
+                        return_list.append(entry)
+                else:
+                    if row[2] >= "L":
+                        course_codes.append(row[3])
+                        start_time = str(row[6])
+                        end_time = str(row[7])
+                        if(len(start_time) < 8):
+                            start_time = f"0{start_time}"
+                        if(len(end_time) < 8):
+                            end_time = f"0{end_time}"
+                        for day in row[4]:
+                            resource = ""
+                            if day == 'M':
+                                resource = "monday"
+                            if day == 'T':
+                                resource = "tuesday"
+                            if day == 'W':
+                                resource = "wednesday"
+                            if day == 'R':
+                                resource = "thursday"
+                            if day == 'F':
+                                resource = "friday"
+                            entry = {
+                                    "id": 1,
+                                    "text": f"{row[3]}",
+                                    "start": f"2013-03-25T{start_time}",
+                                    "end": f"2013-03-25T{end_time}",
+                                    "resource": resource,
+                                    "days": row[4]
+                            }
+                            return_list.append(entry)
+            pprint(return_list)
+            return json.dumps(return_list)
+    data = json.dumps(
+        []
+    )
+    return data
+
+
+
+
 
 
 @app.route("/api/getScheduleInfo", methods=["GET"])
