@@ -390,7 +390,7 @@ def schedule():
     if request.method == "POST":
         # global schedule_name
         # global user_email
-        # global semester_selection
+        global semester_selection
         print("method is post")
         print(user_email)
         cursor = conn.cursor()
@@ -425,6 +425,7 @@ def schedule():
         semester = cursor.fetchall()
         for result in semester:
             semester_current = result[0]
+        semester_selection = semester_current
 
         #Do some formatting with the strings
         if json_data.get("courses"):
@@ -445,8 +446,8 @@ def schedule():
 
                 #Get class info from Class table using code and section as keys
                 cursor.execute(''' 
-                    SELECT * from Class WHERE courseCode like %s AND courseSection like %s;
-                    ''', (f"%{(code)}%", f"%{(section)}",))
+                    SELECT * from Class WHERE courseCode like %s AND courseSection like %s and classSemester = %s;
+                    ''', (f"%{(code)}%", f"%{(section)}", semester_selection,))
                 # cursor.execute(''' 
                 #     SELECT * from Class WHERE courseCode = %s AND courseSection = %s and
                 #     (classSemester = %s or classSemester = %s or classSemester = %s);
