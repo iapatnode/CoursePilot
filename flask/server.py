@@ -515,34 +515,35 @@ def get_new_schedule():
                         }
                         return_list.append(entry)
                 else:
-                    course_codes.append(row[3])
-                    start_time = str(row[6])
-                    end_time = str(row[7])
-                    if(len(start_time) < 8):
-                        start_time = f"0{start_time}"
-                    if(len(end_time) < 8):
-                        end_time = f"0{end_time}"
-                    for day in row[4]:
-                        resource = ""
-                        if day == 'M':
-                            resource = "monday"
-                        if day == 'T':
-                            resource = "tuesday"
-                        if day == 'W':
-                            resource = "wednesday"
-                        if day == 'R':
-                            resource = "thursday"
-                        if day == 'F':
-                            resource = "friday"
-                        entry = {
-                                "id": 1,
-                                "text": f"{row[3]}",
-                                "start": f"2013-03-25T{start_time}",
-                                "end": f"2013-03-25T{end_time}",
-                                "resource": resource,
-                                "days": row[4]
-                        }
-                        return_list.append(entry)
+                    if row[2] >= "L":
+                        course_codes.append(row[3])
+                        start_time = str(row[6])
+                        end_time = str(row[7])
+                        if(len(start_time) < 8):
+                            start_time = f"0{start_time}"
+                        if(len(end_time) < 8):
+                            end_time = f"0{end_time}"
+                        for day in row[4]:
+                            resource = ""
+                            if day == 'M':
+                                resource = "monday"
+                            if day == 'T':
+                                resource = "tuesday"
+                            if day == 'W':
+                                resource = "wednesday"
+                            if day == 'R':
+                                resource = "thursday"
+                            if day == 'F':
+                                resource = "friday"
+                            entry = {
+                                    "id": 1,
+                                    "text": f"{row[3]}",
+                                    "start": f"2013-03-25T{start_time}",
+                                    "end": f"2013-03-25T{end_time}",
+                                    "resource": resource,
+                                    "days": row[4]
+                            }
+                            return_list.append(entry)
             pprint(return_list)
             return json.dumps(return_list)
     data = json.dumps(
