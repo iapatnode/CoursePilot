@@ -508,7 +508,7 @@ def get_data_compare():
                 print(f"Class: {row}")
                 start_time = ""
                 end_time = ""
-                if row[3] not in course_codes:
+                if row[3] not in course_codes or row[3] in course_codes:
                     course_codes.append(row[3])
                     start_time = str(row[6])
                     end_time = str(row[7])
