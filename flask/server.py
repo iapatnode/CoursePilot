@@ -288,22 +288,10 @@ def search():
         cursor = conn.cursor()
         classArray = []
         courseArray = []
-        #request_json = request.get_json()
-        # class_query = "select * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like ?;", (f"%{(search_val)}%",)
-        
-       # search_item = request_json["outlined-search"]
-        #print("search Item:" + search_item)
-
-        print(search_val)
-        # cursor.execute(class_query)
 
         cursor.execute(''' 
             SELECT * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like %s;
         ''', (f"%{(search_val)}%",))
-
-        # cursor.execute('''
-        #     SELECT * from Course where Course.courseCode like %s;
-        # ''', (f"%{(search_val)}%",))
 
         class_table = cursor.fetchall()
         print(class_table)
@@ -323,15 +311,8 @@ def search():
             courseArray.append(course_dict)
 
             for item in row:
-                # print(row)
                 result_string += str(item)
 
-        for row in classArray:
-            print(row)
-            
-        
-        # return (result_string)
-        # return (search_val)
         return json.dumps(courseArray)
 
 @app.route('/api/schedule', methods=["GET", "POST"])
@@ -340,8 +321,6 @@ def schedule():
     global user_email
     global semester_selection
     if request.method == "GET":
-        print("Method is get")
-        print(user_email)
         cursor = conn.cursor()
         classArray = []
         courseArray = []
@@ -379,24 +358,16 @@ def schedule():
             courseArray.append(course_dict)
 
             for item in row:
-                # print(row)
                 result_string += str(item)
-
-        for row in classArray:
-            print(row)
 
         return json.dumps(courseArray)
     
     if request.method == "POST":
-        # global schedule_name
-        # global user_email
         global semester_selection
         print("method is post")
         print(user_email)
         cursor = conn.cursor()
         data = request.data.decode("utf-8")
-        # print("data: ")
-        # print(data)
         json_data = json.loads(data)
         code_pt_1 = ""
         code_pt_2 = ""
@@ -404,18 +375,12 @@ def schedule():
         codes = []
         sections = []
         classes = []
-        print(f"Courses: {json_data.get('courses')}")
-        print(f"Removed: {json_data.get('removed')}")
 
         #Delete courses that were removed from the schedule
         for course in json_data.get("removed"):
             delete_query = "delete from ScheduleClass where email = %s and scheduleName = %s and courseCode = %s"
             cursor.execute(delete_query, (user_email, schedule_name, course))
         conn.commit()
-        
-        # delete = "delete from ScheduleClass where email = %s and scheduleName = %s"
-        # cursor.execute(delete, (user_email, schedule_name))
-        # conn.commit()
 
         #Get the appropriate semester from the Schedule table
         cursor.execute('''
@@ -432,14 +397,9 @@ def schedule():
             for course in json_data.get("courses"):
                 course_string = course.replace(" ", "-")
                 index = course_string.index('-')
-                print(f"Index: {index}")
                 code_pt_1 = course_string[0: index + 4]
-                print(f"Code pt 1: {code_pt_1}")
                 section = course[-1]
-                print(f"Section: {section}")
                 code = code_pt_1.replace("-", " ")
-                print(f"Code: {code}")
-                # print(code)
                 course_w_section = f"{code} {section}"
                 codes.append(code)
                 sections.append(section)
@@ -448,11 +408,6 @@ def schedule():
                 cursor.execute(''' 
                     SELECT * from Class WHERE courseCode like %s AND courseSection like %s and classSemester = %s;
                     ''', (f"%{(code)}%", f"%{(section)}", semester_selection,))
-                # cursor.execute(''' 
-                #     SELECT * from Class WHERE courseCode = %s AND courseSection = %s and
-                #     (classSemester = %s or classSemester = %s or classSemester = %s);
-                #     ''', (code, section, semester_selection, "alternate", "both"))
-
                 schedule_class = cursor.fetchall()
                 print(f"Results: {schedule_class}")
                 for row in schedule_class:
@@ -464,23 +419,24 @@ def schedule():
                     cursor.execute(classInsert, (schedule_name, user_email, row[0], row[5], row[4], row[1], row[2], row[3],))
                 conn.commit()
             
-            # print(f"Classes array: {classes}")
-            
-            # delete = "delete from ScheduleClass where email = %s and scheduleName = %s"
-            # cursor.execute(delete, (user_email, schedule_name))
-            # conn.commit()
+            #TODO: Prerequisite Checking
+            prerequisite_query = "select * from Prerequisite where courseCode like %s"
+            all_classes_query = "select * from ScheduleClass where scheduleName = %s and email = %s"
+            user_taken_courses_query = "select * from StudentCourses where email = %s"
+            prereq_list = []
+            group = 1
+            cursor.execute(all_classes_query, (schedule_name, user_email,))
+            all_classes = cursor.fetchall()
+            for ind_class in all_classes:
+                print(f"Class: {ind_class[3]}")
+                name = ind_class[3]
+                cursor.execute(prerequisite_query, (name,))
+                prerequisites = cursor.fetchall()
+                print(f"Getting prerequisites for {ind_class[3]}...")
+                for prereq in prerequisites:
+                    print(f"Prerequisite for {ind_class[3]} (group[{prereq[0]}]): {prereq[1]}")
 
-            # Insert in to ScheduleClass query
-            # classInsert = "INSERT into ScheduleClass (scheduleName, email, courseSection, courseCode, meetingDays, classSemester) VALUES (%s, %s, %s, %s, %s, %s)"
 
-            # #TODO: Iterate over all of the codes and sections, add them to the database
-            # # Loop that assigns all neccesary items for a class to an array
-            # for result in classes:
-            #     schedule_items = [schedule_name, user_email, result[0], result[5], result[4], result[1]]
-            #     print(schedule_items)
-            #     cursor.execute(classInsert, (schedule_name, user_email, result[0], result[5], result[4], result[1]))
-            # conn.commit()
-            # # print(f"{codes}{sections}")
             return f"{codes} {sections}"
     return ""
 
