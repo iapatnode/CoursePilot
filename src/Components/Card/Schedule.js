@@ -172,12 +172,15 @@ class Schedule extends Component {
 
     http.onreadystatechange = function() {
       if(http.readyState == 4) {
-        alert("Schedule Saved Successfully");
+        alert(this.responseText);
+        global.courses = [];
+        window.location = "/Home";
       }
     }
     http.send(params);
-    global.courses = [];
-    window.location = "/Home";
+    // alert("Schedule Saved Successfully");
+    // alert(http.responseText);
+    // window.location = "/Home";
   }
 
   async componentDidMount() {

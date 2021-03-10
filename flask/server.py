@@ -363,9 +363,8 @@ def schedule():
         return json.dumps(courseArray)
     
     if request.method == "POST":
+        return_text = ""
         global semester_selection
-        print("method is post")
-        print(user_email)
         cursor = conn.cursor()
         data = request.data.decode("utf-8")
         json_data = json.loads(data)
@@ -426,30 +425,47 @@ def schedule():
             user_taken_courses_query = "select * from StudentCourses where email = %s"
             cursor.execute(user_taken_courses_query, (user_email,))
             user_taken_courses = cursor.fetchall()
-            prereq_list = []
-            group = 1
+            user_courses_list = []
+            for course in user_taken_courses:
+                user_courses_list.append(course[1])
 
             cursor.execute(all_classes_query, (schedule_name, user_email,))
             all_classes = cursor.fetchall()
+
             for ind_class in all_classes:
-                print(f"Class: {ind_class[3]}")
+                failed_prereq = []
                 name = ind_class[3]
                 cursor.execute(prerequisite_query, (name,))
                 prerequisites = cursor.fetchall()
                 print(f"Getting prerequisites for {ind_class[3]}...")
+                group = 1
+                temp_list = []
                 for prereq in prerequisites:
                     print(f"Prerequisite for {ind_class[3]} (group[{prereq[0]}]): {prereq[1]}")
-                    taken = False
-                    for course in user_taken_courses:
-                        if course[1] == prereq[1]:
-                            taken = True
-                            print(f"User has taken {prereq[1]}")
-                        if not taken:
-                            print(f"User has not taken {prereq[1]}")
+                    if prereq[0] == group:
+                        temp_list.append(prereq[1])
+                        print(f"temp list: {temp_list}")
+                    else:
+                        return_text = ""
+                        for prerequisite in temp_list:
+                            print(f"Prerequisite: {prerequisite}")
+                            if prerequisite not in user_courses_list:
+                                return_text = "Warning: You have not taken all necessary prerequites for some courses on your schedule"
+                                failed_prereq.append(ind_class[3])
+                        group = group + 1
+                        temp_list = []
+                        temp_list.append(prereq[1])
+                for prerequisite in temp_list:
+                    print(f"Prerequisite: {prerequisite}")
+                    if prerequisite not in user_courses_list:
+                        return_text = "Warning: You have not taken all necessary prerequites for some courses on your schedule"
+                        failed_prereq.append(ind_class[3])
 
+                if return_text == "":
+                    return_text = "Saved Schedule Successfully"
 
-            return f"{codes} {sections}"
-    return ""
+            return f"{return_text}"
+    return "Successfully Saved Schedule"
 
 
 @app.route("/api/getScheduleInfo", methods=["GET"])
