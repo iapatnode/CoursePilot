@@ -422,9 +422,13 @@ def schedule():
             #TODO: Prerequisite Checking
             prerequisite_query = "select * from Prerequisite where courseCode like %s"
             all_classes_query = "select * from ScheduleClass where scheduleName = %s and email = %s"
+
             user_taken_courses_query = "select * from StudentCourses where email = %s"
+            cursor.execute(user_taken_courses_query, (user_email,))
+            user_taken_courses = cursor.fetchall()
             prereq_list = []
             group = 1
+
             cursor.execute(all_classes_query, (schedule_name, user_email,))
             all_classes = cursor.fetchall()
             for ind_class in all_classes:
@@ -435,6 +439,13 @@ def schedule():
                 print(f"Getting prerequisites for {ind_class[3]}...")
                 for prereq in prerequisites:
                     print(f"Prerequisite for {ind_class[3]} (group[{prereq[0]}]): {prereq[1]}")
+                    taken = False
+                    for course in user_taken_courses:
+                        if course[1] == prereq[1]:
+                            taken = True
+                            print(f"User has taken {prereq[1]}")
+                        if not taken:
+                            print(f"User has not taken {prereq[1]}")
 
 
             return f"{codes} {sections}"

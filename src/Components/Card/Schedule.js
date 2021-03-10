@@ -177,6 +177,7 @@ class Schedule extends Component {
     }
     http.send(params);
     global.courses = [];
+    window.location = "/Home";
   }
 
   async componentDidMount() {
