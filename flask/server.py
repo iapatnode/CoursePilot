@@ -403,6 +403,12 @@ def schedule():
         sections = []
         classes = []
         print(json_data.get("removed"))
+
+        #Delete courses that were removed from the schedule
+        for course in json_data.get("removed"):
+            delete_query = "delete from ScheduleClass where email = %s and scheduleName = %s and courseCode = %s"
+            cursor.execute(delete_query, (user_email, schedule_name, course))
+        conn.commit()
         
         #Get the appropriate semester from the Schedule table
         cursor.execute('''
@@ -414,6 +420,8 @@ def schedule():
             semester_current = result[0]
 
         #Do some formatting with the strings
+        if not json_data.get("courses"):
+            print("no courses were added here")
         for course in json_data.get("courses"):
             course_string = course.replace(" ", "-")
             # print(course_string)
@@ -440,9 +448,9 @@ def schedule():
             print(schedule_class[0])
             classes.append(schedule_class[0])
         
-        delete = "delete from ScheduleClass where email = %s and scheduleName = %s"
-        cursor.execute(delete, (user_email, schedule_name))
-        conn.commit()
+        # delete = "delete from ScheduleClass where email = %s and scheduleName = %s"
+        # cursor.execute(delete, (user_email, schedule_name))
+        # conn.commit()
 
         # Insert in to ScheduleClass query
         classInsert = "INSERT into ScheduleClass (scheduleName, email, courseSection, courseCode, meetingDays, classSemester) VALUES (%s, %s, %s, %s, %s, %s)"
