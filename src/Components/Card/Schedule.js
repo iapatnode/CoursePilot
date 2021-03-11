@@ -198,6 +198,7 @@ class Schedule extends Component {
     http.onreadystatechange = function() {
       if(http.readyState === 4) {
         alert("Schedule Deleted Successfully");
+        window.location = "/Home";
       }
     }
     http.send(params);
