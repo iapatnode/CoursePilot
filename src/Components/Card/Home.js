@@ -81,7 +81,7 @@ export const Home = ()=> {
               </Nav>
               </Navbar.Collapse>
             </Navbar>
-            <h1> Schedules </h1>
+            <h1 id="home-header"> Schedules </h1>
             <div className="container" id="schedule-list-view">
                 <div className="row">
                 <div className="col-2 text-center" id="container"></div>
@@ -91,7 +91,6 @@ export const Home = ()=> {
                             {success.map((value, index) => {
                                 let schedule_url = "http://localhost:3000/Schedule"
                                 return <li onClick={clickListener} key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></li>
-                                // return <Link id="link" to='/Schedule' key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></Link>
                             })}
                         </ul>
                     </div>
@@ -107,6 +106,7 @@ export const Home = ()=> {
                 </div>
             </div>
             <div id="button-container">
+                <Button variant="primary" id="home-page-secondary-button"> Auto-Generate Schedule </Button>
                 <Button variant="primary" id="home-page-secondary-button" onClick={handleShow}> Create New Schedule </Button>
                 <Button variant="primary" id="home-page-secondary-button" onClick={handleCompare}> Compare Two Schedules </Button>
                 <Modal show={show} onHide={handleClose}>

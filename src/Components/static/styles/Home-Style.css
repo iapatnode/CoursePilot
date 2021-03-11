@@ -9,4 +9,26 @@ ul {
 
 #home-page-secondary-button {
     background-color: #926DD6;
+    border-color: #926DD6;
+}
+
+#names {
+    cursor: pointer;
+}
+
+#schedule-list-view {
+    padding-top: 4vh;
+    height: 60vh;
+    margin-top: 2vh;
+    overflow-y: scroll;
+    border-radius: 8px;
+}
+
+#home-header {
+    margin-top: 3vh;
+    width: 100%;
+}
+
+#main-content {
+    height: 100vh;
 }
