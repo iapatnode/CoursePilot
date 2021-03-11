@@ -27,6 +27,8 @@ global.courses = [];
 global.classTime = "";
 global.endTime = "";
 global.conflict = false;
+global.removedCourses = []
+global.className = "";
 
 class Schedule extends Component {
 
@@ -41,6 +43,9 @@ class Schedule extends Component {
       courseInfo: [],
       myRef: React.createRef(true),
       onEventDeleted: function(args) {
+        if(!global.removedCourses.includes(args.e.text())) {
+          global.removedCourses.push(args.e.text());
+        }
         this.message("Course Deleted: " + args.e.text());
         var newEvents = [];
         var newCourses = [];
@@ -56,6 +61,8 @@ class Schedule extends Component {
         });        
       }
     };
+    console.log(global.removedCourses);
+    console.log(global.courses)
   }
   
   classFilter() {
@@ -93,6 +100,7 @@ class Schedule extends Component {
       var text = e.target.innerText
       global.addedClass = true;
       global.classAdded = {text};
+      global.className = text.substring(0, text.indexOf("-") - 9);
 
       var id = 1
     }
@@ -126,11 +134,12 @@ class Schedule extends Component {
         if(!global.conflict) {
           global.classEvents.push({
             "id": 1,
-            "text": global.classAdded.text,
+            "text": global.className,
             "start": "2013-03-25T" + global.classTime,
             "end": "2013-03-25T" + global.endTime,
             "resource": res,
-            "days": days
+            "days": days,
+            "backColor": "#926DD6"
             },
           )
           this.setState({
@@ -148,23 +157,50 @@ class Schedule extends Component {
 
       }
     }
-    console.log(global.courses);
   }
 
   saveSchedule() {
-    console.log("Schedule should save when this is clicked");
-    console.log(global.courses);
     var http = new XMLHttpRequest();
     var url = '/api/schedule';
-    var params = JSON.stringify({courses: global.courses});
+    var params = JSON.stringify(
+      {
+        courses: global.courses,
+        removed: global.removedCourses,
+      }
+    );
+    console.log(global.courses);
     http.open("POST", url, true);
 
     http.onreadystatechange = function() {
       if(http.readyState == 4) {
-        alert(http.responseText);
+        alert(this.responseText);
+        global.courses = [];
+        window.location = "/Home";
       }
     }
     http.send(params);
+    // alert("Schedule Saved Successfully");
+    // alert(http.responseText);
+    // window.location = "/Home";
+  }
+
+  deleteSchedule() {
+    var http = new XMLHttpRequest();
+    var url = '/api/delete';
+    http.open("POST", url, true);
+    http.onreadystatechange = function() {
+      if(http.readyState === 4) {
+        if(this.responseText == "success") {
+          alert("Schedule Deleted Successfully");
+          window.location = "/Home";
+        } 
+        else {
+          alert("Whoops... That didn't seem to work");
+          window.location = "/Home";
+        }
+      }
+    }
+    http.send();
   }
 
   async componentDidMount() {
@@ -249,6 +285,9 @@ class Schedule extends Component {
             </Button>
             <Button href="/home" variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
               Exit
+            </Button>
+            <Button onClick={this.deleteSchedule} variant="secondary" type="submit" id="delete-schedule" className="signup-form-field">
+              Delete Schedule
             </Button>
         </div>
     );

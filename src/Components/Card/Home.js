@@ -19,9 +19,14 @@ export const Home = ()=> {
     const [success, setSuccess] = useState();
     const [show, setShow] = useState(false);
     const [redirect, setRedirect] = useState(false);
+    const [compare, setCompare] = useState(false);
 
+    //New Schedule Modal listeners
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+    //Compare Schedule Modal Listeners
+    const handleCompare = () => setCompare(true);
+    const handleCloseCompare = () => setCompare(false);
 
     function makePostRequest(path, params) {
         return new Promise(function (resolve, reject) {
@@ -46,7 +51,7 @@ export const Home = ()=> {
         var result = await makePostRequest('/api/existingSchedule', params);
         console.log(result);
         if(result == "good") {
-            alert("Schedule Loaded... Take me to my schedule!");
+            // alert("Schedule Loaded... Take me to my schedule!");
             window.location = "/Schedule";
         }
     }
@@ -76,7 +81,7 @@ export const Home = ()=> {
               </Nav>
               </Navbar.Collapse>
             </Navbar>
-            <h1> Schedules </h1>
+            <h1 id="home-header"> Schedules </h1>
             <div className="container" id="schedule-list-view">
                 <div className="row">
                 <div className="col-2 text-center" id="container"></div>
@@ -86,7 +91,6 @@ export const Home = ()=> {
                             {success.map((value, index) => {
                                 let schedule_url = "http://localhost:3000/Schedule"
                                 return <li onClick={clickListener} key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></li>
-                                // return <Link id="link" to='/Schedule' key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></Link>
                             })}
                         </ul>
                     </div>
@@ -102,7 +106,9 @@ export const Home = ()=> {
                 </div>
             </div>
             <div id="button-container">
-                <Button variant="primary" onClick={handleShow}> Create New Schedule </Button>
+                <Button variant="primary" id="home-page-secondary-button"> Auto-Generate Schedule </Button>
+                <Button variant="primary" id="home-page-secondary-button" onClick={handleShow}> Create New Schedule </Button>
+                <Button variant="primary" id="home-page-secondary-button" onClick={handleCompare}> Compare Two Schedules </Button>
                 <Modal show={show} onHide={handleClose}>
                     <Modal.Header closeButton>
                         <Modal.Title>Create New Schedule - Enter Name</Modal.Title>
@@ -120,6 +126,37 @@ export const Home = ()=> {
                                 </Button>
                                 <Button variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
                                     Create Schedule
+                                </Button>
+                            </Form.Group>
+                        </Form>
+                    </Modal.Body>
+                </Modal>
+
+                <Modal show={compare} onHide={handleCloseCompare}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Compare Two Schedules</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form method="post" action="/api/compare">
+                            <Form.Group>
+                                
+                                <Form.Control as="select" id="schedule-semester" name="schedule-one">
+                                    {success.map((value, index) => {
+
+                                    return <option key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
+                                        })}
+                                </Form.Control>
+                                <Form.Control as="select" id="schedule-semester" name="schedule-two">
+                                    {success.map((value, index) => {
+
+                                    return <option key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
+                                        })}
+                                </Form.Control>
+                                <Button variant="secondary" onClick={handleCloseCompare}>
+                                    Cancel
+                                </Button>
+                                <Button variant="primary" type="submit" id="compare-schedule" className="signup-form-field">
+                                   Compare Selected Schedules
                                 </Button>
                             </Form.Group>
                         </Form>
