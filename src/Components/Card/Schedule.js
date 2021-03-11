@@ -138,7 +138,8 @@ class Schedule extends Component {
             "start": "2013-03-25T" + global.classTime,
             "end": "2013-03-25T" + global.endTime,
             "resource": res,
-            "days": days
+            "days": days,
+            "backColor": "#926DD6"
             },
           )
           this.setState({

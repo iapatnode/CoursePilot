@@ -654,7 +654,8 @@ def get_new_schedule():
                                     "start": f"2013-03-25T{start_time}",
                                     "end": f"2013-03-25T{end_time}",
                                     "resource": resource,
-                                    "days": row[4]
+                                    "days": row[4],
+                                    "backColor": "#926DD6"
                             }
                             return_list.append(entry)
             pprint(return_list)
