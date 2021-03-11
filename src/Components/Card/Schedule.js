@@ -185,7 +185,7 @@ class Schedule extends Component {
 
   deleteSchedule() {
     var http = new XMLHttpRequest();
-    var url = '/api/schedule';
+    var url = '/api/delete';
     var params = JSON.stringify(
       {
         courses: global.courses,
