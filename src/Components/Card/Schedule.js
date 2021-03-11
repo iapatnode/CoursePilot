@@ -187,21 +187,20 @@ class Schedule extends Component {
   deleteSchedule() {
     var http = new XMLHttpRequest();
     var url = '/api/delete';
-    var params = JSON.stringify(
-      {
-        courses: global.courses,
-        removed: global.removedCourses,
-      }
-    );
     http.open("POST", url, true);
-
     http.onreadystatechange = function() {
       if(http.readyState === 4) {
-        alert("Schedule Deleted Successfully");
-        window.location = "/Home";
+        if(this.responseText == "success") {
+          alert("Schedule Deleted Successfully");
+          window.location = "/Home";
+        } 
+        else {
+          alert("Whoops... That didn't seem to work");
+          window.location = "/Home";
+        }
       }
     }
-    http.send(params);
+    http.send();
   }
 
   async componentDidMount() {

@@ -475,13 +475,7 @@ def schedule():
 def delete_schedule():
     global schedule_name
     global user_email
-    print("we got to deleting")
     cursor = conn.cursor()
-
-    # cursor.execute(''' 
-    # SELECT * from Class WHERE courseCode like %s AND courseSection like %s and classSemester = %s;
-    # ''', (f"%{(code)}%", f"%{(section)}", semester_selection,))
-
     cursor.execute('''
         delete from ScheduleClass WHERE email like %s AND scheduleName like %s;
     ''', (f"%{(user_email)}%", f"{(schedule_name)}",))
@@ -491,12 +485,7 @@ def delete_schedule():
     ''', (f"%{(user_email)}%", f"{(schedule_name)}",))
 
     conn.commit()
-
-
-    print(schedule_name)
-    print(user_email)
-
-    return ""
+    return "success"
 
 
 @app.route("/api/compare", methods=["GET", "POST"])
