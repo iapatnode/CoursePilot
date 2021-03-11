@@ -502,9 +502,9 @@ def get_data_compare():
             results = cursor.fetchall()
             for row in results:
                 if row[0] == compare_schedule_one:
-                    backColor = "#cc4125"
+                    backColor = "#926DD6"
                 else:
-                    backColor = "blue"
+                    backColor = "#d89cf6"
                 print(f"Class: {row}")
                 start_time = ""
                 end_time = ""
@@ -623,7 +623,8 @@ def get_new_schedule():
                                 "start": f"2013-03-25T{start_time}",
                                 "end": f"2013-03-25T{end_time}",
                                 "resource": resource,
-                                "days": row[4]
+                                "days": row[4],
+                                "backColor": "#926DD6"
                         }
                         return_list.append(entry)
                 else:

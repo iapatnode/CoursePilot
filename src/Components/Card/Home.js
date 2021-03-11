@@ -107,8 +107,8 @@ export const Home = ()=> {
                 </div>
             </div>
             <div id="button-container">
-                <Button variant="primary" onClick={handleShow}> Create New Schedule </Button>
-                <Button variant="primary" onClick={handleCompare}> Compare Two Schedules </Button>
+                <Button variant="primary" id="home-page-secondary-button" onClick={handleShow}> Create New Schedule </Button>
+                <Button variant="primary" id="home-page-secondary-button" onClick={handleCompare}> Compare Two Schedules </Button>
                 <Modal show={show} onHide={handleClose}>
                     <Modal.Header closeButton>
                         <Modal.Title>Create New Schedule - Enter Name</Modal.Title>
