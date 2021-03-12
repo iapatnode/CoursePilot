@@ -3,6 +3,7 @@ import axios from 'axios'
 import '../static/styles/Majors-Style.css'
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
+import {DropdownButton, Dropdown} from 'react-bootstrap'
 
 import {Tabs, Tab} from 'react-bootstrap-tabs'
 
@@ -24,6 +25,7 @@ export const Majors = () => {
     var state = {activeIndex: 0};
  
     var handleActiveIndexUpdate = (activeIndex) => this.setState({activeIndex});
+    //var minorList = document.createElement("ul")
 
     // useEffect(() => {
     //     axios.get("/api/MajorPage").then(response => {
@@ -35,21 +37,58 @@ export const Majors = () => {
 
     //console.log(success.data)
     //success.major.foreach(element => majorCourses.push({"value": element, "label": element}))
-    
-    axios.get('http://localhost:5000/api/getMinors').then((response) => {
-        console.log(response.data);
-        response.data.forEach(element => {
-            var name = element["name"];
-            var para = document.createElement("li");
-            var tag = document.createElement("a");
-            para.setAttribute("id", name);
-            var node = document.createTextNode(name);
-            tag.appendChild(node);
-            para.appendChild(tag);
-            var element = document.getElementById("MinorList");
-            element.appendChild(para);
-        });
-    })
+    var minorList = document.createElement("ul");
+    if(isFirstRun.current) {
+        axios.get('http://localhost:5000/api/getMinors').then((response) => {
+            console.log(response.data);
+            response.data.forEach(element => {
+                var name = element["name"];
+                var para = document.createElement("li");
+                var tag = document.createElement("a");
+                para.setAttribute("id", name);
+                var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
+                tag.appendChild(node);
+                para.appendChild(tag);
+                minorList.appendChild(para);
+            });
+        })
+    }
+     var recMinorList = document.createElement("ul");
+    // if (isFirstRun.current) {
+    //     axios.get('http://localhost:5000/api/getMinorsRec').then((response) => {
+    //             console.log(response.data);
+    //             response.data.forEach(element => {
+    //                 var name = element["name"];
+    //                 var para = document.createElement("li");
+    //                 var tag = document.createElement("a");
+    //                 para.setAttribute("id", name);
+    //                 var node = document.createTextNode(name);
+    //                 tag.appendChild(node);
+    //                 para.appendChild(tag);
+    //                 recMinorList.appendChild(para);
+    //             });
+    //         })
+    // }
+
+    function getMinors() {
+        var parent = document.getElementById("MinorList")
+        if (parent.hasChildNodes()) {
+            parent.removeChild(parent.firstChild);
+        }
+        
+       parent.appendChild(minorList);
+    }
+
+    function getMinorsRec() {
+        var parent = document.getElementById("MinorList")
+        if (parent.hasChildNodes()) {
+            parent.removeChild(parent.firstChild);
+        }
+        
+       parent.appendChild(recMinorList);
+    }
+
+
 
     return (
         <div id="main-content">
@@ -75,8 +114,13 @@ export const Majors = () => {
                 <Tabs>
                     <Tab label="Majors">Majors</Tab>
                     <Tab label="Minors">Minors
+                        <button onClick={getMinors}>Click to show Minors</button>
+                        <DropdownButton id="dropdown-basic-button" title="Sort by">
+                            <Dropdown.Item onClick={getMinors}>A-Z</Dropdown.Item>
+                            <Dropdown.Item onClick={getMinorsRec}>Recommended</Dropdown.Item>
+                        </DropdownButton>
                         <div id="MinorList">
-                    </div> 
+                        </div> 
                     
                     </Tab>
                 </Tabs>
@@ -87,12 +131,17 @@ export const Majors = () => {
 
 
 
+            </div>
         </div>
-        
-        </div>
+
+
     );
 }
 
 
 export default Majors
+
+
+
+
 

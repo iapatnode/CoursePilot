@@ -189,52 +189,101 @@ def populateAllMajors(majors, reqYear, classesTaken):
 
 
 
-classesTaken = [course("MATH 214", 3), course("MATH 232", 3)]
-remainingClassesInMajor = []
-allMinors = getMinorsByRequirementYear(2017)
 
 
+def recommendMinors(classesTaken, remainingClassesInMajor, allMinors):
+    #1st Pass
+    """
+    for each classTaken:
+        for each minor:
+            if classTaken is in minor.requirements:
+                minor.hoursNeeded -= classTaken.hours
+    """
+    for classTaken in classesTaken:
+        for minorVar in allMinors:
+            for requirement in minorVar.requiredCourses:
+                if requirement.containsClass(classTaken):
+                    minorVar.hoursRemaining -= classTaken.hours
+
+    #2nd Pass
+    """
+    for each classNotTakenButInMajor:
+        for each minor:
+            if classNotTakenButInMajor is in minor.requirements:
+                minor.hoursNeeded -= classNotTakenButInMajor.hours
+    """
+    for remainingClass in remainingClassesInMajor:
+        for minorVar in allMinors:
+            for requirement in minorVar.requiredCourses:
+                if requirement.containsClass(remainingClass):
+                    minorVar.hoursRemaining -= remainingClass.hours
+    # SORT
+    allMinors.sort(key=lambda x: x.hoursRemaining, reverse=False)
+
+def recommendMinors(classesTaken, remainingClassesInMajor, allMinors):
+    #1st Pass
+    """
+    for each classTaken:
+        for each minor:
+            if classTaken is in minor.requirements:
+                minor.hoursNeeded -= classTaken.hours
+    """
+    for classTaken in classesTaken:
+        for minorVar in allMinors:
+            for requirement in minorVar.requiredCourses:
+                if requirement.containsClass(classTaken):
+                    minorVar.hoursRemaining -= classTaken.hours
+
+    #2nd Pass
+    """
+    for each classNotTakenButInMajor:
+        for each minor:
+            if classNotTakenButInMajor is in minor.requirements:
+                minor.hoursNeeded -= classNotTakenButInMajor.hours
+    """
+    for remainingClass in remainingClassesInMajor:
+        for minorVar in allMinors:
+            for requirement in minorVar.requiredCourses:
+                if requirement.containsClass(remainingClass):
+                    minorVar.hoursRemaining -= remainingClass.hours
+    # SORT
+    allMinors.sort(key=lambda x: x.hoursRemaining, reverse=False)
+
+def recommendMinorsJSON(classesTaken, remainingClassesInMajor, allMinors):
+    #1st Pass
+    for classTaken in classesTaken:
+        for minorVar in allMinors:
+            for requirement in minorVar["requiredClasses"]:
+                if classTaken["code"] in requirement["courseList"]:
+                    if (requirement["requirementMet"] == False):
+                        minorVar["hoursRemaining"] -= classTaken["hours"]
+
+    #2nd Pass
+    for remainingClass in remainingClassesInMajor:
+        for minorVar in allMinors:
+            for requirement in minorVar["requiredClasses"]:
+                if remainingClass["code"] in requirement["courseList"]:
+                    if (requirement["requirementMet"] == False):
+                        minorVar["hoursRemaining"] -= remainingClass["hours"]
+    # SORT
+    allMinors.sort(key=lambda x: x["hoursRemaining"], reverse=False)
+
+
+
+classesTaken = [{"code":"MATH 214", "hours": 3}, {"code":"MATH 232", "hours":3}]
+remainingClassesInMajor = [{"code": "MATH 421", "hours":3}]
+allMinors = getMinorsByRequirementYearJSON(2017)
 for minorVal in allMinors:
-    print(minorVal.name + ", Remaining Hours: " + str(minorVal.hoursRemaining))
+    print(minorVal["name"] + ", Remaining Hours: " + str(minorVal["hoursRemaining"]))
 print("*************")
-#1st Pass
-"""
-for each classTaken:
-    for each minor:
-        if classTaken is in minor.requirements:
-            minor.hoursNeeded -= classTaken.hours
-"""
-for classTaken in classesTaken:
-    for minorVar in allMinors:
-        for requirement in minorVar.requiredCourses:
-            if requirement.containsClass(classTaken):
-                minorVar.hoursRemaining -= classTaken.hours
 
-#2nd Pass
-"""
-for each classNotTakenButInMajor:
-    for each minor:
-        if classNotTakenButInMajor is in minor.requirements:
-            minor.hoursNeeded -= classNotTakenButInMajor.hours
-"""
-for remainingClass in remainingClassesInMajor:
-    for minorVar in allMinors:
-        for requirement in minorVar.requiredCourses:
-            if requirement.containsClass(remainingClass):
-                minorVar.hoursRemaining -= remainingClass.hours
-
+recommendMinorsJSON(classesTaken, remainingClassesInMajor, allMinors)
 
 
 for minorVal in allMinors:
-    print(minorVal.name + ", Remaining Hours: " + str(minorVal.hoursRemaining))
+    print(minorVal["name"] + ", Remaining Hours: " + str(minorVal["hoursRemaining"]))
 
 
-print("--------------")
-# SORT
-allMinors.sort(key=lambda x: x.hoursRemaining, reverse=False)
-
-for minorVal in allMinors:
-    print(minorVal.name + ", Remaining Hours: " + str(minorVal.hoursRemaining))
 """
 JSON?
 Minors = ["Mathematics":[1:["MATH101","MATH202"], 2:["MATH365","MATH475"]]]

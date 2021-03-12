@@ -486,7 +486,13 @@ def get_filled_schedule():
 
 @app.route("/api/getMinors", methods=["GET"])
 def getMinors():
-
     allMinors = MinorRecommendation.getMinorsByRequirementYearJSON(2017)
-
     return json.dumps(allMinors)
+
+# @app.route("/api/getMinorsRec", methods=["GET"])
+# def getMinorsRec():
+#     classesTaken = [{"code":"MATH 214", "hours": 3}, {"code":"MATH 232", "hours":3}]
+#     remainingClassesInMajor = [{"code": "MATH 421", "hours":3}]
+#     allMinors = MinorRecommendation.getMinorsByRequirementYearJSON(2017)
+#     MinorRecommendation.recommendMinorsJSON(classesTaken, remainingClassesInMajor, allMinors)
+#     return json.dumps(allMinors)
