@@ -703,7 +703,16 @@ def degree_report():
         #TODO: GET CLASSES THAT THEY HAVE ALREADY TAKEN
         #format stays the same
         return json.dumps(studentDegreeReqs)
-    else:
+    if request.method == "POST":
+        print("HIIIIIIII")
+        data = request.data.decode("utf-8")
+        json_data = json.loads(data)
+
+        addCourses = json_data.get("add")
+        deleteCourses = json_data.get("delete")
+
+        print(f'{addCourses}')
+        print(f'/n{deleteCourses}')
 
         # for req in studentDegreeReqs["req_details"]:
         #     requirementCat = req["req_category"]
@@ -714,7 +723,8 @@ def degree_report():
         #             report.insertCourse(user_email, course["course_code"])
         #             #TODO: report.insertStudentReqCourse(user_email, course["course_code"], requirementCat)
 
-        return redirect("http://localhost:3000/degreereport")
+        return jsonify({'redirect_to_degreereport': True}), 200
+        # return redirect("http://localhost:3000/degreereport")
 
 def getClasses():
     cursor = conn.cursor()
