@@ -119,7 +119,7 @@ def insertCourse(email, course):
     
     cursor.close()
 
-def deleteCourse(email, course):
+def deleteStudentCourse(email, course):
     cursor = conn.cursor()
 
     deleteQuery = "Delete from StudentCourses where email = %s and course = %s"
@@ -130,3 +130,4 @@ def deleteCourse(email, course):
         print("Unable to delete course..." + str(error))
     
     cursor.close()
+

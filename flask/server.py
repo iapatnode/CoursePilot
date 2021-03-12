@@ -709,10 +709,13 @@ def degree_report():
         json_data = json.loads(data)
 
         addCourses = json_data.get("add")
-        deleteCourses = json_data.get("delete")
+        deleteCourses = json_data.get("remove")
 
         print(f'{addCourses}')
         print(f'/n{deleteCourses}')
+
+        report.insertStudentCourses(email, addCourses)
+        report.deleteStudentCourses(email, deleteCourses)
 
         # for req in studentDegreeReqs["req_details"]:
         #     requirementCat = req["req_category"]
