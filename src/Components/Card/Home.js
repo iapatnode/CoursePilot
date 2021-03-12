@@ -84,28 +84,25 @@ export const Home = ()=> {
             <h1 id="home-header"> Schedules </h1>
             <div className="container" id="schedule-list-view">
                 <div className="row">
-                <div className="col-2 text-center" id="container"></div>
-                    <div className="col-md-4 col-md-offset-2" id="names">
+                    <div className="col-md-6" id="names">
                         <h2> Name </h2>
                         <ul>
                             {success.map((value, index) => {
-                                let schedule_url = "http://localhost:3000/Schedule"
-                                return <li onClick={clickListener} key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></li>
+                                return <li id="schedule-name" onClick={clickListener} key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></li>
                             })}
                         </ul>
                     </div>
-                    <div className="col-md-4" id="dates">
+                    <div className="col-md-6" id="dates">
                         <h2> Date Modified </h2> 
                         <ul>
                             {success.map((value, index) => {
-                                return <li key={index} value={value["dateModified"]}>{value["dateModified"]}</li>
+                                return <li id="schedule-date" key={index} value={value["dateModified"]}>{value["dateModified"]}</li>
                             })}
                         </ul>
                     </div>
-                    <div className="col-2"></div>
                 </div>
             </div>
-            <div id="button-container">
+            <div id="button-container-home">
                 <Button variant="primary" id="home-page-secondary-button"> Auto-Generate Schedule </Button>
                 <Button variant="primary" id="home-page-secondary-button" onClick={handleShow}> Create New Schedule </Button>
                 <Button variant="primary" id="home-page-secondary-button" onClick={handleCompare}> Compare Two Schedules </Button>
@@ -116,7 +113,7 @@ export const Home = ()=> {
                     <Modal.Body>
                         <Form method="post" action="/api/home">
                             <Form.Group>
-                                <Form.Control type="text" placeholder="Enter Schedule Name" id="schedule-name" name="schedule-name"></Form.Control>
+                                <Form.Control type="text" placeholder="Enter Schedule Name" id="enter-schedule-name" name="schedule-name"></Form.Control>
                                 <Form.Control as="select" id="schedule-semester" name="schedule-semester">
                                     <option value="fall">Fall</option>
                                     <option value="spring">Spring</option>
@@ -140,13 +137,13 @@ export const Home = ()=> {
                         <Form method="post" action="/api/compare">
                             <Form.Group>
                                 
-                                <Form.Control as="select" id="schedule-semester" name="schedule-one">
+                                <Form.Control as="select" id="schedule-one" name="schedule-one">
                                     {success.map((value, index) => {
 
                                     return <option key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
                                         })}
                                 </Form.Control>
-                                <Form.Control as="select" id="schedule-semester" name="schedule-two">
+                                <Form.Control as="select" id="schedule-two" name="schedule-two">
                                     {success.map((value, index) => {
 
                                     return <option key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>

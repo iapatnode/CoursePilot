@@ -4,10 +4,10 @@ import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import axios from 'axios'
 import Form from 'react-bootstrap/Form'
-import '../static/styles/Schedule-Style.css'
 import Button from 'react-bootstrap/Button'
 import Image from 'react-bootstrap/Image'
 import Logo from '../static/images/logo.jpg'
+import '../static/styles/Compare-Style.css'
 
 global.classEvents = [];
 global.courses = [];

@@ -128,7 +128,6 @@ class Schedule extends Component {
       var id = 1
     }
     if(global.classAdded && cont) { 
-      //FIX THIS PART RIGHT HERE
       global.courses.push(global.classAdded.text)
       for(var i = 0; i < days.length; i++) {
         var res = "";
@@ -274,7 +273,7 @@ class Schedule extends Component {
   render() {
     var {...config} = this.state;
     return (
-        <div>
+        <div id="main-schedule-div">
             <Navbar bg="dark" variant="dark" expand="lg">
               <Navbar.Brand href="/home">Course Pilot</Navbar.Brand>
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -287,7 +286,7 @@ class Schedule extends Component {
               </Nav>
               </Navbar.Collapse>
             </Navbar>
-            <div className="container-fluid">
+            <div className="container-fluid" id="calendar-view">
                 <div className="row">
                     <div className="col-md-9">
                         <DayPilotCalendar

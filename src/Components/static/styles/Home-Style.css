@@ -32,3 +32,29 @@ ul {
 #main-content {
     height: 100vh;
 }
+
+#names, #dates {
+    font-size: 20px;
+}
+
+#schedule-name, #schedule-date {
+    margin: 3%;
+}
+
+#enter-schedule-name, #schedule-semester {
+    margin-top: 4%;
+    margin-bottom: 4%;
+}
+
+#schedule-one {
+    margin-top: 4%;
+    margin-bottom: 4%;
+}
+
+#schedule-two {
+    margin-bottom: 4%;
+}
+
+#button-container-home {
+    margin-top: 3%;
+}
