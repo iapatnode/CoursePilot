@@ -5,7 +5,7 @@ import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import {DropdownButton, Dropdown} from 'react-bootstrap'
 
-import {Tabs, Tab} from 'react-bootstrap-tabs'
+//import {Tabs, Tab} from 'react-bootstrap-tabs'
 
 //import '@material/react-tab-bar/dist/tab-bar.css';
 //import '@material/react-tab-scroller/dist/tab-scroller.css';

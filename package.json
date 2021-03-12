@@ -33,7 +33,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "start-api": "cd flask && flask run --no-debugger",
+    "start-api": "cd flask && python3 -m flask run",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

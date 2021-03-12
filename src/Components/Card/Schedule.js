@@ -1,12 +1,11 @@
-import React, {Component, useState, useEffect} from 'react';
+import React, {Component, useState, useEffect, useRef} from 'react';
 import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react";
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import axios from 'axios'
 import Form from 'react-bootstrap/Form'
 import '../static/styles/Schedule-Style.css'
-import Logo from '../static/images/logo.jpg'
-import Image from 'react-bootstrap/Image'
+import Button from 'react-bootstrap/Button'
 
 
 const styles = {
@@ -21,19 +20,40 @@ const styles = {
   }
 };
 
+global.addedClass = false;
+global.classAdded = "";
+global.classEvents = [];
+global.courses = [];
+global.classTime = "";
+global.endTime = "";
+global.conflict = false;
 
 class Schedule extends Component {
 
   constructor(props) {
     super(props);
+    this.addClass = this.addClass.bind(this);
     this.state = {
       viewType: "Resources",
       durationBarVisible: false,
       timeRangeSelectedHandling: "Enabled",
       eventDeleteHandling: "Update",
       courseInfo: [],
+      myRef: React.createRef(true),
       onEventDeleted: function(args) {
-          this.message("Course Deleted: " + args.e.text());
+        this.message("Course Deleted: " + args.e.text());
+        var newEvents = [];
+        var newCourses = [];
+        global.classEvents.forEach(element => {
+          if(element.text != args.e.text()) {
+            newEvents.push(element);
+            if(newCourses.includes(element.text) == false) {
+              newCourses.push(element.text)
+            }
+          }
+          global.classEvents = newEvents;
+          global.courses = newCourses;
+        });        
       }
     };
   }
@@ -56,68 +76,141 @@ class Schedule extends Component {
     }
   }
 
-  componentDidMount() {
+  //TODO: Send async request to see if a user is allowed to take the course or not (checking prerequisites)
+  addClass(e) {
+    if(e.target && e.target.nodeName === "A") {
+      var days = e.target.id.substring(e.target.id.indexOf("!") + 1, e.target.id.length);
+      var section_and_time = e.target.id.substring(e.target.id.indexOf("*") + 1, e.target.id.indexOf("!"));
+      var start_end_times = section_and_time.substring(section_and_time.indexOf("*") + 1, section_and_time.length);
+      global.classTime = start_end_times.substring(0, start_end_times.indexOf("*"));
+      if(global.classTime.length < 8) {
+        global.classTime = "0" + global.classTime
+      }
+      global.endTime = start_end_times.substring(start_end_times.indexOf("*") + 1, start_end_times.length);
+      if(global.endTime.length < 8) {
+        global.endTime = "0" + global.endTime;
+      }
+      var text = e.target.innerText
+      global.addedClass = true;
+      global.classAdded = {text};
 
-      axios.get('http://localhost:5000/api/schedule')
-        .then((response) => {
-            var start = "2013-03-25T12:00:00"
-            var end = "2013-03-25T13:00:00"
-            var text = ""
-            var id = 1
-            var resource = "monday"
-            console.log(response.data);
-            this.setState({
-                columns: [
-                    { name: "Monday", id: "monday", start: "2013-03-25" },
-                    { name: "Tuesday", id: "tuesday", start: "2013-03-25" },
-                    { name: "Wednesday", id: "wednesday", start: "2013-03-25" },
-                    { name: "Thursday", id: "thursday", start: "2013-03-25" },
-                    { name: "Friday", id: "friday", start: "2013-03-25" },
-                ],
-                events: [],
-                courseInfo: response.data,
-            })
-            response.data.forEach(element => {
-              var para = document.createElement("li");
-              var tag = document.createElement("a");
-              para.setAttribute("id", element["course_name"] + "/" + element["course_section"]);
-              para.appendChild(tag);
-              var node = document.createTextNode(element["course_name"] + " " + element["course_section"]);
-              var course = document.createTextNode(element["course_code"] + "\n");
-              tag.appendChild(course);
-              tag.appendChild(node);
-              
-              var element = document.getElementById("courses");
-              element.appendChild(para);
-            })
-            document.getElementById("courses").addEventListener("click", function(e) {
-              if(e.target && e.target.nodeName === "A") {
-                //was console.log(e.target.id)
-                console.log(e.target.innerText + " was clicked");
-                text = e.target.innerText
-                console.log(text)
-                id = 1
-              }
-              
-            })
-            document.getElementById("myInput").addEventListener("click", function(e) {
-              console.log("bar was clicked")
-            })
-            // this.setState({
-            //   events: [
-            //     {
-            //       "start": start,
-            //       "end": end,
-            //       "text": text,
-            //       "id": id,
-            //       "resource": resource
-            //     }
-            //   ]
-            // })
+      var id = 1
+    }
+    if(global.classAdded) { 
+      var cont = true;
+      global.courses.push(global.classAdded.text)
+      for(var i = 0; i < days.length; i++) {
+        var res = "";
+        switch(days.charAt(i)) {
+          case "M":
+            res = "monday";
+            break;
+          case "T":
+            res = "tuesday";
+            break;
+          case "W":
+            res = "wednesday";
+            break;
+          case "R":
+            res = "thursday";
+            break;
+          default:
+            res = "friday";
+            break;
+        }
+        global.classEvents.forEach(element => {
+          if((element.start.value == "2013-03-25T" + global.classTime) && element.resource == res) {
+            global.conflict = true;
+          }
         })
-    
-    
+        if(!global.conflict) {
+          global.classEvents.push({
+            "id": 1,
+            "text": global.classAdded.text,
+            "start": "2013-03-25T" + global.classTime,
+            "end": "2013-03-25T" + global.endTime,
+            "resource": res,
+            "days": days
+            },
+          )
+          this.setState({
+            events: global.classEvents,
+          })
+        }
+      }
+      if(global.conflict) {
+        global.conflict = false;
+        cont = false;
+        alert("Error: Adding '" + global.classAdded.text + "' will cause a time conflict.");
+      }
+      // This is where we are going to check prerequisites
+      if(cont) {
 
+      }
+    }
+    console.log(global.courses);
+  }
+
+  saveSchedule() {
+    console.log("Schedule should save when this is clicked");
+    console.log(global.courses);
+    var http = new XMLHttpRequest();
+    var url = '/api/schedule';
+    var params = JSON.stringify({courses: global.courses});
+    http.open("POST", url, true);
+
+    http.onreadystatechange = function() {
+      if(http.readyState == 4) {
+        alert(http.responseText);
+      }
+    }
+    http.send(params);
+  }
+
+  async componentDidMount() {
+    if(this.state.myRef) {
+      await axios.get('http://localhost:5000/api/getScheduleInfo')
+      .then((response) => {
+          this.setState({
+              columns: [
+                  { name: "Monday", id: "monday", start: "2013-03-25" },
+                  { name: "Tuesday", id: "tuesday", start: "2013-03-25" },
+                  { name: "Wednesday", id: "wednesday", start: "2013-03-25" },
+                  { name: "Thursday", id: "thursday", start: "2013-03-25" },
+                  { name: "Friday", id: "friday", start: "2013-03-25" },
+              ],
+              events: response.data,
+          })
+          console.log(response.data);
+          response.data.forEach(element => {
+            global.courses.push(element.text);
+          })
+          global.classEvents = response.data;
+          console.log(global.courses);
+      })
+      await axios.get('http://localhost:5000/api/schedule')
+      .then((response) => {
+          response.data.forEach(element => {
+            var para = document.createElement("li");
+            var tag = document.createElement("a");
+            para.appendChild(tag);
+            var node = document.createTextNode(element["course_name"] + " " + element["course_section"]);
+            var course = document.createTextNode(element["course_code"] + "\n");
+            var time = document.createTextNode(" " + element["course_time"] + " - " + element["course_end"])
+            tag.appendChild(course);
+            tag.appendChild(time);
+            tag.appendChild(node);
+            tag.setAttribute("id", element["course_name"] + "*" + element["course_section"] + "*" + element["course_time"] + "*" + element["course_end"] + "!" + element["days"]);
+            var element = document.getElementById("courses");
+            element.appendChild(para);
+          })
+          document.getElementById("courses").addEventListener("click", this.addClass);
+
+          document.getElementById("myInput").addEventListener("click", function(e) {
+            console.log("bar was clicked")
+          })
+      })
+    }
   }
 
   render() {
@@ -125,7 +218,7 @@ class Schedule extends Component {
     return (
         <div>
             <Navbar bg="dark" variant="dark" expand="lg">
-              <Navbar.Brand><Image src={Logo} style={{height: 50}}/></Navbar.Brand>
+              <Navbar.Brand href="/home">Course Pilot</Navbar.Brand>
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="mr-auto">
@@ -148,26 +241,19 @@ class Schedule extends Component {
                     </div>
                     <div className="col-md-3" id="search-container">
                       <h2> Search Courses </h2>
-                        {/* <Form noValidate autoComplete="off" method="post" action="/api/search">
-                        
-                            <Form.Group>
-                              <Form.Control 
-                                type="search"
-                                name="outlined-search" 
-                                placeholder="Enter Course Name/Code Here">
-                              </Form.Control>
-                            </Form.Group>
-                        </Form>
-                         */}
                         <div id="div1">
                         <input type="text" id="myInput" onKeyUp={this.classFilter} placeholder="Search for Class" title="Type in a name"></input>
-                          <ul id="courses">
-                            
-                          </ul>
+                        <ul id="courses"></ul>
                         </div>
                     </div>
                 </div>
             </div>
+            <Button onClick={this.saveSchedule} variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
+                Save Schedule
+            </Button>
+            <Button href="/home" variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
+              Exit
+            </Button>
         </div>
     );
   }
