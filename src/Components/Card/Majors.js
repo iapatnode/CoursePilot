@@ -5,7 +5,7 @@ import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import {DropdownButton, Dropdown} from 'react-bootstrap'
 
-//import {Tabs, Tab} from 'react-bootstrap-tabs'
+import {Tabs, Tab} from 'react-bootstrap-tabs'
 
 //import '@material/react-tab-bar/dist/tab-bar.css';
 //import '@material/react-tab-scroller/dist/tab-scroller.css';
@@ -109,6 +109,10 @@ export const Majors = () => {
         <div class="req-content">
             <div class="reqYear">
                 Requirement Year
+                <button onClick={getMinors}>2017-2018</button>
+                <button onClick={getMinors}>2018-2019</button>
+                <button onClick={getMinors}>2019-2020</button>
+                <button onClick={getMinors}>2020-2021</button>
             </div>
             <div class="tab">
                 <Tabs>
@@ -120,6 +124,7 @@ export const Majors = () => {
                             <Dropdown.Item onClick={getMinorsRec}>Recommended</Dropdown.Item>
                         </DropdownButton>
                         <div id="MinorList">
+                            
                         </div> 
                     
                     </Tab>
