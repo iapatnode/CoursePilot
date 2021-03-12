@@ -85,10 +85,14 @@ class Schedule extends Component {
 
   //TODO: Send async request to see if a user is allowed to take the course or not (checking prerequisites)
   addClass(e) {
+    var course_code;
+    var cont = true;
     if(e.target && e.target.nodeName === "A") {
-      var days = e.target.id.substring(e.target.id.indexOf("!") + 1, e.target.id.length);
+      var days = e.target.id.substring(e.target.id.indexOf("!") + 1, e.target.id.indexOf("~"));
       var section_and_time = e.target.id.substring(e.target.id.indexOf("*") + 1, e.target.id.indexOf("!"));
       var start_end_times = section_and_time.substring(section_and_time.indexOf("*") + 1, section_and_time.length);
+      course_code = e.target.id.substring(e.target.id.indexOf("~") + 1);
+      console.log(course_code);
       global.classTime = start_end_times.substring(0, start_end_times.indexOf("*"));
       if(global.classTime.length < 8) {
         global.classTime = "0" + global.classTime
@@ -97,15 +101,24 @@ class Schedule extends Component {
       if(global.endTime.length < 8) {
         global.endTime = "0" + global.endTime;
       }
+      //TODO: Make this ID based rather than html based
       var text = e.target.innerText
+      var test = e.target.id;
+      console.log(test);
       global.addedClass = true;
       global.classAdded = {text};
       global.className = text.substring(0, text.indexOf("-") - 9);
+      global.classEvents.forEach(element => {
+        if(element["text"] == course_code && cont) {
+          console.log("duplicate");
+          alert("Error: You have already added this course to your schedule");
+          cont = false;
+        }
+      });
 
       var id = 1
     }
-    if(global.classAdded) { 
-      var cont = true;
+    if(global.classAdded && cont) { 
       global.courses.push(global.classAdded.text)
       for(var i = 0; i < days.length; i++) {
         var res = "";
@@ -153,9 +166,6 @@ class Schedule extends Component {
         alert("Error: Adding '" + global.classAdded.text + "' will cause a time conflict.");
       }
       // This is where we are going to check prerequisites
-      if(cont) {
-
-      }
     }
   }
 
@@ -218,7 +228,7 @@ class Schedule extends Component {
               events: response.data,
           })
           global.classEvents = response.data;
-          console.log(global.courses);
+          console.log(global.classEvents);
       })
       await axios.get('http://localhost:5000/api/schedule')
       .then((response) => {
@@ -227,12 +237,18 @@ class Schedule extends Component {
             var tag = document.createElement("a");
             para.appendChild(tag);
             var node = document.createTextNode(element["course_name"] + " " + element["course_section"]);
-            var course = document.createTextNode(element["course_code"] + "\n");
+            var course = document.createTextNode(element["course_code"]);
             var time = document.createTextNode(" " + element["course_time"] + " - " + element["course_end"])
+            var br = document.createElement("br");
             tag.appendChild(course);
+            tag.appendChild(br);
             tag.appendChild(time);
+            tag.appendChild(br);
             tag.appendChild(node);
-            tag.setAttribute("id", element["course_name"] + "*" + element["course_section"] + "*" + element["course_time"] + "*" + element["course_end"] + "!" + element["days"]);
+            tag.setAttribute(
+              "id", element["course_name"] + "*" + element["course_section"] + 
+              "*" + element["course_time"] + "*" + element["course_end"] + 
+              "!" + element["days"] + "~" + element["course_code"]);
             var element = document.getElementById("courses");
             element.appendChild(para);
           })
