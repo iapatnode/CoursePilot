@@ -84,7 +84,7 @@ export const Home = ()=> {
             <h1 id="home-header"> Schedules </h1>
             <div className="container" id="schedule-list-view">
                 <div className="row">
-                    <div className="col-md-6" id="names">
+                    <div className="col-md-4" id="names">
                         <h2> Name </h2>
                         <ul>
                             {success.map((value, index) => {
@@ -92,7 +92,15 @@ export const Home = ()=> {
                             })}
                         </ul>
                     </div>
-                    <div className="col-md-6" id="dates">
+                    <div className="col-md-4" id="semesters">
+                        <h2> Semester </h2>
+                        <ul>
+                            {success.map((value, index) => {
+                                return <li id="schedule-semester" key={index} value={value["scheduleSemester"]}>{value["scheduleSemester"]}</li>
+                            })}
+                        </ul>
+                    </div>
+                    <div className="col-md-4" id="dates">
                         <h2> Date Modified </h2> 
                         <ul>
                             {success.map((value, index) => {

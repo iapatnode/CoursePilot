@@ -33,8 +33,12 @@ ul {
     height: 100vh;
 }
 
-#names, #dates {
+#names, #dates, #semesters {
     font-size: 20px;
+}
+
+#semesters {
+    text-transform: capitalize;
 }
 
 #schedule-name, #schedule-date {
