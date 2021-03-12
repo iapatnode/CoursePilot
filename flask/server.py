@@ -6,6 +6,7 @@ from mysql.connector import connect, Error
 
 import dbQueries as db_queries
 import degreeReport as report
+from pprint import pprint
 
 #Flask App Setup
 app = Flask(__name__)
@@ -39,6 +40,10 @@ semester_selection = ""
 
 #Get schedule name
 schedule_name = ""
+
+#Schedule Names when we compare schedules
+compare_schedule_one = ""
+compare_schedule_two = ""
 
 @app.route("/api/login", methods=["POST", "GET"])
 def login():
@@ -288,8 +293,6 @@ def search():
         classArray = []
         courseArray = []
 
-        print(search_val)
-
         cursor.execute(''' 
             SELECT * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like %s;
         ''', (f"%{(search_val)}%",))
@@ -314,27 +317,22 @@ def search():
             for item in row:
                 result_string += str(item)
 
-        for row in classArray:
-            print(row)
-
-
         return json.dumps(courseArray)
 
 @app.route('/api/schedule', methods=["GET", "POST"])
 def schedule():
     global schedule_name
     global user_email
+    global semester_selection
     if request.method == "GET":
-        print("Method is get")
-        print(user_email)
         cursor = conn.cursor()
         classArray = []
         courseArray = []
         
 
         cursor.execute('''
-            SELECT scheduleSemester from Schedule WHERE scheduleName like %s AND email like %s;
-            ''', (f"%{(schedule_name)}%", f"%{(user_email)}%",))
+            SELECT scheduleSemester from Schedule WHERE scheduleName = %s AND email = %s;
+            ''', (schedule_name, user_email,))
 
         semester = cursor.fetchall()
         semester_current = ""
@@ -342,8 +340,9 @@ def schedule():
             semester_current = result[0]
 
         cursor.execute(''' 
-            SELECT * from Course join Class on Class.courseCode = Course.courseCode WHERE courseSemester like %s order by Course.courseCode;
-            ''', (f"%{(semester_current)}%",))
+            SELECT * from Course join Class on Class.courseCode = Course.courseCode WHERE
+             (classSemester = %s or classSemester = %s or classSemester = %s) order by Course.courseCode;
+            ''', (semester_current, "both", "alternate",))
 
         class_table = cursor.fetchall()
 
@@ -364,20 +363,13 @@ def schedule():
             for item in row:
                 result_string += str(item)
 
-        for row in classArray:
-            print(row)
         return json.dumps(courseArray)
     
     if request.method == "POST":
-        # global schedule_name
-        # global user_email
-        # global semester_selection
-        print("method is post")
-        print(user_email)
+        return_text = ""
+        global semester_selection
         cursor = conn.cursor()
         data = request.data.decode("utf-8")
-        # print("data: ")
-        # print(data)
         json_data = json.loads(data)
         code_pt_1 = ""
         code_pt_2 = ""
@@ -385,7 +377,13 @@ def schedule():
         codes = []
         sections = []
         classes = []
-        
+
+        #Delete courses that were removed from the schedule
+        for course in json_data.get("removed"):
+            delete_query = "delete from ScheduleClass where email = %s and scheduleName = %s and courseCode = %s"
+            cursor.execute(delete_query, (user_email, schedule_name, course))
+        conn.commit()
+
         #Get the appropriate semester from the Schedule table
         cursor.execute('''
             SELECT scheduleSemester from Schedule WHERE scheduleName like %s AND email like %s;
@@ -394,129 +392,289 @@ def schedule():
         semester = cursor.fetchall()
         for result in semester:
             semester_current = result[0]
+        semester_selection = semester_current
 
         #Do some formatting with the strings
-        for course in json_data.get("courses"):
-            course_string = course.replace(" ", "-")
-            # print(course_string)
-            index = course_string.index('-')
-            # print(index)
-            code_pt_1 = course_string[0: index + 4]
-            # print(code_pt_1)
-            sec_ind = len(course_string) - 1
-            # print(sec_ind)
-            section = course_string[sec_ind]
-            # print(section)
-            code = code_pt_1.replace("-", " ")
-            # print(code)
-            course_w_section = f"{code} {section}"
-            codes.append(code)
-            sections.append(section)
+        if json_data.get("courses"):
+            for course in json_data.get("courses"):
+                course_string = course.replace(" ", "-")
+                index = course_string.index('-')
+                code_pt_1 = course_string[0: index + 4]
+                section = course[-1]
+                code = code_pt_1.replace("-", " ")
+                course_w_section = f"{code} {section}"
+                codes.append(code)
+                sections.append(section)
 
-            #Get class info from Class table using code and section as keys
-            cursor.execute(''' 
-                SELECT * from Class WHERE courseCode like %s AND courseSection like %s;
-                ''', (f"%{(code)}%", f"%{(section)}",))
+                #Get class info from Class table using code and section as keys
+                cursor.execute(''' 
+                    SELECT * from Class WHERE courseCode like %s AND courseSection like %s and classSemester = %s;
+                    ''', (f"%{(code)}%", f"%{(section)}", semester_selection,))
+                schedule_class = cursor.fetchall()
+                print(f"Results: {schedule_class}")
+                for row in schedule_class:
+                    print(f"Row: {row}")
+                    classInsert = """INSERT into ScheduleClass 
+                        (scheduleName, email, courseSection, courseCode, meetingDays, classSemester, startTime, endTime)
+                        values (%s, %s, %s, %s, %s, %s, %s, %s);
+                    """
+                    cursor.execute(classInsert, (schedule_name, user_email, row[0], row[5], row[4], row[1], row[2], row[3],))
+                conn.commit()
+            
+            #TODO: Prerequisite Checking
+            prerequisite_query = "select * from Prerequisite where courseCode like %s"
+            all_classes_query = "select * from ScheduleClass where scheduleName = %s and email = %s"
 
-            schedule_class = cursor.fetchall()
-            print(schedule_class[0])
-            classes.append(schedule_class[0])
+            user_taken_courses_query = "select * from StudentCourses where email = %s"
+            cursor.execute(user_taken_courses_query, (user_email,))
+            user_taken_courses = cursor.fetchall()
+            user_courses_list = []
+            for course in user_taken_courses:
+                user_courses_list.append(course[1])
 
-        # Insert in to ScheduleClass query
-        classInsert = "INSERT into ScheduleClass (scheduleName, email, courseSection, courseCode, meetingDays, classSemester) VALUES (%s, %s, %s, %s, %s, %s)"
+            cursor.execute(all_classes_query, (schedule_name, user_email,))
+            all_classes = cursor.fetchall()
 
-        #TODO: Iterate over all of the codes and sections, add them to the database
-        # Loop that assigns all neccesary items for a class to an array
-        for result in classes:
-            schedule_items = [schedule_name, user_email, result[0], result[5], result[4], result[1]]
-            print(schedule_items)
-            cursor.execute(classInsert, (schedule_name, user_email, result[0], result[5], result[4], result[1]))
-        conn.commit()
-        # print(f"{codes}{sections}")
-        return f"{codes} {sections}"
+            for ind_class in all_classes:
+                failed_prereq = []
+                name = ind_class[3]
+                cursor.execute(prerequisite_query, (name,))
+                prerequisites = cursor.fetchall()
+                print(f"Getting prerequisites for {ind_class[3]}...")
+                group = 1
+                temp_list = []
+                for prereq in prerequisites:
+                    print(f"Prerequisite for {ind_class[3]} (group[{prereq[0]}]): {prereq[1]}")
+                    if prereq[0] == group:
+                        temp_list.append(prereq[1])
+                        print(f"temp list: {temp_list}")
+                    else:
+                        return_text = ""
+                        for prerequisite in temp_list:
+                            print(f"Prerequisite: {prerequisite}")
+                            if prerequisite not in user_courses_list:
+                                return_text = "Warning: You have not taken all necessary prerequites for some courses on your schedule"
+                                failed_prereq.append(ind_class[3])
+                        group = group + 1
+                        temp_list = []
+                        temp_list.append(prereq[1])
+                for prerequisite in temp_list:
+                    print(f"Prerequisite: {prerequisite}")
+                    if prerequisite not in user_courses_list:
+                        return_text = "Warning: You have not taken all necessary prerequites for some courses on your schedule"
+                        failed_prereq.append(ind_class[3])
+
+                if return_text == "":
+                    return_text = "Saved Schedule Successfully"
+
+            return f"{return_text}"
+    return "Successfully Saved Schedule"
+
+@app.route("/api/delete", methods=["POST"])
+def delete_schedule():
+    global schedule_name
+    global user_email
+    cursor = conn.cursor()
+    cursor.execute('''
+        delete from ScheduleClass WHERE email like %s AND scheduleName like %s;
+    ''', (f"%{(user_email)}%", f"{(schedule_name)}",))
+
+    cursor.execute('''
+        delete from Schedule WHERE email like %s AND scheduleName like %s;
+    ''', (f"%{(user_email)}%", f"{(schedule_name)}",))
+
+    conn.commit()
+    return "success"
+
+
+@app.route("/api/compare", methods=["GET", "POST"])
+def compare_schedules():
+    cursor = conn.cursor()
+    if request.method == "POST":
+        global compare_schedule_one
+        global compare_schedule_two
+        data = request.form
+        compare_schedule_one = data.get('schedule-one')
+        compare_schedule_two = data.get('schedule-two')
+        print(f"{compare_schedule_two}, {compare_schedule_one}")
+        return redirect("http://localhost:3000/compare")
+    return ""
+
+@app.route("/api/loadComparedSchedules", methods=["GET"])
+def get_data_compare():
+    cursor = conn.cursor()
+    if request.method == "GET":
+        return_list = []
+        course_codes = []
+        global schedule_name
+        global user_email
+        global semester_selection
+        global compare_schedule_one
+        global compare_schedule_two
+        backColor = ""
+        if schedule_name != "" or schedule_name == "":
+            schedule_info_query = "select * from ScheduleClass where email = %s and scheduleName = %s or scheduleName = %s"
+            cursor.execute(schedule_info_query, (user_email, compare_schedule_one, compare_schedule_two,))
+            results = cursor.fetchall()
+            for row in results:
+                if row[0] == compare_schedule_one:
+                    backColor = "#926DD6"
+                else:
+                    backColor = "#d89cf6"
+                print(f"Class: {row}")
+                start_time = ""
+                end_time = ""
+                if row[3] not in course_codes or row[3] in course_codes:
+                    course_codes.append(row[3])
+                    start_time = str(row[6])
+                    end_time = str(row[7])
+                    if(len(start_time) < 8):
+                        start_time = f"0{start_time}"
+                    if(len(end_time) < 8):
+                        end_time = f"0{end_time}"
+                    for day in row[4]:
+                        resource = ""
+                        if day == 'M':
+                            resource = "monday"
+                        if day == 'T':
+                            resource = "tuesday"
+                        if day == 'W':
+                            resource = "wednesday"
+                        if day == 'R':
+                            resource = "thursday"
+                        if day == 'F':
+                            resource = "friday"
+                        entry = {
+                                "id": 1,
+                                "text": f"{row[3]}",
+                                "start": f"2013-03-25T{start_time}",
+                                "end": f"2013-03-25T{end_time}",
+                                "resource": resource,
+                                "days": row[4],
+                                "backColor": backColor
+                        }
+                        return_list.append(entry)
+                else:
+                    if row[2] >= "L":
+                        course_codes.append(row[3])
+                        start_time = str(row[6])
+                        end_time = str(row[7])
+                        if(len(start_time) < 8):
+                            start_time = f"0{start_time}"
+                        if(len(end_time) < 8):
+                            end_time = f"0{end_time}"
+                        for day in row[4]:
+                            resource = ""
+                            if day == 'M':
+                                resource = "monday"
+                            if day == 'T':
+                                resource = "tuesday"
+                            if day == 'W':
+                                resource = "wednesday"
+                            if day == 'R':
+                                resource = "thursday"
+                            if day == 'F':
+                                resource = "friday"
+                            entry = {
+                                    "id": 1,
+                                    "text": f"{row[3]}",
+                                    "start": f"2013-03-25T{start_time}",
+                                    "end": f"2013-03-25T{end_time}",
+                                    "resource": resource,
+                                    "days": row[4]
+                            }
+                            return_list.append(entry)
+            pprint(return_list)
+            return json.dumps(return_list)
+    data = json.dumps(
+        []
+    )
+    return data
+
+
+
+
 
 
 @app.route("/api/getScheduleInfo", methods=["GET"])
 def get_new_schedule():
+    cursor = conn.cursor()
     if request.method == "GET":
+        return_list = []
+        course_codes = []
         global schedule_name
         global user_email
         global semester_selection
         if schedule_name != "":
-            query = "select * from ScheduleClass where scheduleName = %s and email = %s"
-            cursor = conn.cursor()
-            cursor.execute(query, (schedule_name, user_email,))
-            course_code_list = []
-            course_section_list = []
-            course_meeting_days = []
-            course_start_times = []
-            course_end_times = []
-            course_name_list = []
-            start_string = []
-            end_string = []
-            return_list = []
-            semester = ""
-            result = cursor.fetchall()
-            for row in result:
-                course_code_list.append(row[3])
-                course_section_list.append(row[2])
-                course_meeting_days.append(row[4])
-                semester = row[5]
-            course_info_query = "select startTime, endTime from Class where courseSection = %s and courseCode = %s and classSemester = %s"
-            for i in range(len(course_code_list)):
-                cursor.execute(course_info_query, (course_section_list[i], course_code_list[i], semester))
-                result = cursor.fetchall()
-                for row in result:
-                    course_start_times.append(row[0])
-                    course_end_times.append(row[1])
-            i = 0
-            course_name_query = "select courseName from Course where courseSemester = %s and courseCode = %s"
-            for code in course_code_list:
-                cursor.execute(course_name_query, (semester, code,))
-                result = cursor.fetchall()
-                for row in result:
-                    course_name_list.append(row[0])
-            print(course_name_list)
-            for time in course_start_times:
-                if len(str(time)) < 8:
-                    time = f"0{str(time)}"
-            for time in course_end_times:
-                if len(str(time)) < 8:
-                    time = f"0{str(time)}"
-            for entry in course_meeting_days:
-                for day in entry:
-                    resource = ""
-                    if day == 'M':
-                        resource = "monday"
-                    if day == 'T':
-                        resource = "tuesday"
-                    if day == 'W':
-                        resource = "wednesday"
-                    if day == 'R':
-                        resource = "thursday"
-                    if day == 'F':
-                        resource = "friday"
-                    start_time = ""
-                    end_time = ""
-                    if len(str(course_start_times[i])) < 8:
-                        start_time = f"0{course_start_times[i]}"
-                    else:
-                        start_time = course_start_times[i]
-                    if len(str(course_end_times[i])) < 8:
-                        end_time = f"0{course_end_times[i]}"
-                    else:
-                        end_time = course_end_times[i]
-                    entry = {
-                            "id": 1,
-                            "text": f"{course_code_list[i]} {start_time} - {end_time}{course_name_list[i]} {course_section_list[i]}",
-                            "start": f"2013-03-25T{start_time}",
-                            "end": f"2013-03-25T{end_time}",
-                            "resource": resource,
-                            "days": course_meeting_days[i]
-                    }
-                    return_list.append(entry)
-                i = i + 1
-            print(return_list)
+            schedule_info_query = "select * from ScheduleClass where email = %s and scheduleName = %s"
+            cursor.execute(schedule_info_query, (user_email, schedule_name,))
+            results = cursor.fetchall()
+            for row in results:
+                print(f"Class: {row}")
+                start_time = ""
+                end_time = ""
+                if row[3] not in course_codes:
+                    course_codes.append(row[3])
+                    start_time = str(row[6])
+                    end_time = str(row[7])
+                    if(len(start_time) < 8):
+                        start_time = f"0{start_time}"
+                    if(len(end_time) < 8):
+                        end_time = f"0{end_time}"
+                    for day in row[4]:
+                        resource = ""
+                        if day == 'M':
+                            resource = "monday"
+                        if day == 'T':
+                            resource = "tuesday"
+                        if day == 'W':
+                            resource = "wednesday"
+                        if day == 'R':
+                            resource = "thursday"
+                        if day == 'F':
+                            resource = "friday"
+                        entry = {
+                                "id": 1,
+                                "text": f"{row[3]}",
+                                "start": f"2013-03-25T{start_time}",
+                                "end": f"2013-03-25T{end_time}",
+                                "resource": resource,
+                                "days": row[4],
+                                "backColor": "#926DD6"
+                        }
+                        return_list.append(entry)
+                else:
+                    if row[2] >= "L":
+                        course_codes.append(row[3])
+                        start_time = str(row[6])
+                        end_time = str(row[7])
+                        if(len(start_time) < 8):
+                            start_time = f"0{start_time}"
+                        if(len(end_time) < 8):
+                            end_time = f"0{end_time}"
+                        for day in row[4]:
+                            resource = ""
+                            if day == 'M':
+                                resource = "monday"
+                            if day == 'T':
+                                resource = "tuesday"
+                            if day == 'W':
+                                resource = "wednesday"
+                            if day == 'R':
+                                resource = "thursday"
+                            if day == 'F':
+                                resource = "friday"
+                            entry = {
+                                    "id": 1,
+                                    "text": f"{row[3]}",
+                                    "start": f"2013-03-25T{start_time}",
+                                    "end": f"2013-03-25T{end_time}",
+                                    "resource": resource,
+                                    "days": row[4],
+                                    "backColor": "#926DD6"
+                            }
+                            return_list.append(entry)
+            pprint(return_list)
             return json.dumps(return_list)
     data = json.dumps(
         []
