@@ -83,6 +83,15 @@ class Schedule extends Component {
     }
   }
 
+  titleCase(x) {
+    var str = x.toLowerCase();
+    var str = str.split(' ');
+    for(var i = 0; i < str.length; i++) {
+      str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1);
+    }
+    return str.join(' ');
+  }
+
   //TODO: Send async request to see if a user is allowed to take the course or not (checking prerequisites)
   addClass(e) {
     var course_code;
@@ -119,6 +128,7 @@ class Schedule extends Component {
       var id = 1
     }
     if(global.classAdded && cont) { 
+      //FIX THIS PART RIGHT HERE
       global.courses.push(global.classAdded.text)
       for(var i = 0; i < days.length; i++) {
         var res = "";
@@ -165,7 +175,7 @@ class Schedule extends Component {
         cont = false;
         alert("Error: Adding '" + global.classAdded.text + "' will cause a time conflict.");
       }
-      // This is where we are going to check prerequisites
+      console.log(global.courses);
     }
   }
 
@@ -236,7 +246,7 @@ class Schedule extends Component {
             var para = document.createElement("li");
             var tag = document.createElement("a");
             para.appendChild(tag);
-            var node = document.createTextNode(element["course_name"] + " " + element["course_section"]);
+            var node = document.createTextNode(this.titleCase(element["course_name"]) + " " + element["course_section"]);
             var course = document.createTextNode(element["course_code"]);
             var time = document.createTextNode(" " + element["course_time"] + " - " + element["course_end"])
             var br = document.createElement("br");

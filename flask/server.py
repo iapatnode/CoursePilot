@@ -436,8 +436,8 @@ def schedule():
             cursor.execute(all_classes_query, (schedule_name, user_email,))
             all_classes = cursor.fetchall()
 
+            failed_prereq = []
             for ind_class in all_classes:
-                failed_prereq = []
                 name = ind_class[3]
                 cursor.execute(prerequisite_query, (name,))
                 prerequisites = cursor.fetchall()
@@ -454,7 +454,7 @@ def schedule():
                         for prerequisite in temp_list:
                             print(f"Prerequisite: {prerequisite}")
                             if prerequisite not in user_courses_list:
-                                return_text = "Warning: You have not taken all necessary prerequites for some courses on your schedule"
+                                return_text = "Warning: You have not taken all necessary prerequites for the following courses on your schedule"
                                 failed_prereq.append(ind_class[3])
                         group = group + 1
                         temp_list = []
@@ -462,12 +462,18 @@ def schedule():
                 for prerequisite in temp_list:
                     print(f"Prerequisite: {prerequisite}")
                     if prerequisite not in user_courses_list:
-                        return_text = "Warning: You have not taken all necessary prerequites for some courses on your schedule"
+                        return_text = "Warning: You have not taken all necessary prerequites for the following courses on your schedule"
                         failed_prereq.append(ind_class[3])
 
                 if return_text == "":
                     return_text = "Saved Schedule Successfully"
-
+            seen_courses = []
+            i = 1
+            for course in failed_prereq:
+                if not course in seen_courses:
+                    seen_courses.append(course)
+                    return_text = return_text + f"\n{i}. {course}"
+                    i = i + 1
             return f"{return_text}"
     return "Successfully Saved Schedule"
 
