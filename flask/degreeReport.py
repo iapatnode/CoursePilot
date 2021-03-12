@@ -106,3 +106,27 @@ def getMajorRequirements(degreeId):
     except Error as error:
         print("Unable to obtain student major details..." + str(error))
         return {}
+
+def insertCourse(email, course):
+    cursor = conn.cursor()
+
+    courseQuery = "Insert into StudentCourses(email, courseCode_ values (%s, %s)"
+
+    try:
+        cursor.execute(courseQuery, (email, course,))
+    except Error as error:
+        print("Unable to insert course..." + str(error))
+    
+    cursor.close()
+
+def deleteCourse(email, course):
+    cursor = conn.cursor()
+
+    deleteQuery = "Delete from StudentCourses where email = %s and course = %s"
+
+    try:
+        cursor.execute(deleteQuery, (email, course,))
+    except Error as error:
+        print("Unable to delete course..." + str(error))
+    
+    cursor.close()

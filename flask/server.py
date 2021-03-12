@@ -61,7 +61,25 @@ def login():
         
         #Checks if student's credentials are in the database
         if valid:
-            valid = db_queries.validLogin(email, password)
+            cursor = conn.cursor(buffered=True)
+            studentQuery = "select * from Student where email = %s and passwrd = %s"
+            studentCredentials = (email, password)
+
+            try:
+                cursor.execute(studentQuery, studentCredentials)
+                conn.commit()
+
+                #Checks if user with credentials exists
+                if cursor.rowcount == 0:
+                    print("User not found")
+                    valid = False
+                
+            except Error as error:
+                print("Query did not work: " + str(error))
+                valid = False
+            
+            #DBMS connection cleanup
+            cursor.close()
 
         if valid:
             global user_email
@@ -518,18 +536,27 @@ def get_existing_schedule():
 
 @app.route("/api/degreereport", methods=["GET", "POST"])
 def degree_report():
-    if request.method == "GET":
-        global user_email
-        degreeIds = report.getStudentMajors(user_email)
-        
-        studentDegreeReqs = report.getMajorRequirements(degreeIds[0][0])
+    global user_email
 
+    degreeIds = report.getStudentMajors(user_email)
+    studentDegreeReqs = report.getMajorRequirements(degreeIds[0][0])
+
+    if request.method == "GET":
         #TODO: GET CLASSES THAT THEY HAVE ALREADY TAKEN
         #format stays the same
         return json.dumps(studentDegreeReqs)
     else:
-        return "POST FUCKED!"
 
+        # for req in studentDegreeReqs["req_details"]:
+        #     requirementCat = req["req_category"]
+
+        #     for course in req["req_courses"]:
+        #         if request.form.get(course["course_code"]):
+        #             print(course["course_code"])
+        #             report.insertCourse(user_email, course["course_code"])
+        #             #TODO: report.insertStudentReqCourse(user_email, course["course_code"], requirementCat)
+
+        return redirect("http://localhost:3000/degreereport")
 
 def getClasses():
     cursor = conn.cursor()
