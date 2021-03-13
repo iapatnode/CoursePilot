@@ -5,7 +5,9 @@ import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import {DropdownButton, Dropdown} from 'react-bootstrap'
 
-import {Tabs, Tab} from 'react-bootstrap-tabs'
+import {Tabs, Tab } from 'react-bootstrap-tabs'
+
+import CoolTabs from 'react-cool-tabs';
 
 //import '@material/react-tab-bar/dist/tab-bar.css';
 //import '@material/react-tab-scroller/dist/tab-scroller.css';
@@ -107,38 +109,46 @@ export const Majors = () => {
         </Navbar.Collapse>
         </Navbar>
         <div class="req-content">
-            <div class="reqYear">
+            <div class="reqYear" className="req-buttons">
                 Requirement Year
-                <button onClick={getMinors}>2017-2018</button>
-                <button onClick={getMinors}>2018-2019</button>
-                <button onClick={getMinors}>2019-2020</button>
-                <button onClick={getMinors}>2020-2021</button>
+                <button onClick={getMinors} className="req-button">2017-2018</button>
+                <button onClick={getMinors} className="req-button">2018-2019</button>
+                <button onClick={getMinors} className="req-button">2019-2020</button>
+                <button onClick={getMinors} className="req-button">2020-2021</button>
             </div>
-            <div class="tab">
-                <Tabs>
-                    <Tab label="Majors">Majors</Tab>
-                    <Tab label="Minors">Minors
-                        <button onClick={getMinors}>Click to show Minors</button>
-                        <DropdownButton id="dropdown-basic-button" title="Sort by">
-                            <Dropdown.Item onClick={getMinors}>A-Z</Dropdown.Item>
-                            <Dropdown.Item onClick={getMinorsRec}>Recommended</Dropdown.Item>
-                        </DropdownButton>
-                        <div id="MinorList">
-                            
-                        </div> 
-                    
-                    </Tab>
-                </Tabs>
-            </div>
-            <div>
+
+            <CoolTabs
+                tabKey={'1'}
+                style={{ width:  1500, height:  650, background:  'blue', margin: 20,}}
+                tabsHeaderStyle={{height: 100}}
+                activeTabStyle={{ background:  'purple', color:  'white' }}
+                unActiveTabStyle={{ background:  'white', color:  'black' }}
+                leftContentStyle={{ background:  'white' }}
+                rightContentStyle={{ background:  'white' }}
+
+                leftTabTitleStyle={{fontSize: 40}}
+                rightTabTitleStyle={{fontSize: 40}}
                 
+                rightTabTitleStyle={{}}
+                leftTabTitle={'Majors'}
+                rightTabTitle={'Minors'}
+                leftContent={<div>Majors</div>}
+                rightContent={
+                    <div>
+                <button onClick={getMinors}>Click to show Minors</button>
+                <DropdownButton id="dropdown-basic-button" title="Sort by">
+                    <Dropdown.Item onClick={getMinors}>A-Z</Dropdown.Item>
+                    <Dropdown.Item onClick={getMinorsRec}>Recommended</Dropdown.Item>
+                </DropdownButton>
+                <div id="MinorList">
+                    
+                </div> 
+                </div>
+                }
+                
+            />
             </div>
-
-
-
             </div>
-        </div>
-
 
     );
 }

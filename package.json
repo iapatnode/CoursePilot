@@ -20,6 +20,7 @@
     "react": "^17.0.1",
     "react-bootstrap": "^1.5.1",
     "react-bootstrap-tabs": "^2.0.0",
+    "react-cool-tabs": "^1.1.6",
     "react-dom": "^17.0.1",
     "react-modal": "^3.12.1",
     "react-multi-select-component": "^3.1.2",

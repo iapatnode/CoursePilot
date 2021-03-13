@@ -1,18 +1,26 @@
-.tab {
+.major-minor-section {
     flex: 1;
     justify-content: center;
     overflow: hidden;
     border: 1px solid #ccc;
-    background-color: #f1f1f1;
-    
+    height: 100%;
+    margin: 0;
 }
 
-.inner {
+.tab {
+    width: 100%;
+    min-width: 200px;
+}
+
+.inner-tab {
     display: flex;
+    flex: 1;
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
     padding: 10px;
+    height: 100%;
+    margin: 0;
 }
 
 .tab button:hover {
@@ -31,3 +39,17 @@
     display: flex;
 }
 
+
+.req-buttons {
+    display: flex;
+    flex-direction: column;
+    margin: 10;
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+.req-button {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    margin-top: 50px;
+}
