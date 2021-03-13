@@ -1,9 +1,11 @@
 from flask import Flask, request, render_template, redirect, session, Response, jsonify
 from flask_cors import CORS
-import os
-import re, json
-from mysql.connector import connect, Error
+import os, re, json
 from datetime import datetime
+from mysql.connector import connect, Error
+
+import dbQueries as db_queries
+import degreeReport as report
 from pprint import pprint
 
 #Flask App Setup
@@ -14,7 +16,7 @@ app.config["SECRET_KEY"] = os.urandom(32)
 #Settings for testing
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
-#Credentails for database connection
+#Credentials for database connection
 scriptdir = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(scriptdir, "config.json")) as text:
     config = json.load(text)
@@ -64,7 +66,6 @@ def login():
         
         #Checks if student's credentials are in the database
         if valid:
-            # conn = connection()
             cursor = conn.cursor(buffered=True)
             studentQuery = "select * from Student where email = %s and passwrd = %s"
             studentCredentials = (email, password)
@@ -84,7 +85,6 @@ def login():
             
             #DBMS connection cleanup
             cursor.close()
-        #     conn.close()
 
         if valid:
             global user_email
@@ -343,7 +343,6 @@ def schedule():
             SELECT * from Course join Class on Class.courseCode = Course.courseCode WHERE
              (classSemester = %s or classSemester = %s or classSemester = %s) order by Course.courseCode;
             ''', (semester_current, "both", "alternate",))
-
 
         class_table = cursor.fetchall()
 
@@ -693,14 +692,35 @@ def get_existing_schedule():
     else:
         return "blah"
 
+@app.route("/api/degreereport", methods=["GET", "POST"])
+def degree_report():
+    global user_email
 
+    if request.method == "GET":
 
+        degreeIds = report.getStudentMajors(user_email)
+        studentDegreeReqs = report.getMajorRequirements(degreeIds[0][0])
 
+        studentCourses = report.getStudentCourses(user_email)
 
+        studentReqDetails = [studentDegreeReqs, studentCourses]
 
-#def getTakenCourses():
-#    takenCourses = []
-#    return takenCourses
+        return json.dumps(studentReqDetails)
+        
+    if request.method == "POST":
+        data = request.data.decode("utf-8")
+        json_data = json.loads(data)
+
+        addCourses = json_data.get("add")
+        deleteCourses = json_data.get("remove")
+
+        print(f'{addCourses}')
+        print(f'/n{deleteCourses}')
+
+        report.insertStudentCourses(user_email, addCourses)
+        report.deleteStudentCourses(user_email, deleteCourses)
+
+        return redirect("http://localhost:3000/degreereport")
 
 def getClasses():
     cursor = conn.cursor()
