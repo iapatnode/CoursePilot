@@ -107,25 +107,66 @@ def getMajorRequirements(degreeId):
         print("Unable to obtain student major details..." + str(error))
         return {}
 
-def insertCourse(email, course):
+def insertStudentCourses(email, courses):
     cursor = conn.cursor()
 
-    courseQuery = "Insert into StudentCourses(email, courseCode_ values (%s, %s)"
+    courseQuery = "Insert into StudentCourses(email, courseCode, reqCategory, reqYear) values (%s, %s, %s, %s)"
+
+    studentCourses = getStudentCourses(email)
 
     try:
-        cursor.execute(courseQuery, (email, course,))
+        for course in courses:
+            if not any(c["course_code"] == course["courseCode"] and c["req_cat"] == course["reqCat"] for c in studentCourses):
+                cursor.execute(courseQuery, (email, course["courseCode"], course["reqCat"], course["reqYear"],))
+        
+        conn.commit()
     except Error as error:
         print("Unable to insert course..." + str(error))
     
     cursor.close()
 
-def deleteStudentCourse(email, course):
+def getStudentCourses(email):
     cursor = conn.cursor()
 
-    deleteQuery = "Delete from StudentCourses where email = %s and course = %s"
+    selectQuery = "select courseCode, reqCategory from StudentCourses where email = %s"
 
     try:
-        cursor.execute(deleteQuery, (email, course,))
+        cursor.execute(selectQuery, (email,))
+
+        courseCats = cursor.fetchall()
+
+        courses = []
+
+        for course in courseCats:
+            courseDict = {
+                "course_code": course[0],
+                "req_cat": course[1]
+            }
+            courses.append(courseDict)
+        
+        return courses
+
+    except Error as error:
+        print("Unable to select courses..." + str(error))
+        return []
+    
+    cursor.close()
+
+
+def deleteStudentCourses(email, courses):
+    cursor = conn.cursor()
+
+    deleteQuery = "Delete from StudentCourses where email = %s and courseCode = %s and reqCategory = %s"
+
+    studentCourses = getStudentCourses(email)
+
+    try:
+        for course in courses:
+            if any(c["course_code"] == course["courseCode"] and c["req_cat"] == course["reqCat"] for c in studentCourses):
+                cursor.execute(deleteQuery, (email, course["courseCode"], course["reqCat"],))
+
+        conn.commit()
+
     except Error as error:
         print("Unable to delete course..." + str(error))
     

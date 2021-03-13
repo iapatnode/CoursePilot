@@ -17,9 +17,6 @@ export const Report = () => {
     const [checked, setChecked] = useState([]);
     const [unchecked, setUnchecked] = useState([]);
 
-    // const handleClose = () => setShow(false);
-    // const handleShow = () => setShow(true);
-
     useEffect(() => {
         axios.get("/api/degreereport").then(response => {
             setSuccess(response.data);
@@ -33,8 +30,8 @@ export const Report = () => {
             "remove": unchecked
         }
 
-        axios.Cancel.post('/api/degreereport', parameters).finally(response => {
-            // window.location = '/degreereport';
+        axios.post('/api/degreereport', parameters).finally(response => {
+            window.location = '/degreereport';
         }).catch(err => {
             if (err.response) {
                 console.log("BAD!");
@@ -42,19 +39,33 @@ export const Report = () => {
         })
     }
 
-    const handleChange = (event, courseCode, reqCat) => {
+    const handleChange = (event, courseCode, reqCat, reqYear) => {
         console.log(event)
 
         if(event.target.checked) {
             setUnchecked(unchecked.filter((course) => course.courseCode !== courseCode && course.reqCat !== reqCat))
-            setChecked(checked.concat({courseCode: courseCode, reqCat: reqCat}))
+            setChecked(checked.concat({courseCode: courseCode, reqCat: reqCat, reqYear: reqYear}))
         }
         else {
             setChecked(checked.filter((course) => course.courseCode !== courseCode && course.reqCat !== reqCat))
-            setUnchecked(unchecked.concat({courseCode: courseCode, reqCat: reqCat}))
+            setUnchecked(unchecked.concat({courseCode: courseCode, reqCat: reqCat, reqYear: reqYear}))
         }
 
         console.log(checked)
+    }
+
+    function isChecked(courses, courseCode, reqCat) {
+
+        console.log(courses)
+
+        for(const course of courses) {
+            console.log(course)
+            if(course["course_code"] == courseCode && course["req_cat"] == reqCat) {
+                return true
+            }
+        }
+
+        return false
     }
 
     if (isLoading) {
@@ -80,16 +91,16 @@ export const Report = () => {
                 <meta charSet="UTF-8"></meta>
             </div>
 
-            <h1> { success["degree_name"] } </h1>
+            <h1> { success[0]["degree_name"] } </h1>
 
             <div>
-                <h3> { "Total Hours: "} { success["degree_hours"] } </h3>  
+                <h3> { "Total Hours: "} { success[0]["degree_hours"] } </h3>  
                 <Form id="degree_report">      
                 <Button variant="primary" type="submit" value="Submit" onClick={submitListener}>
                             Save Changes
                 </Button>
 
-                { success["req_details"].map((req) => {
+                { success[0]["req_details"].map((req) => {
                     return <div>
                         <div className="col-md-12">
                         <Form.Group>
@@ -99,8 +110,9 @@ export const Report = () => {
                                 { req["req_courses"].map((course) => {
                                     return <FormControlLabel control = {
                                         <Checkbox
+                                            defaultChecked = {isChecked(success[1], course["course_code"], req["req_category"])}
                                             name = {req["req_category"] + " " + course["course_name"]}
-                                            onChange={(event) => handleChange(event, course["course_code"], req["req_category"])}
+                                            onChange={(event) => handleChange(event, course["course_code"], req["req_category"], success[0]["req_yr"])}
                                         />
                                     }
                                     label = {course["course_code"] + " " + course["course_name"]}/>

@@ -696,15 +696,18 @@ def get_existing_schedule():
 def degree_report():
     global user_email
 
-    degreeIds = report.getStudentMajors(user_email)
-    studentDegreeReqs = report.getMajorRequirements(degreeIds[0][0])
-
     if request.method == "GET":
-        #TODO: GET CLASSES THAT THEY HAVE ALREADY TAKEN
-        #format stays the same
-        return json.dumps(studentDegreeReqs)
+
+        degreeIds = report.getStudentMajors(user_email)
+        studentDegreeReqs = report.getMajorRequirements(degreeIds[0][0])
+
+        studentCourses = report.getStudentCourses(user_email)
+
+        studentReqDetails = [studentDegreeReqs, studentCourses]
+
+        return json.dumps(studentReqDetails)
+        
     if request.method == "POST":
-        print("HIIIIIIII")
         data = request.data.decode("utf-8")
         json_data = json.loads(data)
 
@@ -714,20 +717,10 @@ def degree_report():
         print(f'{addCourses}')
         print(f'/n{deleteCourses}')
 
-        report.insertStudentCourses(email, addCourses)
-        report.deleteStudentCourses(email, deleteCourses)
+        report.insertStudentCourses(user_email, addCourses)
+        report.deleteStudentCourses(user_email, deleteCourses)
 
-        # for req in studentDegreeReqs["req_details"]:
-        #     requirementCat = req["req_category"]
-
-        #     for course in req["req_courses"]:
-        #         if request.form.get(course["course_code"]):
-        #             print(course["course_code"])
-        #             report.insertCourse(user_email, course["course_code"])
-        #             #TODO: report.insertStudentReqCourse(user_email, course["course_code"], requirementCat)
-
-        return jsonify({'redirect_to_degreereport': True}), 200
-        # return redirect("http://localhost:3000/degreereport")
+        return redirect("http://localhost:3000/degreereport")
 
 def getClasses():
     cursor = conn.cursor()
