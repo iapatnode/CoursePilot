@@ -703,10 +703,16 @@ def get_new_schedule():
 
 
 
-@app.route("/api/getMinors", methods=["GET"])
-def getMinors():
-    allMinors = MinorRecommendation.getMinorsByRequirementYearJSON(2017)
-    return json.dumps(allMinors)
+# @app.route("/api/getMinors", methods=["GET"])
+# def getMinors():
+#     allMinors = MinorRecommendation.getMinorsByRequirementYearJSON(2017)
+#     return json.dumps(allMinors)
+
+
+# @app.route("/api/getMajors", methods=["GET"])
+# def getMajors():
+#     allMajors = MinorRecommendation.getMajorsByRequirementYearJSON(2017)
+#     return json.dumps(allMajors)
 
 # @app.route("/api/getMinorsRec", methods=["GET"])
 # def getMinorsRec():
@@ -715,3 +721,8 @@ def getMinors():
 #     allMinors = MinorRecommendation.getMinorsByRequirementYearJSON(2017)
 #     MinorRecommendation.recommendMinorsJSON(classesTaken, remainingClassesInMajor, allMinors)
 #     return json.dumps(allMinors)
+
+@app.route("/api/getAllMajorsAndMinors", methods=["GET"])
+def getAllMajorsAndMinors():
+    all = MinorRecommendation.getEverythingJSON(2017)
+    return json.dumps(all)

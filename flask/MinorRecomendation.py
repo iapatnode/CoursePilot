@@ -106,6 +106,22 @@ def getMinorsByRequirementYearJSON(requirementYear):
     cursor.close()
     return minors
 
+def getMajorsByRequirementYearJSON(requirementYear):
+    cursor = conn.cursor()
+    cursor.execute(''' SELECT * FROM MajorMinor WHERE isMinor=0 AND reqYear=%s;''', (requirementYear, ))
+    result = cursor.fetchall()
+    majors = []
+    for entry in result:
+        course_dict = {
+            "name": entry[3],
+            "requiredClasses": getRequiredClassesJSON(entry[1], requirementYear),
+            "hoursRemaining": entry[4],
+            "requirementYear": entry[0]
+        }
+        majors.append(course_dict)
+    cursor.close()
+    return majors
+
 def getRequiredClassesJSON(degreeId, reqYear):
     requiredCourses = []
     cursor = conn.cursor()
@@ -187,7 +203,26 @@ def populateAllMajors(majors, reqYear, classesTaken):
     
     return majorList
 
-
+def getEverythingJSON():
+    majors = getMajorsByRequirementYearJSON(2017)
+    majorsTwo = getMajorsByRequirementYearJSON(2018)
+    majorsThree = getMajorsByRequirementYearJSON(2019)
+    majorsFour = getMajorsByRequirementYearJSON(2020)
+    minors = getMinorsByRequirementYearJSON(2017)
+    minorsTwo = getMinorsByRequirementYearJSON(2018)
+    minorsThree = getMinorsByRequirementYearJSON(2019)
+    minorsFour = getMinorsByRequirementYearJSON(2020)
+    recMinors = getMinorsByRequirementYearJSON(2017)
+    recMinorsTwo = getMinorsByRequirementYearJSON(2018)
+    recMinorsThree = getMinorsByRequirementYearJSON(2019)
+    recMinorsFour = getMinorsByRequirementYearJSON(2020)
+    classesTaken = [{"code":"MATH 214", "hours": 3}, {"code":"MATH 232", "hours":3}]
+    remainingClassesInMajor = [{"code" : "MATH 421", "hours" : 3}]
+    recommendMinorsJSON(classesTaken, remainingClassesInMajor, recMinors)
+    recommendMinorsJSON(classesTaken, remainingClassesInMajor, recMinorsTwo)
+    recommendMinorsJSON(classesTaken, remainingClassesInMajor, recMinorsThree)
+    recommendMinorsJSON(classesTaken, remainingClassesInMajor, recMinorsFour)
+    return {"2017" : {"majors" : majors, "minors" : minors, "recMinors" : recMinors}, "2018" : {"majors" : majorsTwo, "minors" : minorsTwo, "recMinors" : recMinorsTwo}, "2019" : {"majors" : majorsThree, "minors" : minorsThree, "recMinors" : recMinorsThree}, "2020" : {"majors" : majorsFour, "minors" : minorsFour, "recMinors" : recMinorsFour}}
 
 
 
