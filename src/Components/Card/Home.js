@@ -10,24 +10,34 @@ import Link from 'react-router-dom/Link'
 import Image from 'react-bootstrap/Image'
 import Logo from '../static/images/logo.jpg'
 
-global.semester="";
 
+global.semester=""; // Global variable for which semester the user has chosen
+
+
+/*
+Functional component for the home page, where the user can see and create new schedules
+*/
 export const Home = ()=> {
-
-    // Fetch the user information from the home page
-    const [isLoading, setLoading] = useState(true);
-    const [success, setSuccess] = useState();
-    const [show, setShow] = useState(false);
+    const [isLoading, setLoading] = useState(true); // Determine whether or not the page is loading
+    const [success, setSuccess] = useState(); // State variable used to store response of initial get request
+    const [show, setShow] = useState(false); // Variable to determine whether or not to show modal to create new schedule
     const [redirect, setRedirect] = useState(false);
-    const [compare, setCompare] = useState(false);
+    const [compare, setCompare] = useState(false); // Variable to determine whether or not to show compare modal
 
-    //New Schedule Modal listeners
+    /*
+    The below functions are used to open and close the new schedule modal. Used as 
+    click listeners in the html code below  
+    */
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    //Compare Schedule Modal Listeners
     const handleCompare = () => setCompare(true);
     const handleCloseCompare = () => setCompare(false);
 
+    /*
+    makePostRequest() --> Method used to send a post request with the given parameters
+    to the provided url. Catches an error if there are invalid parameters or invalid
+    url provided
+    */
     function makePostRequest(path, params) {
         return new Promise(function (resolve, reject) {
             axios.post(path, params).then(
@@ -43,19 +53,27 @@ export const Home = ()=> {
         });
     }
 
+    /*
+    Function that uses the makePostRequest method above to send a request to the 
+    below URL when the user selects to view an existing schedule. Will result
+    in the user being redirected to the schedule page where the can view the 
+    schedule they selected. 
+    */
     async function clickListener(e) {
         console.log(e.target.innerText);
         let params = {
             "name": e.target.innerText
         }
         var result = await makePostRequest('/api/existingSchedule', params);
-        console.log(result);
         if(result == "good") {
-            // alert("Schedule Loaded... Take me to my schedule!");
             window.location = "/Schedule";
         }
     }
 
+    /*
+    useEffect() --> Run when the page first loads. Gets necessary information (user schedule info).
+    Stores the result of the get request in the success variable, and sets loading to false. 
+    */
     useEffect(() => {
         axios.get("/api/home").then(response => {
             setSuccess(response.data);
@@ -63,10 +81,12 @@ export const Home = ()=> {
         });
     }, []);
 
+    // If the get request hasn't completed, display a loading page to the user. 
     if (isLoading) {
         return <div> Loading... </div>
     }
 
+    // HTML content of the home page. 
     return(
         <div id="main-content">
             <Navbar bg="dark" variant="dark" expand="lg">

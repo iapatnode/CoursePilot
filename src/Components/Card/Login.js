@@ -7,6 +7,7 @@ import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 
 
+// HTML Content for the login page
 export const Login = ()  => {
     return(
         <div id="login-content" className="container-fluid">

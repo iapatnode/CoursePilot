@@ -9,11 +9,14 @@ import Image from 'react-bootstrap/Image'
 import Logo from '../static/images/logo.jpg'
 import '../static/styles/Compare-Style.css'
 
-global.classEvents = [];
-global.courses = [];
+
+global.classEvents = []; // Global variable keep track of class events for schedule component
+global.courses = []; // Global variable keep track of which courses are in the schedule
+
 
 class Schedule extends Component {
 
+  // Set state variables that are used by the schedule component
   constructor(props) {
     super(props);
     this.state = {
@@ -24,6 +27,10 @@ class Schedule extends Component {
     };
   }
   
+  /*
+  Method is run when the page loads. Send a GET request to get all of the schedule information
+  for the schedules the user has selected to compare, set state variables accordingly. 
+  */
   async componentDidMount() {
     await axios.get('http://localhost:5000/api/loadComparedSchedules')
       .then((response) => {
@@ -40,8 +47,9 @@ class Schedule extends Component {
       })
   }
 
+  // HTML for the compare schedule page
   render() {
-    var {...config} = this.state;
+    var {...config} = this.state; // Set state variables for the page
     return (
         <div>
             <Navbar bg="dark" variant="dark" expand="lg">
