@@ -11,20 +11,24 @@ import Image from 'react-bootstrap/Image'
 
 
 export const SignUp = () => {
-    const [isLoading, setLoading] = useState(true);
-    const [success, setSuccess] = useState();
-    const [email, setEmail] = useState();
-    const [password, setPassword] = useState();
-    const [confirm, setConfirm] = useState();
-    const [minorSelectedValue, setMinorSelectedValue] = useState([]);
-    const [majorSelectedValue, setMajorSelectedValue] = useState([]);
-    const [requirement, setRequirement] = useState("2017");
-    const [graduation, setGraduation] = useState("2021");
-    const [count, setCount] = useState(0);
-    const isFirstRun = useRef(true);
-    const minorOptions = []
-    const majorOptions = []
+    const [isLoading, setLoading] = useState(true); // Variable to determine whether or not the page is loading
+    const [success, setSuccess] = useState(); // Store data to render on the page gotten from the server
+    const [email, setEmail] = useState(); // State variable that holds the user email
+    const [password, setPassword] = useState(); // State variable to hold user password
+    const [confirm, setConfirm] = useState(); // State variable to hold user's confirmed password
+    const [minorSelectedValue, setMinorSelectedValue] = useState([]); // Which minors the user has selected
+    const [majorSelectedValue, setMajorSelectedValue] = useState([]); // Which major the user selected
+    const [requirement, setRequirement] = useState("2017"); // Which requirement year the user has selected
+    const [graduation, setGraduation] = useState("2021"); // User graduation year. 
+    const isFirstRun = useRef(true); // Keep track of whether or not this is the first time the page has loaded
+    const minorOptions = [] // List of all minor options
+    const majorOptions = [] // List of all major options
 
+    /*
+    If this is the first time the page has been loaded, set the success variable to contain
+    all of the major and minor options that were sent from the server. Set the loading 
+    variable to false so we can display the signup page to the user. 
+    */
     useEffect(() => {
         if(isFirstRun.current) {
             axios.get("/api/signup").then(response => {
@@ -35,34 +39,45 @@ export const SignUp = () => {
         }
     }, []);
 
+    // Event listener to get the user's email
     const handleEmailChange = (e) => {
         setEmail(e.target.value)
     }
 
+    // Event listener to get the user's password
     const handlePasswordChange = (e) => {
         setPassword(e.target.value);
     }
 
+    // Event listener to get user's confirmed password
     const handleConfirmChange = (e) => {
         setConfirm(e.target.value);
     }
 
+    // Get the minors that the user has selected
     const handleChange = (e) => {
         setMinorSelectedValue(Array.isArray(e) ? e.map(x => x.value) : []);
     }
 
+    // Get the majors that the user has selected
     const handleMajorChange = (e) => {
         setMajorSelectedValue(Array.isArray(e) ? e.map(x => x.value) : []);
     }
 
+    // Get the user's requirement year
     const handleRequirementChange = (e) => {
         setRequirement(e.target.value);
     }
 
+    // Get the user's graduation year
     const handleGraduationChange = (e) => {
         setGraduation(e.target.value);
     }
 
+    /*
+    When the user clicks signup, send all of the user information to the backend 
+    server in a post request to create the account and reroute the user accordingly
+    */
     const handleSubmit = (e) => {
         const parameters = {
              email: email,
@@ -85,13 +100,16 @@ export const SignUp = () => {
         })
     }
     
+    // Determine whether or not the page is loading
     if (isLoading) {
         return <div> Loading... </div>
     }
 
+    // Set major and minor arrays accordingly to contain the results of the get request. 
     success.minors.forEach(element => minorOptions.push( {"value": element, "label": element} ))
     success.majors.forEach(element => majorOptions.push( {"value": element, "label": element} ))
 
+    // HTML content for the signup page. 
     return(
         <div id="signup-content">
             <div>

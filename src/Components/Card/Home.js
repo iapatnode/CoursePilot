@@ -10,24 +10,34 @@ import Link from 'react-router-dom/Link'
 import Image from 'react-bootstrap/Image'
 import Logo from '../static/images/logo.jpg'
 
-global.semester="";
 
+global.semester=""; // Global variable for which semester the user has chosen
+
+
+/*
+Functional component for the home page, where the user can see and create new schedules
+*/
 export const Home = ()=> {
-
-    // Fetch the user information from the home page
-    const [isLoading, setLoading] = useState(true);
-    const [success, setSuccess] = useState();
-    const [show, setShow] = useState(false);
+    const [isLoading, setLoading] = useState(true); // Determine whether or not the page is loading
+    const [success, setSuccess] = useState(); // State variable used to store response of initial get request
+    const [show, setShow] = useState(false); // Variable to determine whether or not to show modal to create new schedule
     const [redirect, setRedirect] = useState(false);
-    const [compare, setCompare] = useState(false);
+    const [compare, setCompare] = useState(false); // Variable to determine whether or not to show compare modal
 
-    //New Schedule Modal listeners
+    /*
+    The below functions are used to open and close the new schedule modal. Used as 
+    click listeners in the html code below  
+    */
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    //Compare Schedule Modal Listeners
     const handleCompare = () => setCompare(true);
     const handleCloseCompare = () => setCompare(false);
 
+    /*
+    makePostRequest() --> Method used to send a post request with the given parameters
+    to the provided url. Catches an error if there are invalid parameters or invalid
+    url provided
+    */
     function makePostRequest(path, params) {
         return new Promise(function (resolve, reject) {
             axios.post(path, params).then(
@@ -43,19 +53,27 @@ export const Home = ()=> {
         });
     }
 
+    /*
+    Function that uses the makePostRequest method above to send a request to the 
+    below URL when the user selects to view an existing schedule. Will result
+    in the user being redirected to the schedule page where the can view the 
+    schedule they selected. 
+    */
     async function clickListener(e) {
         console.log(e.target.innerText);
         let params = {
             "name": e.target.innerText
         }
         var result = await makePostRequest('/api/existingSchedule', params);
-        console.log(result);
         if(result == "good") {
-            // alert("Schedule Loaded... Take me to my schedule!");
             window.location = "/Schedule";
         }
     }
 
+    /*
+    useEffect() --> Run when the page first loads. Gets necessary information (user schedule info).
+    Stores the result of the get request in the success variable, and sets loading to false. 
+    */
     useEffect(() => {
         axios.get("/api/home").then(response => {
             setSuccess(response.data);
@@ -63,10 +81,12 @@ export const Home = ()=> {
         });
     }, []);
 
+    // If the get request hasn't completed, display a loading page to the user. 
     if (isLoading) {
         return <div> Loading... </div>
     }
 
+    // HTML content of the home page. 
     return(
         <div id="main-content">
             <Navbar bg="dark" variant="dark" expand="lg">
@@ -84,13 +104,19 @@ export const Home = ()=> {
             <h1 id="home-header"> Schedules </h1>
             <div className="container" id="schedule-list-view">
                 <div className="row">
-                <div className="col-2 text-center" id="container"></div>
-                    <div className="col-md-4 col-md-offset-2" id="names">
+                    <div className="col-md-4" id="names">
                         <h2> Name </h2>
                         <ul>
                             {success.map((value, index) => {
-                                let schedule_url = "http://localhost:3000/Schedule"
-                                return <li onClick={clickListener} key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></li>
+                                return <li id="schedule-name" onClick={clickListener} key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></li>
+                            })}
+                        </ul>
+                    </div>
+                    <div className="col-md-4" id="semesters">
+                        <h2> Semester </h2>
+                        <ul>
+                            {success.map((value, index) => {
+                                return <li id="schedule-semester" key={index} value={value["scheduleSemester"]}>{value["scheduleSemester"]}</li>
                             })}
                         </ul>
                     </div>
@@ -98,14 +124,13 @@ export const Home = ()=> {
                         <h2> Date Modified </h2> 
                         <ul>
                             {success.map((value, index) => {
-                                return <li key={index} value={value["dateModified"]}>{value["dateModified"]}</li>
+                                return <li id="schedule-date" key={index} value={value["dateModified"]}>{value["dateModified"]}</li>
                             })}
                         </ul>
                     </div>
-                    <div className="col-2"></div>
                 </div>
             </div>
-            <div id="button-container">
+            <div id="button-container-home">
                 <Button variant="primary" id="home-page-secondary-button"> Auto-Generate Schedule </Button>
                 <Button variant="primary" id="home-page-secondary-button" onClick={handleShow}> Create New Schedule </Button>
                 <Button variant="primary" id="home-page-secondary-button" onClick={handleCompare}> Compare Two Schedules </Button>
@@ -116,7 +141,7 @@ export const Home = ()=> {
                     <Modal.Body>
                         <Form method="post" action="/api/home">
                             <Form.Group>
-                                <Form.Control type="text" placeholder="Enter Schedule Name" id="schedule-name" name="schedule-name"></Form.Control>
+                                <Form.Control type="text" placeholder="Enter Schedule Name" id="enter-schedule-name" name="schedule-name"></Form.Control>
                                 <Form.Control as="select" id="schedule-semester" name="schedule-semester">
                                     <option value="fall">Fall</option>
                                     <option value="spring">Spring</option>
@@ -140,13 +165,13 @@ export const Home = ()=> {
                         <Form method="post" action="/api/compare">
                             <Form.Group>
                                 
-                                <Form.Control as="select" id="schedule-semester" name="schedule-one">
+                                <Form.Control as="select" id="schedule-one" name="schedule-one">
                                     {success.map((value, index) => {
 
                                     return <option key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
                                         })}
                                 </Form.Control>
-                                <Form.Control as="select" id="schedule-semester" name="schedule-two">
+                                <Form.Control as="select" id="schedule-two" name="schedule-two">
                                     {success.map((value, index) => {
 
                                     return <option key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
