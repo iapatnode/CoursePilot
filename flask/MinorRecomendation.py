@@ -133,6 +133,7 @@ def getRequiredClassesJSON(degreeId, reqYear):
         cursor.execute(''' SELECT * FROM Requirement WHERE category=%s AND requirementYear=%s;''', (category, reqYear))
         categoryResult = cursor.fetchall()
         categoryResult = categoryResult[0]
+        categoryName = categoryResult[0]
         numHoursRequired = categoryResult[3]
         totalHours = categoryResult[4]
         hoursRemaining = numHoursRequired
@@ -142,6 +143,7 @@ def getRequiredClassesJSON(degreeId, reqYear):
         for course in courseResult:
             courseList.append(course[1])
         requiredCourseDict = {
+            "name" : categoryName,
             "courseList": courseList,
             "numHoursRequired": numHoursRequired,
             "totalHours": totalHours,

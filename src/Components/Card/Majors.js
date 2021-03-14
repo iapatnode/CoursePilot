@@ -106,17 +106,20 @@ export const Majors = () => {
     }
     
     var majorList = document.createElement("ul");
-    var majorListTwo = document.createElement("ul");
-    var majorListThree = document.createElement("ul");
-    var majorListFour = document.createElement("ul");
-    var minorList = document.createElement("ul");
-    var minorListTwo = document.createElement("ul");
-    var minorListThree = document.createElement("ul");
-    var minorListFour = document.createElement("ul");
     var recMinorList = document.createElement("ul");
-    var recMinorListTwo = document.createElement("ul");
-    var recMinorListThree = document.createElement("ul");
-    var recMinorListFour = document.createElement("ul");
+    var minorList = document.createElement("ul");
+
+    // var majorListTwo = document.createElement("ul");
+    // var majorListThree = document.createElement("ul");
+    // var majorListFour = document.createElement("ul");
+
+    // var minorListTwo = document.createElement("ul");
+    // var minorListThree = document.createElement("ul");
+    // var minorListFour = document.createElement("ul");
+
+    // var recMinorListTwo = document.createElement("ul");
+    // var recMinorListThree = document.createElement("ul");
+    // var recMinorListFour = document.createElement("ul");
     
     var majors = [];
     if(isFirstRun.current) {
@@ -126,43 +129,104 @@ export const Majors = () => {
             const minorResponse = firstResponse["minors"];
             const recMinorResponse = firstResponse["recMinors"]
             majorResponse.forEach(element => {
-                majors.push(element);
+                //majors.push(element);
                 var name = element["name"];
                 var requirements = element["requiredClasses"];
-                var classesRequiredString = "Requirements: "
+                var majorInformationNode = document.createElement("li");
+                var majorTitle = document.createElement("div");
+                majorTitle.setAttribute("id", "columnTitle");
+                majorTitle.appendChild(document.createTextNode("Requirements:"));
+
+                //var classesRequiredString = "Requirements: "
+                majorInformationNode.appendChild(majorTitle);
                 requirements.forEach(requirement => {
                     var currentRequirementString = "";
-                    currentRequirementString += requirement["numHoursRequired"] + " hours from ";
-                    requirement["courseList"].forEach(course => {
-                        currentRequirementString += course + ", ";
-                    })
+                    currentRequirementString += requirement["name"] + ": ";
+
+                    var listLength = requirement["courseList"].length;
+                    if (listLength == 0) {
+                        currentRequirementString += requirement["numHoursRequired"] + " hours";
+                    }
+                    else {
+                        var currentLength = 0;
+                        currentRequirementString += requirement["numHoursRequired"] + " hours from ";
+                        requirement["courseList"].forEach(course => {
+                            currentLength++;
+                            if (currentLength == listLength) {
+                                currentRequirementString += course;
+                            }
+                            else {
+                                currentRequirementString += course + ", ";
+                            }
+                        })
+                    }
+                    
                     currentRequirementString += "; ";
-                    classesRequiredString += currentRequirementString;
+                    //classesRequiredString += currentRequirementString;
+                    var currentRequirementNode = document.createElement("div");
+                    currentRequirementNode.setAttribute("id", "requirementInformation");
+                    currentRequirementNode.appendChild(document.createTextNode(currentRequirementString));
+                    majorInformationNode.appendChild(currentRequirementNode);
                 })
                 var para = document.createElement("li");
                 var tag = document.createElement("a");
                 tag.setAttribute("class", "majorButton")
                 para.setAttribute("id", name);
+                
                 var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
-                var moreInformationNode = document.createTextNode(classesRequiredString);
+                //var moreInformationNode = document.createTextNode(classesRequiredString);
                 tag.appendChild(node);
                 //tag.addEventListener("click", this.loadMajor(name));
-                tag.addEventListener("click", function() {para.appendChild(moreInformationNode)});
+                tag.addEventListener("click", function() {
+                    if (para.nextSibling != null) {
+                        //majorList.insertBefore(moreInformationNode, para.nextSibling);
+                        majorList.insertBefore(majorInformationNode, para.nextSibling);
+                    }
+                });
                 para.appendChild(tag);
                 majorList.appendChild(para);
             });
             minorResponse.forEach(element => {
                 var name = element["name"];
                 var requirements = element["requiredClasses"];
-                var classesRequiredString = "Requirements: "
+                var classesRequiredString = "Requirements: ";
+                var minorInformationNode = document.createElement("li");
+                var minorTitle = document.createElement("div")
+                minorTitle.setAttribute("id", "columnTitle");
+                minorTitle.appendChild(document.createTextNode("Requirements: "));
+
+
+                minorInformationNode.appendChild(minorTitle);
                 requirements.forEach(requirement => {
                     var currentRequirementString = "";
-                    currentRequirementString += requirement["numHoursRequired"] + " hours from ";
-                    requirement["courseList"].forEach(course => {
-                        currentRequirementString += course + ", ";
-                    })
+
+                    var listLength = requirement["courseList"].length;
+                    if (listLength == 0) {
+                        currentRequirementString += requirement["numHoursRequired"] + " hours";
+                    }
+                    else {
+                        var currentLength = 0;
+                        currentRequirementString += requirement["numHoursRequired"] + " hours from ";
+                        requirement["courseList"].forEach(course => {
+                            currentLength++;
+                            if (currentLength == listLength) {
+                                currentRequirementString += course;
+                            }
+                            else {
+                                currentRequirementString += course + ", ";
+                            }
+                            
+                        })
+                    }
+
+                    
+                    
                     currentRequirementString += "; ";
-                    classesRequiredString += currentRequirementString;
+                    //classesRequiredString += currentRequirementString;
+                    var currentRequirementNode = document.createElement("div");
+                    currentRequirementNode.setAttribute("id", "requirementInformation");
+                    currentRequirementNode.appendChild(document.createTextNode(currentRequirementString));
+                    minorInformationNode.appendChild(currentRequirementNode);
                 })
                 var para = document.createElement("li");
                 var tag = document.createElement("button");
@@ -172,7 +236,11 @@ export const Majors = () => {
 
                 var moreInformationNode = document.createTextNode(classesRequiredString);
                 tag.appendChild(node);
-                tag.addEventListener("click", function() {para.appendChild(moreInformationNode)});
+                tag.addEventListener("click", function() {
+                    if (para.nextSibling != null) {
+                        minorList.insertBefore(minorInformationNode, para.nextSibling);
+                    }
+                });
                 para.appendChild(tag);
                 minorList.appendChild(para);
             });
@@ -196,254 +264,291 @@ export const Majors = () => {
                 var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
                 var moreInformationNode = document.createTextNode(classesRequiredString);
                 tag.appendChild(node);
-                tag.addEventListener("click", function() {para.appendChild(moreInformationNode)});
+                tag.addEventListener("click", function() {
+                    if (para.nextSibling != null) {
+                        recMinorList.insertBefore(moreInformationNode, para.nextSibling);
+                    }
+                });
                 para.appendChild(tag);
                 recMinorList.appendChild(para);
             });
 
 
 
-            const secondResponse = response.data["2018"];
-            const majorResponseTwo = secondResponse["majors"];
-            const minorResponseTwo = secondResponse["minors"];
-            const recMinorResponseTwo = secondResponse["recMinors"]
-            majorResponseTwo.forEach(element => {
-                majors.push(element);
-                var name = element["name"];
-                var requirements = element["requiredClasses"];
-                var classesRequiredString = "Requirements: "
-                requirements.forEach(requirement => {
-                    var currentRequirementString = "";
-                    currentRequirementString += requirement["numHoursRequired"] + " hours from ";
-                    requirement["courseList"].forEach(course => {
-                        currentRequirementString += course + ", ";
-                    })
-                    currentRequirementString += "; ";
-                    classesRequiredString += currentRequirementString;
-                })
-                var para = document.createElement("li");
-                var tag = document.createElement("a");
-                tag.setAttribute("class", "majorButton")
-                para.setAttribute("id", name);
-                var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
-                var moreInformationNode = document.createTextNode(classesRequiredString);
-                tag.appendChild(node);
-                //tag.addEventListener("click", this.loadMajor(name));
-                tag.addEventListener("click", function() {para.appendChild(moreInformationNode)});
-                para.appendChild(tag);
-                majorListTwo.appendChild(para);
-            });
-            minorResponseTwo.forEach(element => {
-                var name = element["name"];
-                var requirements = element["requiredClasses"];
-                var classesRequiredString = "Requirements: "
-                requirements.forEach(requirement => {
-                    var currentRequirementString = "";
-                    currentRequirementString += requirement["numHoursRequired"] + " hours from ";
-                    requirement["courseList"].forEach(course => {
-                        currentRequirementString += course + ", ";
-                    })
-                    currentRequirementString += "; ";
-                    classesRequiredString += currentRequirementString;
-                })
-                var para = document.createElement("li");
-                var tag = document.createElement("button");
-                tag.setAttribute("id", "minorButton");
-                para.setAttribute("id", name);
-                var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
+            // const secondResponse = response.data["2018"];
+            // const majorResponseTwo = secondResponse["majors"];
+            // const minorResponseTwo = secondResponse["minors"];
+            // const recMinorResponseTwo = secondResponse["recMinors"]
+            // majorResponseTwo.forEach(element => {
+            //     majors.push(element);
+            //     var name = element["name"];
+            //     var requirements = element["requiredClasses"];
+            //     var classesRequiredString = "Requirements: "
+            //     requirements.forEach(requirement => {
+            //         var currentRequirementString = "";
+            //         currentRequirementString += requirement["numHoursRequired"] + " hours from ";
+            //         requirement["courseList"].forEach(course => {
+            //             currentRequirementString += course + ", ";
+            //         })
+            //         currentRequirementString += "; ";
+            //         classesRequiredString += currentRequirementString;
+            //     })
+            //     var para = document.createElement("li");
+            //     var tag = document.createElement("a");
+            //     tag.setAttribute("class", "majorButton")
+            //     para.setAttribute("id", name);
+            //     var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
+            //     var moreInformationNode = document.createTextNode(classesRequiredString);
+            //     tag.appendChild(node);
+            //     //tag.addEventListener("click", this.loadMajor(name));
+            //     tag.addEventListener("click", function() {
+            //            if (para.nextSibling != null) {
+            //                majorListTwo.insertBefore(moreInformationNode, para.nextSibling);
+            //            }
+            //        });
+            //     para.appendChild(tag);
+            //     majorListTwo.appendChild(para);
+            // });
+            // minorResponseTwo.forEach(element => {
+            //     var name = element["name"];
+            //     var requirements = element["requiredClasses"];
+            //     var classesRequiredString = "Requirements: "
+            //     requirements.forEach(requirement => {
+            //         var currentRequirementString = "";
+            //         currentRequirementString += requirement["numHoursRequired"] + " hours from ";
+            //         requirement["courseList"].forEach(course => {
+            //             currentRequirementString += course + ", ";
+            //         })
+            //         currentRequirementString += "; ";
+            //         classesRequiredString += currentRequirementString;
+            //     })
+            //     var para = document.createElement("li");
+            //     var tag = document.createElement("button");
+            //     tag.setAttribute("id", "minorButton");
+            //     para.setAttribute("id", name);
+            //     var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
 
-                var moreInformationNode = document.createTextNode(classesRequiredString);
-                tag.appendChild(node);
-                tag.addEventListener("click", function() {para.appendChild(moreInformationNode)});
-                para.appendChild(tag);
-                minorListTwo.appendChild(para);
-            });
-            recMinorResponseTwo.forEach(element => {
-                var name = element["name"];
-                var requirements = element["requiredClasses"];
-                var classesRequiredString = "Requirements: "
-                requirements.forEach(requirement => {
-                    var currentRequirementString = "";
-                    currentRequirementString += requirement["numHoursRequired"] + " hours from ";
-                    requirement["courseList"].forEach(course => {
-                        currentRequirementString += course + ", ";
-                    })
-                    currentRequirementString += "; ";
-                    classesRequiredString += currentRequirementString;
-                })
-                var para = document.createElement("li");
-                var tag = document.createElement("button");
-                tag.setAttribute("id", "minorButton");
-                para.setAttribute("id", name);
-                var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
-                var moreInformationNode = document.createTextNode(classesRequiredString);
-                tag.appendChild(node);
-                tag.addEventListener("click", function() {para.appendChild(moreInformationNode)});
-                para.appendChild(tag);
-                recMinorListTwo.appendChild(para);
-            });
-
-
-            const thirdResponse = response.data["2019"];
-            const majorResponseThree = thirdResponse["majors"];
-            const minorResponseThree = thirdResponse["minors"];
-            const recMinorResponseThree = thirdResponse["recMinors"]
-            majorResponseThree.forEach(element => {
-                majors.push(element);
-                var name = element["name"];
-                var requirements = element["requiredClasses"];
-                var classesRequiredString = "Requirements: "
-                requirements.forEach(requirement => {
-                    var currentRequirementString = "";
-                    currentRequirementString += requirement["numHoursRequired"] + " hours from ";
-                    requirement["courseList"].forEach(course => {
-                        currentRequirementString += course + ", ";
-                    })
-                    currentRequirementString += "; ";
-                    classesRequiredString += currentRequirementString;
-                })
-                var para = document.createElement("li");
-                var tag = document.createElement("a");
-                tag.setAttribute("class", "majorButton")
-                para.setAttribute("id", name);
-                var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
-                var moreInformationNode = document.createTextNode(classesRequiredString);
-                tag.appendChild(node);
-                //tag.addEventListener("click", this.loadMajor(name));
-                tag.addEventListener("click", function() {para.appendChild(moreInformationNode)});
-                para.appendChild(tag);
-                majorListThree.appendChild(para);
-            });
-            minorResponseThree.forEach(element => {
-                var name = element["name"];
-                var requirements = element["requiredClasses"];
-                var classesRequiredString = "Requirements: "
-                requirements.forEach(requirement => {
-                    var currentRequirementString = "";
-                    currentRequirementString += requirement["numHoursRequired"] + " hours from ";
-                    requirement["courseList"].forEach(course => {
-                        currentRequirementString += course + ", ";
-                    })
-                    currentRequirementString += "; ";
-                    classesRequiredString += currentRequirementString;
-                })
-                var para = document.createElement("li");
-                var tag = document.createElement("button");
-                tag.setAttribute("id", "minorButton");
-                para.setAttribute("id", name);
-                var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
-
-                var moreInformationNode = document.createTextNode(classesRequiredString);
-                tag.appendChild(node);
-                tag.addEventListener("click", function() {para.appendChild(moreInformationNode)});
-                para.appendChild(tag);
-                minorListThree.appendChild(para);
-            });
-            recMinorResponseThree.forEach(element => {
-                var name = element["name"];
-                var requirements = element["requiredClasses"];
-                var classesRequiredString = "Requirements: "
-                requirements.forEach(requirement => {
-                    var currentRequirementString = "";
-                    currentRequirementString += requirement["numHoursRequired"] + " hours from ";
-                    requirement["courseList"].forEach(course => {
-                        currentRequirementString += course + ", ";
-                    })
-                    currentRequirementString += "; ";
-                    classesRequiredString += currentRequirementString;
-                })
-                var para = document.createElement("li");
-                var tag = document.createElement("button");
-                tag.setAttribute("id", "minorButton");
-                para.setAttribute("id", name);
-                var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
-                var moreInformationNode = document.createTextNode(classesRequiredString);
-                tag.appendChild(node);
-                tag.addEventListener("click", function() {para.appendChild(moreInformationNode)});
-                para.appendChild(tag);
-                recMinorListThree.appendChild(para);
-            });
+            //     var moreInformationNode = document.createTextNode(classesRequiredString);
+            //     tag.appendChild(node);
+            //     tag.addEventListener("click", function() {
+            //    if (para.nextSibling != null) {
+            //        minorListTwo.insertBefore(moreInformationNode, para.nextSibling);
+            //    }
+            //});
+            //     para.appendChild(tag);
+            //     minorListTwo.appendChild(para);
+            // });
+            // recMinorResponseTwo.forEach(element => {
+            //     var name = element["name"];
+            //     var requirements = element["requiredClasses"];
+            //     var classesRequiredString = "Requirements: "
+            //     requirements.forEach(requirement => {
+            //         var currentRequirementString = "";
+            //         currentRequirementString += requirement["numHoursRequired"] + " hours from ";
+            //         requirement["courseList"].forEach(course => {
+            //             currentRequirementString += course + ", ";
+            //         })
+            //         currentRequirementString += "; ";
+            //         classesRequiredString += currentRequirementString;
+            //     })
+            //     var para = document.createElement("li");
+            //     var tag = document.createElement("button");
+            //     tag.setAttribute("id", "minorButton");
+            //     para.setAttribute("id", name);
+            //     var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
+            //     var moreInformationNode = document.createTextNode(classesRequiredString);
+            //     tag.appendChild(node);
+            //     tag.addEventListener("click", function() {
+            //    if (para.nextSibling != null) {
+            //        recMinorListTwo.insertBefore(moreInformationNode, para.nextSibling);
+            //    }
+            //});
+            //     para.appendChild(tag);
+            //     recMinorListTwo.appendChild(para);
+            // });
 
 
-            const fourthResponse = response.data["2020"];
-            const majorResponseFour = fourthResponse["majors"];
-            const minorResponseFour = fourthResponse["minors"];
-            const recMinorResponseFour = fourthResponse["recMinors"]
-            majorResponseFour.forEach(element => {
-                majors.push(element);
-                var name = element["name"];
-                var requirements = element["requiredClasses"];
-                var classesRequiredString = "Requirements: "
-                requirements.forEach(requirement => {
-                    var currentRequirementString = "";
-                    currentRequirementString += requirement["numHoursRequired"] + " hours from ";
-                    requirement["courseList"].forEach(course => {
-                        currentRequirementString += course + ", ";
-                    })
-                    currentRequirementString += "; ";
-                    classesRequiredString += currentRequirementString;
-                })
-                var para = document.createElement("li");
-                var tag = document.createElement("a");
-                tag.setAttribute("class", "majorButton")
-                para.setAttribute("id", name);
-                var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
-                var moreInformationNode = document.createTextNode(classesRequiredString);
-                tag.appendChild(node);
-                //tag.addEventListener("click", this.loadMajor(name));
-                tag.addEventListener("click", function() {para.appendChild(moreInformationNode)});
-                para.appendChild(tag);
-                majorListFour.appendChild(para);
-            });
-            minorResponseFour.forEach(element => {
-                var name = element["name"];
-                var requirements = element["requiredClasses"];
-                var classesRequiredString = "Requirements: "
-                requirements.forEach(requirement => {
-                    var currentRequirementString = "";
-                    currentRequirementString += requirement["numHoursRequired"] + " hours from ";
-                    requirement["courseList"].forEach(course => {
-                        currentRequirementString += course + ", ";
-                    })
-                    currentRequirementString += "; ";
-                    classesRequiredString += currentRequirementString;
-                })
-                var para = document.createElement("li");
-                var tag = document.createElement("button");
-                tag.setAttribute("id", "minorButton");
-                para.setAttribute("id", name);
-                var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
+            // const thirdResponse = response.data["2019"];
+            // const majorResponseThree = thirdResponse["majors"];
+            // const minorResponseThree = thirdResponse["minors"];
+            // const recMinorResponseThree = thirdResponse["recMinors"]
+            // majorResponseThree.forEach(element => {
+            //     majors.push(element);
+            //     var name = element["name"];
+            //     var requirements = element["requiredClasses"];
+            //     var classesRequiredString = "Requirements: "
+            //     requirements.forEach(requirement => {
+            //         var currentRequirementString = "";
+            //         currentRequirementString += requirement["numHoursRequired"] + " hours from ";
+            //         requirement["courseList"].forEach(course => {
+            //             currentRequirementString += course + ", ";
+            //         })
+            //         currentRequirementString += "; ";
+            //         classesRequiredString += currentRequirementString;
+            //     })
+            //     var para = document.createElement("li");
+            //     var tag = document.createElement("a");
+            //     tag.setAttribute("class", "majorButton")
+            //     para.setAttribute("id", name);
+            //     var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
+            //     var moreInformationNode = document.createTextNode(classesRequiredString);
+            //     tag.appendChild(node);
+            //     //tag.addEventListener("click", this.loadMajor(name));
+            //     tag.addEventListener("click", function() {
+            //    if (para.nextSibling != null) {
+            //        majorsListThree.insertBefore(moreInformationNode, para.nextSibling);
+            //    }
+            //});
+            //     para.appendChild(tag);
+            //     majorListThree.appendChild(para);
+            // });
+            // minorResponseThree.forEach(element => {
+            //     var name = element["name"];
+            //     var requirements = element["requiredClasses"];
+            //     var classesRequiredString = "Requirements: "
+            //     requirements.forEach(requirement => {
+            //         var currentRequirementString = "";
+            //         currentRequirementString += requirement["numHoursRequired"] + " hours from ";
+            //         requirement["courseList"].forEach(course => {
+            //             currentRequirementString += course + ", ";
+            //         })
+            //         currentRequirementString += "; ";
+            //         classesRequiredString += currentRequirementString;
+            //     })
+            //     var para = document.createElement("li");
+            //     var tag = document.createElement("button");
+            //     tag.setAttribute("id", "minorButton");
+            //     para.setAttribute("id", name);
+            //     var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
 
-                var moreInformationNode = document.createTextNode(classesRequiredString);
-                tag.appendChild(node);
-                tag.addEventListener("click", function() {para.appendChild(moreInformationNode)});
-                para.appendChild(tag);
-                minorListFour.appendChild(para);
-            });
-            recMinorResponseFour.forEach(element => {
-                var name = element["name"];
-                var requirements = element["requiredClasses"];
-                var classesRequiredString = "Requirements: "
-                requirements.forEach(requirement => {
-                    var currentRequirementString = "";
-                    currentRequirementString += requirement["numHoursRequired"] + " hours from ";
-                    requirement["courseList"].forEach(course => {
-                        currentRequirementString += course + ", ";
-                    })
-                    currentRequirementString += "; ";
-                    classesRequiredString += currentRequirementString;
-                })
-                var para = document.createElement("li");
-                var tag = document.createElement("button");
-                tag.setAttribute("id", "minorButton");
-                para.setAttribute("id", name);
-                var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
-                var moreInformationNode = document.createTextNode(classesRequiredString);
-                tag.appendChild(node);
-                tag.addEventListener("click", function() {para.appendChild(moreInformationNode)});
-                para.appendChild(tag);
-                recMinorListFour.appendChild(para);
-            });
+            //     var moreInformationNode = document.createTextNode(classesRequiredString);
+            //     tag.appendChild(node);
+            //     tag.addEventListener("click", function() {
+            //    if (para.nextSibling != null) {
+            //        minorsListThree.insertBefore(moreInformationNode, para.nextSibling);
+            //    }
+            //});
+            //     para.appendChild(tag);
+            //     minorListThree.appendChild(para);
+            // });
+            // recMinorResponseThree.forEach(element => {
+            //     var name = element["name"];
+            //     var requirements = element["requiredClasses"];
+            //     var classesRequiredString = "Requirements: "
+            //     requirements.forEach(requirement => {
+            //         var currentRequirementString = "";
+            //         currentRequirementString += requirement["numHoursRequired"] + " hours from ";
+            //         requirement["courseList"].forEach(course => {
+            //             currentRequirementString += course + ", ";
+            //         })
+            //         currentRequirementString += "; ";
+            //         classesRequiredString += currentRequirementString;
+            //     })
+            //     var para = document.createElement("li");
+            //     var tag = document.createElement("button");
+            //     tag.setAttribute("id", "minorButton");
+            //     para.setAttribute("id", name);
+            //     var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
+            //     var moreInformationNode = document.createTextNode(classesRequiredString);
+            //     tag.appendChild(node);
+            //     tag.addEventListener("click", function() {
+            //    if (para.nextSibling != null) {
+            //        recMinorsListThree.insertBefore(moreInformationNode, para.nextSibling);
+            //    }
+            //});
+            //     para.appendChild(tag);
+            //     recMinorListThree.appendChild(para);
+            // });
+
+
+            // const fourthResponse = response.data["2020"];
+            // const majorResponseFour = fourthResponse["majors"];
+            // const minorResponseFour = fourthResponse["minors"];
+            // const recMinorResponseFour = fourthResponse["recMinors"]
+            // majorResponseFour.forEach(element => {
+            //     majors.push(element);
+            //     var name = element["name"];
+            //     var requirements = element["requiredClasses"];
+            //     var classesRequiredString = "Requirements: "
+            //     requirements.forEach(requirement => {
+            //         var currentRequirementString = "";
+            //         currentRequirementString += requirement["numHoursRequired"] + " hours from ";
+            //         requirement["courseList"].forEach(course => {
+            //             currentRequirementString += course + ", ";
+            //         })
+            //         currentRequirementString += "; ";
+            //         classesRequiredString += currentRequirementString;
+            //     })
+            //     var para = document.createElement("li");
+            //     var tag = document.createElement("a");
+            //     tag.setAttribute("class", "majorButton")
+            //     para.setAttribute("id", name);
+            //     var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
+            //     var moreInformationNode = document.createTextNode(classesRequiredString);
+            //     tag.appendChild(node);
+            //     //tag.addEventListener("click", this.loadMajor(name));
+            //     tag.addEventListener("click", function() {
+            //    if (para.nextSibling != null) {
+            //            majorListFour.insertBefore(moreInformationNode, para.nextSibling);
+            //        }});
+            //     para.appendChild(tag);
+            //     majorListFour.appendChild(para);
+            // });
+            // minorResponseFour.forEach(element => {
+            //     var name = element["name"];
+            //     var requirements = element["requiredClasses"];
+            //     var classesRequiredString = "Requirements: "
+            //     requirements.forEach(requirement => {
+            //         var currentRequirementString = "";
+            //         currentRequirementString += requirement["numHoursRequired"] + " hours from ";
+            //         requirement["courseList"].forEach(course => {
+            //             currentRequirementString += course + ", ";
+            //         })
+            //         currentRequirementString += "; ";
+            //         classesRequiredString += currentRequirementString;
+            //     })
+            //     var para = document.createElement("li");
+            //     var tag = document.createElement("button");
+            //     tag.setAttribute("id", "minorButton");
+            //     para.setAttribute("id", name);
+            //     var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
+
+            //     var moreInformationNode = document.createTextNode(classesRequiredString);
+            //     tag.appendChild(node);
+            //     tag.addEventListener("click", function() {
+            //    if (para.nextSibling != null) {
+            //            minorListFour.insertBefore(moreInformationNode, para.nextSibling);
+            //        }});
+            //     para.appendChild(tag);
+            //     minorListFour.appendChild(para);
+            // });
+            // recMinorResponseFour.forEach(element => {
+            //     var name = element["name"];
+            //     var requirements = element["requiredClasses"];
+            //     var classesRequiredString = "Requirements: "
+            //     requirements.forEach(requirement => {
+            //         var currentRequirementString = "";
+            //         currentRequirementString += requirement["numHoursRequired"] + " hours from ";
+            //         requirement["courseList"].forEach(course => {
+            //             currentRequirementString += course + ", ";
+            //         })
+            //         currentRequirementString += "; ";
+            //         classesRequiredString += currentRequirementString;
+            //     })
+            //     var para = document.createElement("li");
+            //     var tag = document.createElement("button");
+            //     tag.setAttribute("id", "minorButton");
+            //     para.setAttribute("id", name);
+            //     var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
+            //     var moreInformationNode = document.createTextNode(classesRequiredString);
+            //     tag.appendChild(node);
+            //     tag.addEventListener("click", function() {
+            //    if (para.nextSibling != null) {
+            //            recMinorListFour.insertBefore(moreInformationNode, para.nextSibling);
+            //        }});
+            //     para.appendChild(tag);
+            //     recMinorListFour.appendChild(para);
+            // });
         })
     }
 
@@ -623,11 +728,11 @@ export const Majors = () => {
         </Navbar>
         <div class="req-content">
             <div class="reqYear" className="req-buttons">
-                <div id="columnTitle">Requirement Year</div>
+                <div id="columnTitle" >Requirement Year</div>
                 <button onClick={getMajorsAndMinors} className="req-button">2017-2018</button>
-                <button onClick={getMajorsAndMinorsTwo} className="req-button">2018-2019</button>
-                <button onClick={getMajorsAndMinorsThree} className="req-button">2019-2020</button>
-                <button onClick={getMajorsAndMinorsFour} className="req-button">2020-2021</button>
+                <button onClick={getMajorsAndMinors} className="req-button">2018-2019</button>
+                <button onClick={getMajorsAndMinors} className="req-button">2019-2020</button>
+                <button onClick={getMajorsAndMinors} className="req-button">2020-2021</button>
             </div>
 
             <CoolTabs
@@ -635,17 +740,18 @@ export const Majors = () => {
                 style={{ width:  1500, height:  650, background:  'blue', margin: 20,}}
                 tabsHeaderStyle={{height: 100}}
                 activeTabStyle={{ background:  'purple', color:  'white' }}
-                unActiveTabStyle={{ background:  'white', color:  'black' }}
+                unActiveTabStyle={{ background:  'white', color:  'black'}}
                 leftContentStyle={{ background:  'white' }}
                 rightContentStyle={{ background:  'white' }}
 
                 leftTabTitleStyle={{fontSize: 40}}
                 rightTabTitleStyle={{fontSize: 40}}
                 
-                rightTabTitleStyle={{}}
                 leftTabTitle={'Majors'}
                 rightTabTitle={'Minors'}
-                leftContent={<div id="MajorList"> Click on a requirement year to view majors. </div>}
+                leftContent={
+                    <div id="MajorList"> Click on a requirement year to view minors. </div> 
+                }
                 rightContent={
                     <div>
                         <div id="sortingButton">
@@ -660,6 +766,8 @@ export const Majors = () => {
                 }
                 
             />
+
+
             </div>
             </div>
 

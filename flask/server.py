@@ -726,5 +726,5 @@ def get_new_schedule():
 
 @app.route("/api/getAllMajorsAndMinors", methods=["GET"])
 def getAllMajorsAndMinors():
-    all = MinorRecommendation.getEverythingJSON(2017)
+    all = MinorRecommendation.getEverythingJSON()
     return json.dumps(all)
