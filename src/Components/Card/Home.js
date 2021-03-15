@@ -34,6 +34,8 @@ export const Home = ()=> {
     const handleShow = () => setShow(true);
     const handleCompare = () => setCompare(true);
     const handleCloseCompare = () => setCompare(false);
+    const handleCloseAuto = () => setShowAuto(false);
+
 
     /*
     makePostRequest() --> Method used to send a post request with the given parameters
@@ -134,19 +136,19 @@ export const Home = ()=> {
             </div>
             <div id="button-container-home">
                 <Button variant="primary" id="home-page-secondary-button" onClick={handleAuto}> Auto Gen Schedule </Button>
-                    <Modal show={showAuto} onHide={handleAuto}>
+                    <Modal show={showAuto} onHide={handleCloseAuto}>
                         <Modal.Header closeButton>
-                            <Modal.Title>Magic</Modal.Title>
+                            <Modal.Title>Auto-Generate Schedule</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
                             <Form method="post" action="/api/autoGenerate">
                                 <Form.Group>
-                                    <Form.Control type="text" placeholder="Enter Schedule Name" id="schedule-name" name="schedule-name"></Form.Control>
+                                    <Form.Control type="text" placeholder="Enter Schedule Name" id="auto-schedule-name" name="schedule-name"></Form.Control>
                                     <Form.Control as="select" id="schedule-semester" name="schedule-semester">
                                         <option value="fall">Fall</option>
                                         <option value="spring">Spring</option>
                                     </Form.Control>
-                                    <Button variant="secondary" onClick={handleAuto}>
+                                    <Button variant="secondary" onClick={handleCloseAuto}>
                                         Cancel
                                     </Button>
                                     <Button variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">

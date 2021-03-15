@@ -614,35 +614,42 @@ def get_data_compare():
                 # for the course, meaning set the days, start and end time, and event
                 # title. 
                 if row[3] not in course_codes or row[3] in course_codes:
-                    course_codes.append(row[3])
-                    start_time = str(row[6])
-                    end_time = str(row[7])
-                    if(len(start_time) < 8):
-                        start_time = f"0{start_time}"
-                    if(len(end_time) < 8):
-                        end_time = f"0{end_time}"
-                    for day in row[4]:
-                        resource = ""
-                        if day == 'M':
-                            resource = "monday"
-                        if day == 'T':
-                            resource = "tuesday"
-                        if day == 'W':
-                            resource = "wednesday"
-                        if day == 'R':
-                            resource = "thursday"
-                        if day == 'F':
-                            resource = "friday"
-                        entry = {
-                                "id": 1,
-                                "text": f"{row[3]}",
-                                "start": f"2013-03-25T{start_time}",
-                                "end": f"2013-03-25T{end_time}",
-                                "resource": resource,
-                                "days": row[4],
-                                "backColor": backColor
-                        }
-                        return_list.append(entry)
+                    count = 0
+                    if row[3] in course_codes:
+                        for course in course_codes:
+                            if course == row[3]:
+                                count = count + 1
+                    if count <= 1:
+                        count = 0
+                        course_codes.append(row[3])
+                        start_time = str(row[6])
+                        end_time = str(row[7])
+                        if(len(start_time) < 8):
+                            start_time = f"0{start_time}"
+                        if(len(end_time) < 8):
+                            end_time = f"0{end_time}"
+                        for day in row[4]:
+                            resource = ""
+                            if day == 'M':
+                                resource = "monday"
+                            if day == 'T':
+                                resource = "tuesday"
+                            if day == 'W':
+                                resource = "wednesday"
+                            if day == 'R':
+                                resource = "thursday"
+                            if day == 'F':
+                                resource = "friday"
+                            entry = {
+                                    "id": 1,
+                                    "text": f"{row[3]}",
+                                    "start": f"2013-03-25T{start_time}",
+                                    "end": f"2013-03-25T{end_time}",
+                                    "resource": resource,
+                                    "days": row[4],
+                                    "backColor": backColor
+                            }
+                            return_list.append(entry)
                 # This else statement is needed for classes who have labs, where
                 # we want to make sure we do not overlook a lab section just because
                 # it has the same course code (i.e. look at the section to see if it's a lab)
@@ -683,6 +690,206 @@ def get_data_compare():
         []
     )
     return data
+
+
+@app.route("/api/profile", methods=["GET", "POST"])
+def profile():
+    if request.method == "GET":
+        global user_email
+        passwrd = ""
+        majors = []
+        minors = []
+        cursor = conn.cursor()
+        user_info = ''' SELECT Student.email, StudentMajorMinor.degreeId, Student.passwrd FROM Student join StudentMajorMinor on Student.email = StudentMajorMinor.email where Student.email = %s; '''
+        cursor.execute(user_info, (user_email,))
+        results = cursor.fetchall()
+        for result in results:
+            id = result[1]
+            check_if_major_or_minor = ''' select MajorMinor.isMinor, MajorMinor.degreeName from MajorMinor where MajorMinor.degreeId = %s '''
+            cursor.execute(check_if_major_or_minor, (id,))
+            status = cursor.fetchall()
+            for row in status:
+                if row[0] == 1:
+                    minors.append(row[1])
+                else:
+                    majors.append(row[1])
+            # majors.append(result[1])
+            passwrd = result[1]
+        conn.commit()
+        return {
+            "email": user_email,
+            "majors": majors, 
+            "minors": minors,
+            "passwrd": passwrd,
+        }
+    
+@app.route("/api/changeMajor", methods=["POST"])
+def changeMajor():
+    cursor = conn.cursor()
+    valid = True
+    global requirement_yr
+    global user_email
+    data = request.data.decode("utf-8")
+    json_data = json.loads(data)
+    major = json_data.get("major")
+    minors = []
+    if major is None or major == []:
+        valid = False
+    
+    else:
+        """
+        Workflow:
+        1. Get all student major minor details. 
+        2. For each entry, search MajorMinor database and determine whether it is a minor or not
+        3. If it is a minor, add to list of minors, continue
+        4. Delete all student major minor info
+        5. Add all new major info
+        6. Add back all minor info
+        7. Commit
+        """
+        try:
+            # Workflow 1: Get all student major minor details
+            getMinorQuery = """
+                select * from StudentMajorMinor join MajorMinor on StudentMajorMinor.degreeId = MajorMinor.degreeID
+                where StudentMajorMinor.email = %s;
+            """
+            cursor.execute(getMinorQuery, (user_email,))
+            results = cursor.fetchall()
+            # Workflow 2/3: Search each entry in major minor database to determine whether the id represents a minor, add to list
+            for result in results:
+                isMinor = result[4]
+                print(result)
+                if(result[4]) == 1:
+                    minors.append(result[1])
+            
+            print(minors)
+
+            # Workflow 4: Delete StudentMajorMinor info
+            deleteStudentDegree = "delete from StudentMajorMinor where email = %s"
+            cursor.execute(deleteStudentDegree, (user_email,))
+            conn.commit()
+
+            # Workflow 5: Add back new major info
+            studentDegreeQuery = "select degreeID from MajorMinor where degreeName = %s and reqYear = %s and isMinor = %s"
+            for m in major:
+                mid = 0
+                cursor.execute(studentDegreeQuery, (m, requirement_yr, 0))
+                result = cursor.fetchall()
+                for row in result:
+                    mid = row[0]
+                    addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
+                    cursor.execute(addToMajorMinor, (user_email, mid))
+                    print("Inserted one major")
+                    conn.commit()
+                
+            # Workflow 6: Add back minor info
+            for minor in minors:
+                addMinors = "insert into StudentMajorMinor values (%s, %s)"
+                cursor.execute(addMinors, (user_email, minor))
+                conn.commit()
+
+        except Error as error:
+            #If you cannot insert the invidual into the database, print error and reroute
+            print("Insertion in database unsuccessful: " + str(error))
+            return redirect("http//localhost:3000/Profile")
+
+    return "good"
+
+@app.route("/api/changeMinor", methods=["POST"])
+def changeMinor():
+    cursor = conn.cursor()
+    valid = True
+    global requirement_yr
+    global user_email
+    data = request.data.decode("utf-8")
+    json_data = json.loads(data)
+    minor = json_data.get("minor")
+    majors = []
+    if minor is None or minor == []:
+        valid = False
+    
+    else:
+        """
+        Workflow:
+        1. Get all student major minor details. 
+        2. For each entry, search MajorMinor database and determine whether it is a minor or not
+        3. If it is a minor, add to list of minors, continue
+        4. Delete all student major minor info
+        5. Add all new major info
+        6. Add back all minor info
+        7. Commit
+        """
+        try:
+            # Workflow 1: Get all student major minor details
+            getMajorQuery = """
+                select * from StudentMajorMinor join MajorMinor on StudentMajorMinor.degreeId = MajorMinor.degreeID
+                where StudentMajorMinor.email = %s;
+            """
+            cursor.execute(getMajorQuery, (user_email,))
+            results = cursor.fetchall()
+            # Workflow 2/3: Search each entry in major minor database to determine whether the id represents a minor, add to list
+            for result in results:
+                isMajor = result[4]
+                print(result)
+                if(result[4]) == 0:
+                    majors.append(result[1])
+            
+            print(majors)
+
+            # Workflow 4: Delete StudentMajorMinor info
+            deleteStudentDegree = "delete from StudentMajorMinor where email = %s"
+            cursor.execute(deleteStudentDegree, (user_email,))
+            conn.commit()
+
+            # Workflow 5: Add back new minor info
+            studentDegreeQuery = "select degreeID from MajorMinor where degreeName = %s and reqYear = %s and isMinor = %s"
+            for m in minor:
+                mid = 0
+                cursor.execute(studentDegreeQuery, (m, requirement_yr, 1))
+                result = cursor.fetchall()
+                for row in result:
+                    mid = row[0]
+                    addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
+                    cursor.execute(addToMajorMinor, (user_email, mid))
+                    print("Inserted one minor")
+                    conn.commit()
+                
+            # Workflow 6: Add back minor info
+            for major in majors:
+                addMinors = "insert into StudentMajorMinor values (%s, %s)"
+                cursor.execute(addMinors, (user_email, major))
+                conn.commit()
+
+        except Error as error:
+            #If you cannot insert the invidual into the database, print error and reroute
+            print("Insertion in database unsuccessful: " + str(error))
+            return redirect("http//localhost:3000/Profile")
+
+    return "good"
+
+@app.route("/api/changePassword", methods=["POST"])
+def changePassword():
+    data = request.data.decode("utf-8")
+    json_data = json.loads(data)
+    oldPassword = json_data.get("oldPassword")
+    newPassword = json_data.get("newPassword")
+    global user_email
+    valid = False
+    cursor = conn.cursor()
+    getUserPassword = "select passwrd from Student where email = %s"
+    cursor.execute(getUserPassword, (user_email,))
+    results = cursor.fetchone()
+    password = results[0]
+    if password == oldPassword:
+        valid = True
+    if valid:
+        updateUserPassword = "update Student set passwrd = %s where email = %s"
+        cursor.execute(updateUserPassword, (newPassword, user_email,))
+        conn.commit()
+    else:
+        return {
+            "response": "error"
+        }
 
 
 """
