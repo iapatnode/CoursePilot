@@ -690,7 +690,7 @@ export const Majors = () => {
                 leftTabTitle={'Majors'}
                 rightTabTitle={'Minors'}
                 leftContent={
-                    <div id="MajorList"> Click on a requirement year to view minors. </div> 
+                    <div id="MajorList"> Click on a requirement year to view minors. It can take up to 10 seconds to display. </div> 
                 }
                 rightContent={
                     <div>
@@ -701,7 +701,7 @@ export const Majors = () => {
                             </DropdownButton>
                         </div>
 
-                <div id="MinorList"> Click on a requirement year to view minors. </div> 
+                <div id="MinorList"> Click on a requirement year to view minors. It can take up to 10 seconds to display. </div> 
                 </div>
                 }
                 
