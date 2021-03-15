@@ -218,8 +218,7 @@ def getEverythingJSON(user_email):
     recMinorsTwo = getMinorsByRequirementYearJSON(2018)
     recMinorsThree = getMinorsByRequirementYearJSON(2019)
     recMinorsFour = getMinorsByRequirementYearJSON(2020)
-    classesTaken = [{"code":"MATH 214", "hours": 3}, {"code":"MATH 232", "hours":3}]
-    remainingClassesInMajor = [{"code" : "MATH 421", "hours" : 3}]
+
     recommendMinorsJSON(user_email, recMinors)
     recommendMinorsJSON(user_email, recMinorsTwo)
     recommendMinorsJSON(user_email, recMinorsThree)
@@ -264,30 +263,43 @@ def recommendMinorsJSON(userEmail, allMinors):
     classesChecked = []
 
     #1st Pass
+    print("Taken Classes")
     for classTaken in classesTaken:
-        if (classTaken not in classesChecked):
-            classesChecked.append(classTaken)
+        if (classTaken["code"] not in classesChecked):
+            classesChecked.append(classTaken["code"])
+            
             for minorVar in allMinors:
+                usedInMinor = False
                 for requirement in minorVar["requiredClasses"]:
-                    if classTaken["code"] in requirement["courseList"]:
-                        if (requirement["requirementMet"] == False):
-                            minorVar["hoursRemaining"] -= classTaken["hours"]
-                            requirement["hoursRemaining"] -= classTaken["hours"]
-                            if (requirement["hoursRemaining"] <= 0):
-                                requirement["requirementMet"] = True
+                    if usedInMinor == False:
+                        if classTaken["code"] in requirement["courseList"]:
+                            usedInMinor = True
+                            if (requirement["requirementMet"] == False):
+                                print(classTaken["code"])
+                                minorVar["hoursRemaining"] -= classTaken["hours"]
+                                requirement["hoursRemaining"] -= classTaken["hours"]
+                                if (requirement["hoursRemaining"] <= 0):
+                                    requirement["requirementMet"] = True
 
     #2nd Pass
+    print("Remaining Classes")
     for remainingClass in remainingClassesInMajor:
-        if remainingClass not in classesChecked:
-            classesChecked.append(remainingClass)
+        if remainingClass["code"] not in classesChecked:
+            classesChecked.append(remainingClass["code"])
+            
             for minorVar in allMinors:
+                usedInMinor = False
                 for requirement in minorVar["requiredClasses"]:
-                    if remainingClass["code"] in requirement["courseList"]:
-                        if (requirement["requirementMet"] == False):
-                            minorVar["hoursRemaining"] -= remainingClass["hours"]
-                            requirement["hoursRemaining"] -= remainingClass["hours"]
-                            if (requirement["hoursRemaining"] <= 0):
-                                requirement["requirementMet"] = True
+                    if usedInMinor == False:
+                        if remainingClass["code"] in requirement["courseList"]:
+                            usedInMinor = True
+                            if (requirement["requirementMet"] == False):
+                                print(remainingClass["code"])
+                                minorVar["hoursRemaining"] -= remainingClass["hours"]
+                                requirement["hoursRemaining"] -= remainingClass["hours"]
+                                if (requirement["hoursRemaining"] <= 0):
+                                    requirement["requirementMet"] = True
+                
     # SORT
     allMinors.sort(key=lambda x: x["hoursRemaining"], reverse=False)
 
@@ -313,9 +325,6 @@ def getRequiredCourses(user_email):
     
     try:
         cursor = conn.cursor()
-        print("WOWZA")
-        print(user_email)
-        print("SHABAM")
 
         cursor.execute("select degreeId from StudentMajorMinor WHERE email = %s;", (user_email,))
 
