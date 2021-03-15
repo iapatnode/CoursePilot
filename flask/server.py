@@ -48,6 +48,8 @@ schedule_name = ""
 compare_schedule_one = ""
 compare_schedule_two = ""
 
+requirement_yr = ""
+
 
 """
 /API/LOGIN ROUTE
@@ -1127,5 +1129,6 @@ def autoGenerate():
 @app.route("/api/getAllMajorsAndMinors", methods=["GET"])
 def getAllMajorsAndMinors():
     global user_email
+    print(f"User email: {user_email}")
     all = MinorRecommendation.getEverythingJSON(user_email)
     return json.dumps(all)

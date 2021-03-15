@@ -120,7 +120,7 @@ export const Home = ()=> {
                         <h2> Semester </h2>
                         <ul>
                             {success.map((value, index) => {
-                                return <li id="schedule-semester" key={index} value={value["scheduleSemester"]}>{value["scheduleSemester"]}</li>
+                                return <li id="schedule-semester" key={index} value={value["scheduleSemester"]}>{value["scheduleSemester"]}<br></br></li>
                             })}
                         </ul>
                     </div>
