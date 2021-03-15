@@ -260,21 +260,34 @@ def recommendMinors(classesTaken, remainingClassesInMajor, allMinors):
 def recommendMinorsJSON(userEmail, allMinors):
     classesTaken = getTakenCourses(userEmail)
     remainingClassesInMajor = getRequiredCourses(userEmail)
+
+    classesChecked = []
+
     #1st Pass
     for classTaken in classesTaken:
-        for minorVar in allMinors:
-            for requirement in minorVar["requiredClasses"]:
-                if classTaken["code"] in requirement["courseList"]:
-                    if (requirement["requirementMet"] == False):
-                        minorVar["hoursRemaining"] -= classTaken["hours"]
+        if (classTaken not in classesChecked):
+            classesChecked.append(classTaken)
+            for minorVar in allMinors:
+                for requirement in minorVar["requiredClasses"]:
+                    if classTaken["code"] in requirement["courseList"]:
+                        if (requirement["requirementMet"] == False):
+                            minorVar["hoursRemaining"] -= classTaken["hours"]
+                            requirement["hoursRemaining"] -= classTaken["hours"]
+                            if (requirement["hoursRemaining"] <= 0):
+                                requirement["requirementMet"] = True
 
     #2nd Pass
     for remainingClass in remainingClassesInMajor:
-        for minorVar in allMinors:
-            for requirement in minorVar["requiredClasses"]:
-                if remainingClass["code"] in requirement["courseList"]:
-                    if (requirement["requirementMet"] == False):
-                        minorVar["hoursRemaining"] -= remainingClass["hours"]
+        if remainingClass not in classesChecked:
+            classesChecked.append(remainingClass)
+            for minorVar in allMinors:
+                for requirement in minorVar["requiredClasses"]:
+                    if remainingClass["code"] in requirement["courseList"]:
+                        if (requirement["requirementMet"] == False):
+                            minorVar["hoursRemaining"] -= remainingClass["hours"]
+                            requirement["hoursRemaining"] -= remainingClass["hours"]
+                            if (requirement["hoursRemaining"] <= 0):
+                                requirement["requirementMet"] = True
     # SORT
     allMinors.sort(key=lambda x: x["hoursRemaining"], reverse=False)
 
