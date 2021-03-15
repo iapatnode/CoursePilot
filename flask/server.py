@@ -5,6 +5,7 @@ from datetime import datetime
 from mysql.connector import connect, Error
 
 import AutoGenerateSchedule as AGS
+import MinorRecomendation as MinorRecommendation
 
 import dbQueries as db_queries
 import degreeReport as report
@@ -915,3 +916,9 @@ def autoGenerate():
         url = '{}?{}'.format(schedule_url, schedule_name)
 
         return redirect(url)
+
+@app.route("/api/getAllMajorsAndMinors", methods=["GET"])
+def getAllMajorsAndMinors():
+    global user_email
+    all = MinorRecommendation.getEverythingJSON(user_email)
+    return json.dumps(all)
