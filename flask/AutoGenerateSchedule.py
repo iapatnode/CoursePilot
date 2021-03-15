@@ -211,8 +211,9 @@ def getPrereqDepth(course, coursePrereqDepth):
         return 0
     else:
         for prereq in course.prerequisites:
-            prereq.coursePrereqDepth = coursePrereqDepth
-            getPrereqDepth(prereq, coursePrereqDepth + 1)
+            if prereq.courseCode != course.courseCode:
+                prereq.coursePrereqDepth = coursePrereqDepth
+                getPrereqDepth(prereq, coursePrereqDepth + 1)
     
     return 0
 
