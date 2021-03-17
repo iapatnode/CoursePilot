@@ -31,6 +31,7 @@ global.endTime = ""; // End time of the class that was added
 global.conflict = false; // Keep track of any time conflicts in the schedule
 global.removedCourses = [] // List of courses that the user has removed from the schedule
 global.className = ""; // Name of the class that was added
+global.cont = true;
 
 
 class Schedule extends Component {
@@ -113,7 +114,7 @@ class Schedule extends Component {
   */
   addClass(e) {
     var course_code;
-    var cont = true;
+    global.cont = true;
     // If the user has clicked an element, and it is an a tag (i.e. it is a course)
     if(e.target && e.target.nodeName === "A") {
       // Get all of the course information from the ID of the element
@@ -144,13 +145,12 @@ class Schedule extends Component {
       global.classAdded = {text};
       global.className = text.substring(0, text.indexOf("-") - 9);
       global.classEvents.forEach(element => {
-        if(element["text"] == course_code && cont) {
+        console.log(element);
+        if(element["text"] == course_code && global.cont) {
           alert("Error: You have already added this course to your schedule");
-          cont = false;
+          global.cont = false;
         }
       });
-
-      var id = 1
     }
 
     /*
@@ -159,8 +159,7 @@ class Schedule extends Component {
     adding the course will cause a time conflict. Otherwise, add the course to the schedule
     state variable and update the page. 
     */
-    if(global.classAdded && cont) { 
-      global.courses.push(global.classAdded.text)
+    if(global.classAdded && global.cont) { 
       // For each day of the course, create a calendar event for the given day
       for(var i = 0; i < days.length; i++) {
         var res = "";
@@ -189,7 +188,7 @@ class Schedule extends Component {
         })
 
         // If adding the course does not result in a time conflict, add the course to the schedule
-        if(!global.conflict) {
+        if(!global.conflict && global.cont) {
           global.classEvents.push({
             "id": 1,
             "text": global.className,
@@ -208,10 +207,12 @@ class Schedule extends Component {
       // Alert the user of potential time conflicts. 
       if(global.conflict) {
         global.conflict = false;
-        cont = false;
+        global.cont = false;
         alert("Error: Adding '" + global.classAdded.text + "' will cause a time conflict.");
+      } 
+      else {
+        global.courses.push(global.classAdded.text);
       }
-      console.log(global.courses);
     }
   }
 
