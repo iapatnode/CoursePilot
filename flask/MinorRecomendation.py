@@ -89,6 +89,71 @@ def getMinorsByRequirementYear(requirementYear):
     cursor.close()
     return minors
 
+
+def getMinorsByRequirementYearJSON(requirementYear):
+    cursor = conn.cursor()
+    cursor.execute(''' SELECT * FROM MajorMinor WHERE isMinor=1 AND reqYear=%s;''', (requirementYear, ))
+    result = cursor.fetchall()
+    minors = []
+    for entry in result:
+        course_dict = {
+            "name": entry[3],
+            "requiredClasses": getRequiredClassesJSON(entry[1], requirementYear),
+            "hoursRemaining": entry[4],
+            "requirementYear": entry[0]
+        }
+        minors.append(course_dict)
+    cursor.close()
+    return minors
+
+def getMajorsByRequirementYearJSON(requirementYear):
+    cursor = conn.cursor()
+    cursor.execute(''' SELECT * FROM MajorMinor WHERE isMinor=0 AND reqYear=%s;''', (requirementYear, ))
+    result = cursor.fetchall()
+    majors = []
+    for entry in result:
+        course_dict = {
+            "name": entry[3],
+            "requiredClasses": getRequiredClassesJSON(entry[1], requirementYear),
+            "hoursRemaining": entry[4],
+            "requirementYear": entry[0]
+        }
+        majors.append(course_dict)
+    cursor.close()
+    return majors
+
+def getRequiredClassesJSON(degreeId, reqYear):
+    requiredCourses = []
+    cursor = conn.cursor()
+    cursor.execute(''' SELECT * FROM MajorMinorRequirements WHERE degreeId=%s AND catYear=%s;''', (degreeId, reqYear))
+    result = cursor.fetchall()
+    for entry in result:
+        courseList = []
+        category = entry[1]
+        cursor.execute(''' SELECT * FROM Requirement WHERE category=%s AND requirementYear=%s;''', (category, reqYear))
+        categoryResult = cursor.fetchall()
+        categoryResult = categoryResult[0]
+        categoryName = categoryResult[0]
+        numHoursRequired = categoryResult[3]
+        totalHours = categoryResult[4]
+        hoursRemaining = numHoursRequired
+        requirementMet = False
+        cursor.execute(''' SELECT * FROM ReqCourses WHERE category=%s AND catYear=%s;''', (category, reqYear))
+        courseResult = cursor.fetchall()
+        for course in courseResult:
+            courseList.append(course[1])
+        requiredCourseDict = {
+            "name" : categoryName,
+            "courseList": courseList,
+            "numHoursRequired": numHoursRequired,
+            "totalHours": totalHours,
+            "hoursRemaining": hoursRemaining,
+            "requirementMet": requirementMet
+        }
+        requiredCourses.append(requiredCourseDict)
+    cursor.close()
+    return requiredCourses
+
 """
 Once we obtain the list of minors, we need to get the classes required for each of those minors.
 This will most likely be stored in a tree structure or something similar because we need to account for
@@ -140,55 +205,150 @@ def populateAllMajors(majors, reqYear, classesTaken):
     
     return majorList
 
+def getEverythingJSON(user_email):
+    majors = getMajorsByRequirementYearJSON(2017)
+    majorsTwo = getMajorsByRequirementYearJSON(2018)
+    majorsThree = getMajorsByRequirementYearJSON(2019)
+    majorsFour = getMajorsByRequirementYearJSON(2020)
+    minors = getMinorsByRequirementYearJSON(2017)
+    minorsTwo = getMinorsByRequirementYearJSON(2018)
+    minorsThree = getMinorsByRequirementYearJSON(2019)
+    minorsFour = getMinorsByRequirementYearJSON(2020)
+    recMinors = getMinorsByRequirementYearJSON(2017)
+    recMinorsTwo = getMinorsByRequirementYearJSON(2018)
+    recMinorsThree = getMinorsByRequirementYearJSON(2019)
+    recMinorsFour = getMinorsByRequirementYearJSON(2020)
+
+    recommendMinorsJSON(user_email, recMinors)
+    recommendMinorsJSON(user_email, recMinorsTwo)
+    recommendMinorsJSON(user_email, recMinorsThree)
+    recommendMinorsJSON(user_email, recMinorsFour)
+    return {"2017" : {"majors" : majors, "minors" : minors, "recMinors" : recMinors}, "2018" : {"majors" : majorsTwo, "minors" : minorsTwo, "recMinors" : recMinorsTwo}, "2019" : {"majors" : majorsThree, "minors" : minorsThree, "recMinors" : recMinorsThree}, "2020" : {"majors" : majorsFour, "minors" : minorsFour, "recMinors" : recMinorsFour}}
 
 
 
-classesTaken = [course("MATH 214", 3), course("MATH 232", 3)]
-remainingClassesInMajor = []
-allMinors = getMinorsByRequirementYear(2017)
+def recommendMinors(classesTaken, remainingClassesInMajor, allMinors):
+    #1st Pass
+    """
+    for each classTaken:
+        for each minor:
+            if classTaken is in minor.requirements:
+                minor.hoursNeeded -= classTaken.hours
+    """
+    for classTaken in classesTaken:
+        for minorVar in allMinors:
+            for requirement in minorVar.requiredCourses:
+                if requirement.containsClass(classTaken):
+                    minorVar.hoursRemaining -= classTaken.hours
+
+    #2nd Pass
+    """
+    for each classNotTakenButInMajor:
+        for each minor:
+            if classNotTakenButInMajor is in minor.requirements:
+                minor.hoursNeeded -= classNotTakenButInMajor.hours
+    """
+    for remainingClass in remainingClassesInMajor:
+        for minorVar in allMinors:
+            for requirement in minorVar.requiredCourses:
+                if requirement.containsClass(remainingClass):
+                    minorVar.hoursRemaining -= remainingClass.hours
+    # SORT
+    allMinors.sort(key=lambda x: x.hoursRemaining, reverse=False)
+
+def recommendMinorsJSON(userEmail, allMinors):
+    classesTaken = getTakenCourses(userEmail)
+    remainingClassesInMajor = getRequiredCourses(userEmail)
+
+    classesChecked = []
+
+    #1st Pass
+    print("Taken Classes")
+    for classTaken in classesTaken:
+        if (classTaken["code"] not in classesChecked):
+            classesChecked.append(classTaken["code"])
+            
+            for minorVar in allMinors:
+                usedInMinor = False
+                for requirement in minorVar["requiredClasses"]:
+                    if usedInMinor == False:
+                        if classTaken["code"] in requirement["courseList"]:
+                            usedInMinor = True
+                            if (requirement["requirementMet"] == False):
+                                print(classTaken["code"])
+                                minorVar["hoursRemaining"] -= classTaken["hours"]
+                                requirement["hoursRemaining"] -= classTaken["hours"]
+                                if (requirement["hoursRemaining"] <= 0):
+                                    requirement["requirementMet"] = True
+
+    #2nd Pass
+    print("Remaining Classes")
+    for remainingClass in remainingClassesInMajor:
+        if remainingClass["code"] not in classesChecked:
+            classesChecked.append(remainingClass["code"])
+            
+            for minorVar in allMinors:
+                usedInMinor = False
+                for requirement in minorVar["requiredClasses"]:
+                    if usedInMinor == False:
+                        if remainingClass["code"] in requirement["courseList"]:
+                            usedInMinor = True
+                            if (requirement["requirementMet"] == False):
+                                print(remainingClass["code"])
+                                minorVar["hoursRemaining"] -= remainingClass["hours"]
+                                requirement["hoursRemaining"] -= remainingClass["hours"]
+                                if (requirement["hoursRemaining"] <= 0):
+                                    requirement["requirementMet"] = True
+                
+    # SORT
+    allMinors.sort(key=lambda x: x["hoursRemaining"], reverse=False)
+
+def getTakenCourses(user_email):
+    cursor = conn.cursor()
+    try:
+        cursor.execute("select Course.courseCode, Course.creditHours from StudentCourses JOIN Course on StudentCourses.courseCode = Course.courseCode WHERE StudentCourses.email = %s;", (user_email,))
+
+        info = cursor.fetchall()
+        
+        takenCourses = []
+
+        for val in info:
+            newCourse = {"code": val[0], "hours": val[1]}
+            takenCourses.append(newCourse)
+
+        return takenCourses
+    except error as error:
+        print("Could not pull the data" + str(error))
 
 
-for minorVal in allMinors:
-    print(minorVal.name + ", Remaining Hours: " + str(minorVal.hoursRemaining))
-print("*************")
-#1st Pass
-"""
-for each classTaken:
-    for each minor:
-        if classTaken is in minor.requirements:
-            minor.hoursNeeded -= classTaken.hours
-"""
-for classTaken in classesTaken:
-    for minorVar in allMinors:
-        for requirement in minorVar.requiredCourses:
-            if requirement.containsClass(classTaken):
-                minorVar.hoursRemaining -= classTaken.hours
+def getRequiredCourses(user_email):
+    
+    try:
+        cursor = conn.cursor()
 
-#2nd Pass
-"""
-for each classNotTakenButInMajor:
-    for each minor:
-        if classNotTakenButInMajor is in minor.requirements:
-            minor.hoursNeeded -= classNotTakenButInMajor.hours
-"""
-for remainingClass in remainingClassesInMajor:
-    for minorVar in allMinors:
-        for requirement in minorVar.requiredCourses:
-            if requirement.containsClass(remainingClass):
-                minorVar.hoursRemaining -= remainingClass.hours
+        cursor.execute("select degreeId from StudentMajorMinor WHERE email = %s;", (user_email,))
+
+        degreeID = cursor.fetchall()[0]
+        
+
+        #AND Course.courseCode NOT LIKE 'HUMA%' AND Course.courseCode NOT LIKE 'PHYE%' AND Course.courseCode NOT LIKE 'SSFT%' AND Course.courseCode NOT LIKE 'WRIT%'
+        cursor.execute("select Course.courseCode, Course.creditHours from Course JOIN ReqCourses ON Course.courseCode = ReqCourses.courseCode JOIN MajorMinorRequirements ON ReqCourses.category = MajorMinorRequirements.category JOIN MajorMinor ON MajorMinorRequirements.degreeId = MajorMinor.degreeId WHERE MajorMinor.degreeId = %s", (degreeID))
+
+        info = cursor.fetchall()
 
 
+        requiredCourses = []
+        for val in info:
+            newCourse = {"code": val[0], "hours": val[1]}
+            requiredCourses.append(newCourse)
 
-for minorVal in allMinors:
-    print(minorVal.name + ", Remaining Hours: " + str(minorVal.hoursRemaining))
+        # add the prereqs to the user
+                            
+        print(requiredCourses)
+        return requiredCourses
 
-
-print("--------------")
-# SORT
-allMinors.sort(key=lambda x: x.hoursRemaining, reverse=False)
-
-for minorVal in allMinors:
-    print(minorVal.name + ", Remaining Hours: " + str(minorVal.hoursRemaining))
+    except error as error:
+        print("Could not pull the data" + str(error))
 """
 JSON?
 Minors = ["Mathematics":[1:["MATH101","MATH202"], 2:["MATH365","MATH475"]]]

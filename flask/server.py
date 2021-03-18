@@ -4,6 +4,9 @@ import os, re, json
 from datetime import datetime
 from mysql.connector import connect, Error
 
+import AutoGenerateSchedule as AGS
+import MinorRecomendation as MinorRecommendation
+
 import dbQueries as db_queries
 import degreeReport as report
 from pprint import pprint
@@ -44,6 +47,8 @@ schedule_name = ""
 #Schedule Names when we compare schedules
 compare_schedule_one = ""
 compare_schedule_two = ""
+
+requirement_yr = ""
 
 
 """
@@ -611,35 +616,42 @@ def get_data_compare():
                 # for the course, meaning set the days, start and end time, and event
                 # title. 
                 if row[3] not in course_codes or row[3] in course_codes:
-                    course_codes.append(row[3])
-                    start_time = str(row[6])
-                    end_time = str(row[7])
-                    if(len(start_time) < 8):
-                        start_time = f"0{start_time}"
-                    if(len(end_time) < 8):
-                        end_time = f"0{end_time}"
-                    for day in row[4]:
-                        resource = ""
-                        if day == 'M':
-                            resource = "monday"
-                        if day == 'T':
-                            resource = "tuesday"
-                        if day == 'W':
-                            resource = "wednesday"
-                        if day == 'R':
-                            resource = "thursday"
-                        if day == 'F':
-                            resource = "friday"
-                        entry = {
-                                "id": 1,
-                                "text": f"{row[3]}",
-                                "start": f"2013-03-25T{start_time}",
-                                "end": f"2013-03-25T{end_time}",
-                                "resource": resource,
-                                "days": row[4],
-                                "backColor": backColor
-                        }
-                        return_list.append(entry)
+                    count = 0
+                    if row[3] in course_codes:
+                        for course in course_codes:
+                            if course == row[3]:
+                                count = count + 1
+                    if count <= 1:
+                        count = 0
+                        course_codes.append(row[3])
+                        start_time = str(row[6])
+                        end_time = str(row[7])
+                        if(len(start_time) < 8):
+                            start_time = f"0{start_time}"
+                        if(len(end_time) < 8):
+                            end_time = f"0{end_time}"
+                        for day in row[4]:
+                            resource = ""
+                            if day == 'M':
+                                resource = "monday"
+                            if day == 'T':
+                                resource = "tuesday"
+                            if day == 'W':
+                                resource = "wednesday"
+                            if day == 'R':
+                                resource = "thursday"
+                            if day == 'F':
+                                resource = "friday"
+                            entry = {
+                                    "id": 1,
+                                    "text": f"{row[3]}",
+                                    "start": f"2013-03-25T{start_time}",
+                                    "end": f"2013-03-25T{end_time}",
+                                    "resource": resource,
+                                    "days": row[4],
+                                    "backColor": backColor
+                            }
+                            return_list.append(entry)
                 # This else statement is needed for classes who have labs, where
                 # we want to make sure we do not overlook a lab section just because
                 # it has the same course code (i.e. look at the section to see if it's a lab)
@@ -682,6 +694,38 @@ def get_data_compare():
     return data
 
 
+@app.route("/api/profile", methods=["GET", "POST"])
+def profile():
+    if request.method == "GET":
+        global user_email
+        passwrd = ""
+        majors = []
+        minors = []
+        cursor = conn.cursor()
+        user_info = ''' SELECT Student.email, StudentMajorMinor.degreeId, Student.passwrd FROM Student join StudentMajorMinor on Student.email = StudentMajorMinor.email where Student.email = %s; '''
+        cursor.execute(user_info, (user_email,))
+        results = cursor.fetchall()
+        for result in results:
+            id = result[1]
+            check_if_major_or_minor = ''' select MajorMinor.isMinor, MajorMinor.degreeName from MajorMinor where MajorMinor.degreeId = %s '''
+            cursor.execute(check_if_major_or_minor, (id,))
+            status = cursor.fetchall()
+            for row in status:
+                if row[0] == 1:
+                    minors.append(row[1])
+                else:
+                    majors.append(row[1])
+            # majors.append(result[1])
+            passwrd = result[1]
+        conn.commit()
+        return {
+            "email": user_email,
+            "majors": majors, 
+            "minors": minors,
+            "passwrd": passwrd,
+        }
+    
+    
 """
 /API/GETSCHEDULEINFO
 ----------------------
@@ -832,122 +876,91 @@ def degree_report():
 
         return redirect("http://localhost:3000/degreereport")
 
-def getClasses():
-    cursor = conn.cursor()
-    try:
-        cursor.execute("select * from Class")
 
-        info = cursor.fetchall()
-        print(info)
-    except error as error:
-        print("Could not pull the data" + str(error))
-    
-def getCourse():
-    cursor = conn.cursor()
-    try:
-        cursor.execute("select * from Course")
 
-        info = cursor.fetchall()
-        print(info)
-    except error as error:
-        print("Could not pull the data" + str(error))
 
-def getMajorMinor():
-    cursor = conn.cursor()
-    try:
-        cursor.execute("select * from MajorMinor")
+@app.route("/api/autoGenerate", methods=["GET", "POST"])
+def autoGenerate():
+    #TODO: Return user data retrieved from database tables as needed
+    global user_email
+    global semester_selection
+    if request.method == "GET":
 
-        info = cursor.fetchall()
-        print(info)
-    except error as error:
-        print("Could not pull the data" + str(error))
+        print("YEET")
+        # email = session.get("email")
+        # print(email)
+        all_schedules = []
+        cursor = conn.cursor()
+        print(f"email: {user_email}")
+        get_schedules_query = ('''
+            SELECT * FROM Schedule WHERE email = %s;
+            ''')
+        cursor.execute(get_schedules_query, (user_email,))
+        result = cursor.fetchall()
+        for schedule in result:
+            # print(schedule)
+            all_schedules.append(
+                {
+                    "scheduleName": schedule[0],
+                    "dateModified": str(schedule[1]),
+                    "email": schedule[2],
+                    "scheduleSemester": schedule[3]
+                }
+            )
+        # print(all_schedules)
+        return json.dumps(all_schedules)
 
-def getMajorMinorRequirements():
-    cursor = conn.cursor()
-    try:
-        cursor.execute("select * from MajorMinorRequirements")
+    if request.method == "POST":
+        cursor = conn.cursor()
+        global schedule_name
+        schedule_name = request.form.get("schedule-name")
+        schedule_semester = request.form.get("schedule-semester")
+        semester_selection = request.form.get("schedule-semester")
+        created_at = datetime.now()
+        formatted_date = created_at.strftime('%Y-%m-%d %H:%M:%S')
+        session["schedule_semester"] = schedule_semester #Test to load courses and whatnot
+        print(f"{schedule_name} {formatted_date} {user_email} {schedule_semester}")
 
-        info = cursor.fetchall()
-        print(info)
-    except error as error:
-        print("Could not pull the data" + str(error))
+        insert_schedule_query = "INSERT INTO Schedule values (%s, %s, %s, %s)"
+        cursor.execute(insert_schedule_query, (schedule_name, formatted_date, user_email, schedule_semester))
+        conn.commit()
 
-def getPrerequisite():
-    cursor = conn.cursor()
-    try:
-        cursor.execute("select * from Prerequisite")
+        semester = semester_selection
 
-        info = cursor.fetchall()
-        print(info)
-    except error as error:
-        print("Could not pull the data" + str(error))
+        RecommendedCourses = AGS.GetAutoGeneratedSchedule(user_email, semester)
 
-def getReqCourses():
-    cursor = conn.cursor()
-    try:
-        cursor.execute("select * from ReqCourses")
+        print("I AM ALIVE")
 
-        info = cursor.fetchall()
-        print(info)
-    except error as error:
-        print("Could not pull the data" + str(error))
+        #classInsert = "INSERT into ScheduleClass (scheduleName, email, courseSection, courseCode, meetingDays, classSemester) VALUES (%s, %s, %s, %s, %s, %s)"
+        #cursor.execute(classInsert, (schedule_name, user_email, RecommendedCourses[0].courseSection, RecommendedCourses[0].courseCode, RecommendedCourses[0].dayAvail, RecommendedCourses[0].semesterAvail))
+      
 
-def getRequirement():
-    cursor = conn.cursor()
-    try:
-        cursor.execute("select * from Requirement")
 
-        info = cursor.fetchall()
-        print(info)
-    except error as error:
-        print("Could not pull the data" + str(error))
+        for course in RecommendedCourses:
+            print(course.courseSection)
+            print(course.courseCode)
+            print(course.dayAvail)
+            print(course.semesterAvail)
+            print(course.startTime)
+            print(course.endTime)
+        for course in RecommendedCourses:
+            #print(course.courseName)
+            classInsert = "INSERT into ScheduleClass (scheduleName, email, courseSection, courseCode, meetingDays, classSemester, startTime, endTime) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            cursor.execute(classInsert, (schedule_name, user_email, course.courseSection, course.courseCode, course.dayAvail, course.semesterAvail, course.startTime, course.endTime))
+        conn.commit()
 
-def getSchedule():
-    cursor = conn.cursor()
-    try:
-        cursor.execute("select * from Schedule")
 
-        info = cursor.fetchall()
-        print(info)
-    except error as error:
-        print("Could not pull the data" + str(error))
 
-def getScheduleClass():
-    cursor = conn.cursor()
-    try:
-        cursor.execute("select * from ScheduleClass")
 
-        info = cursor.fetchall()
-        print(info)
-    except error as error:
-        print("Could not pull the data" + str(error))
+        schedule_url = "http://localhost:3000/Schedule"
 
-def getStudent():
-    cursor = conn.cursor()
-    try:
-        cursor.execute("select * from Student")
+        url = '{}?{}'.format(schedule_url, schedule_name)
 
-        info = cursor.fetchall()
-        print(info)
-    except error as error:
-        print("Could not pull the data" + str(error))
+        return redirect(url)
 
-def getStudentCourses():
-    cursor = conn.cursor()
-    try:
-        cursor.execute("select * from StudentCourses")
-
-        info = cursor.fetchall()
-        print(info)
-    except error as error:
-        print("Could not pull the data" + str(error))
-
-def getStudentMajorMinor():
-    cursor = conn.cursor()
-    try:
-        cursor.execute("select * from StudentMajorMinor")
-
-        info = cursor.fetchall()
-        print(info)
-    except error as error:
-        print("Could not pull the data" + str(error))
+@app.route("/api/getAllMajorsAndMinors", methods=["GET"])
+def getAllMajorsAndMinors():
+    global user_email
+    print(f"User email: {user_email}")
+    all = MinorRecommendation.getEverythingJSON(user_email)
+    return json.dumps(all)

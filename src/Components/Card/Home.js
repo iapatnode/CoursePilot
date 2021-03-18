@@ -21,6 +21,7 @@ export const Home = ()=> {
     const [isLoading, setLoading] = useState(true); // Determine whether or not the page is loading
     const [success, setSuccess] = useState(); // State variable used to store response of initial get request
     const [show, setShow] = useState(false); // Variable to determine whether or not to show modal to create new schedule
+    const [showAuto, setShowAuto] = useState(false);
     const [redirect, setRedirect] = useState(false);
     const [compare, setCompare] = useState(false); // Variable to determine whether or not to show compare modal
 
@@ -29,9 +30,12 @@ export const Home = ()=> {
     click listeners in the html code below  
     */
     const handleClose = () => setShow(false);
+    const handleAuto = () => setShowAuto(true);
     const handleShow = () => setShow(true);
     const handleCompare = () => setCompare(true);
     const handleCloseCompare = () => setCompare(false);
+    const handleCloseAuto = () => setShowAuto(false);
+
 
     /*
     makePostRequest() --> Method used to send a post request with the given parameters
@@ -133,7 +137,29 @@ export const Home = ()=> {
                 </div>
             </div>
             <div id="button-container-home">
-                <Button variant="primary" id="home-page-secondary-button"> Auto-Generate Schedule </Button>
+                <Button variant="primary" id="home-page-secondary-button" onClick={handleAuto}> Auto Gen Schedule </Button>
+                    <Modal show={showAuto} onHide={handleCloseAuto}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Auto-Generate Schedule</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <Form method="post" action="/api/autoGenerate">
+                                <Form.Group>
+                                    <Form.Control type="text" placeholder="Enter Schedule Name" id="auto-schedule-name" name="schedule-name"></Form.Control>
+                                    <Form.Control as="select" id="schedule-semester" name="schedule-semester">
+                                        <option value="fall">Fall</option>
+                                        <option value="spring">Spring</option>
+                                    </Form.Control>
+                                    <Button variant="secondary" onClick={handleCloseAuto}>
+                                        Cancel
+                                    </Button>
+                                    <Button variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
+                                        Auto Gen
+                                    </Button>
+                                </Form.Group>
+                            </Form>
+                        </Modal.Body>
+                    </Modal>
                 <Button variant="primary" id="home-page-secondary-button" onClick={handleShow}> Create New Schedule </Button>
                 <Button variant="primary" id="home-page-secondary-button" onClick={handleCompare}> Compare Two Schedules </Button>
                 <Modal show={show} onHide={handleClose}>
