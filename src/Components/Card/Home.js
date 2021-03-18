@@ -24,6 +24,16 @@ export const Home = ()=> {
     const [showAuto, setShowAuto] = useState(false);
     const [redirect, setRedirect] = useState(false);
     const [compare, setCompare] = useState(false); // Variable to determine whether or not to show compare modal
+    const [scheduleName, setScheduleName] = useState();
+    const [scheduleSemester, setScheduleSemester] = useState();
+
+    const handleScheduleName = (e) => {
+        setScheduleName(e.target.value);
+    }
+
+    const handleScheduleSemester = (e) => {
+        setScheduleSemester(e.target.value);
+    }
 
     /*
     The below functions are used to open and close the new schedule modal. Used as 
@@ -74,6 +84,41 @@ export const Home = ()=> {
         }
     }
 
+    function createSchedule() {
+        console.log(scheduleName);
+        var makeRequest = true;
+        success.forEach(element => {
+            if(scheduleName == element["scheduleName"]) {
+                alert("Error: You cannot add two schedules with the same name");
+                makeRequest = false;
+            }
+        });
+        if(makeRequest) {
+            var semester = ""
+            if(scheduleSemester === undefined) {
+                console.log("hm");
+                semester = "fall"
+            }
+            else {
+                semester = "spring";
+            }
+            console.log(semester);
+            const parameters = {
+                "schedule-name": scheduleName,
+                "schedule-semester": semester
+           }
+           axios.post('/api/home', parameters).then(response => {
+            window.location = "/Schedule"
+        })
+        .catch(err => {
+            if (err.response) {
+                alert("Error: There was a problem with creating your schedule");
+                window.location = "/Home";
+            }
+        })
+        }
+    }
+
     /*
     useEffect() --> Run when the page first loads. Gets necessary information (user schedule info).
     Stores the result of the get request in the success variable, and sets loading to false. 
@@ -112,11 +157,11 @@ export const Home = ()=> {
                 <div className="row">
                     <div className="col-md-4" id="names">
                         <h2 id="name-header"> Name </h2>
-                        <ol>
+                        <ul>
                             {success.map((value, index) => {
                                 return <li id="schedule-name" onClick={clickListener} key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></li>
                             })}
-                        </ol>
+                        </ul>
                     </div>
                     <div className="col-md-4" id="semesters">
                         <h2 id="semester-header"> Semester </h2>
@@ -167,17 +212,17 @@ export const Home = ()=> {
                         <Modal.Title>Create New Schedule - Enter Name</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Form method="post" action="/api/home">
+                        <Form>
                             <Form.Group>
-                                <Form.Control type="text" placeholder="Enter Schedule Name" id="enter-schedule-name" name="schedule-name"></Form.Control>
-                                <Form.Control as="select" id="schedule-semester" name="schedule-semester">
+                                <Form.Control onChange={handleScheduleName} type="text" placeholder="Enter Schedule Name" id="enter-schedule-name" name="schedule-name"></Form.Control>
+                                <Form.Control onChange={handleScheduleSemester} as="select" id="schedule-semester" name="schedule-semester">
                                     <option value="fall">Fall</option>
                                     <option value="spring">Spring</option>
                                 </Form.Control>
                                 <Button variant="secondary" onClick={handleClose}>
                                     Cancel
                                 </Button>
-                                <Button variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
+                                <Button onClick={createSchedule} variant="primary" id="signup-form-submit" className="signup-form-field">
                                     Create Schedule
                                 </Button>
                             </Form.Group>
@@ -191,19 +236,16 @@ export const Home = ()=> {
                     </Modal.Header>
                     <Modal.Body>
                         <Form method="post" action="/api/compare">
-                            <Form.Group>
-                                
+                            <Form.Group>   
                                 <Form.Control as="select" id="schedule-one" name="schedule-one">
                                     {success.map((value, index) => {
-
-                                    return <option key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
-                                        })}
+                                        return <option key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
+                                    })}
                                 </Form.Control>
                                 <Form.Control as="select" id="schedule-two" name="schedule-two">
                                     {success.map((value, index) => {
-
-                                    return <option key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
-                                        })}
+                                        return <option key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
+                                    })}
                                 </Form.Control>
                                 <Button variant="secondary" onClick={handleCloseCompare}>
                                     Cancel

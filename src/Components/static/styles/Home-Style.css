@@ -42,10 +42,6 @@ ul {
     text-transform: capitalize;
 }
 
-#schedule-name, #schedule-date, #schedule-semester {
-    margin: 3%;
-}
-
 #enter-schedule-name {
     margin-top: 4%;
     margin-bottom: 4%;

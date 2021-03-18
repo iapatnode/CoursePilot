@@ -63,27 +63,44 @@ user, redirect them back to the login page.
 """
 @app.route("/api/login", methods=["POST"])
 def login():
+    global user_email
     if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
+        data = request.data.decode("utf-8")
+        json_data = json.loads(data)
+        email = json_data.get("email")
+        password = json_data.get("password")
+        print(f"Password: {password}")
         valid = True
+        cont = True
+        return_message = ""
 
         #Check to see that a valid email was entered
         if email is None or email == "":
             valid = False
+            if cont:
+                return_message = "Error: Email and password cannot be blank"
+                cont = False
         else:
             domain = re.search("@[\w.]+", email)
             if domain.group() != '@gcc.edu':
                 valid = False
+                if cont:
+                    return_message = "Error: Must use GCC email"
+                    cont = False
+            else:
+                user_email = email
         
         #Check to see that a password was entered
         if password is None or password == "":
             valid = False
+            if cont:
+                return_message = "Error: Email and Password cannot be blank"
+                cont = False
         
         #Checks if student's credentials are in the database
         if valid:
             cursor = conn.cursor(buffered=True)
-            studentQuery = "select * from Student where email = %s and passwrd = %s"
+            studentQuery = "select * from Student where email = %s and binary passwrd = %s"
             studentCredentials = (email, password)
 
             try:
@@ -93,6 +110,7 @@ def login():
                 #Checks if user with credentials exists
                 if cursor.rowcount == 0:
                     valid = False
+                    return_message = f"Error: Incorrect email or password detected"
                 
             except Error as error:
                 valid = False
@@ -101,13 +119,15 @@ def login():
             cursor.close()
 
         if valid:
-            global user_email
-            user_email = email
-            return redirect("http://localhost:3000/home")
+            return {
+                "text": "success"
+            }
         
         #If the user's credentials are not found, redirect them back to the login page
         else:
-            return redirect("http://localhost:3000")
+            return {
+                "text": return_message
+            }
 
 
 """
@@ -129,6 +149,8 @@ def sign_up():
     if request.method == "POST":
         # On a post request, get all user data from the form received. 
         valid = True
+        cont = True
+        return_message = ""
         data = request.data.decode("utf-8")
         json_data = json.loads(data)
         email = json_data.get("email")
@@ -142,30 +164,58 @@ def sign_up():
         #Check to see that the user gives a valid gcc email address
         if email is None or email == "":
             valid = False
+            cont = False
+            return_message = "Error: Email is a required field"
+        if not "@" in email:
+            valid = False
+            if cont:
+                return_message = "Error: Enter a valid email address"
+                cont = False
         regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
         if(re.search(regex, email)):
             domain = re.search("@[\w.]+", email)
             if domain.group() != '@gcc.edu':
                 valid = False
+                if cont:
+                    return_message = "Error: A GCC email address is required"
+                    cont = False
         
         # #Check to see whether or not the user gave a valid username
         string_check = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
 
         #Check to see if the user gave a valid password
+        if len(password) < 8:
+            valid = False
+            if cont:
+                return_message = "Error: Password must be at least 8 characters long"
+                cont = False
+
         password_regex = re.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)")
         if(password_regex.search(password)) == None:
             valid = False
+            if cont:
+                return_message = "Error: Password must contain uppercase/lowercase characters, numbers, and one special character"
+                cont = False
             
         if(string_check.search(password) == None):
             valid = False
+            if cont:
+                return_message = "Error: Password must contain uppercase/lowercase characters, numbers, and one special character"
+                cont = False
         
         #Check to see if the two password fields match
         if password != confirm_password:
             valid = False
+            if cont:
+                return_message = "Error: Two password fields must match"
+                cont = False
 
         #Check to see that the user's major/minor selections are valid
-        if major is None or major == "":
+        if major is None or major == []:
             valid = False
+            if cont:
+                return_message = "Error: You must select a major"
+                cont = False
 
         if valid:
             # conn = connection()
@@ -216,9 +266,14 @@ def sign_up():
 
             global user_email
             user_email = email
-            return jsonify({'redirect_to_home': True}), 200
+
+            return {
+                "text": return_message
+            }
         else:
-            return jsonify({'redirect_to_home': False}), 400
+            return {
+                "text": return_message
+            }
 
     if request.method == "GET":
         # Get a list of all majors and minors from the database
@@ -268,6 +323,7 @@ def home():
     if request.method == "GET":
         all_schedules = []
         cursor = conn.cursor()
+        print(f"Email: {user_email}")
 
         # Get user schedules from the database
         get_schedules_query = ('''
@@ -294,9 +350,12 @@ def home():
         global schedule_name
 
         # Get schedule name and semester from the request form
-        schedule_name = request.form.get("schedule-name")
-        schedule_semester = request.form.get("schedule-semester")
-        semester_selection = request.form.get("schedule-semester")
+        data = request.data.decode("utf-8")
+        json_data = json.loads(data)
+        schedule_name = json_data.get("schedule-name")
+        schedule_semester = json_data.get("schedule-semester")
+        semester_selection = json_data.get("schedule-semester")
+        print(f"{schedule_name}, {schedule_semester}, {semester_selection}")
         created_at = datetime.now()
         formatted_date = created_at.strftime('%Y-%m-%d %H:%M:%S')
 
@@ -305,11 +364,7 @@ def home():
         cursor.execute(insert_schedule_query, (schedule_name, formatted_date, user_email, schedule_semester))
         conn.commit()
 
-        schedule_url = "http://localhost:3000/Schedule"
-
-        url = '{}?{}'.format(schedule_url, schedule_name)
-
-        return redirect("http://localhost:3000/Schedule")
+        return "Created Schedule Successfully"
 
 
 @app.route("/api/search", methods=["GET","POST"])
