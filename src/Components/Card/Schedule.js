@@ -3,7 +3,6 @@ import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react"
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import axios from 'axios'
-import Form from 'react-bootstrap/Form'
 import '../static/styles/Schedule-Style.css'
 import Button from 'react-bootstrap/Button'
 
@@ -32,6 +31,7 @@ global.conflict = false; // Keep track of any time conflicts in the schedule
 global.removedCourses = [] // List of courses that the user has removed from the schedule
 global.className = ""; // Name of the class that was added
 global.cont = true;
+global.reload = false;
 
 
 class Schedule extends Component {
@@ -266,6 +266,15 @@ class Schedule extends Component {
     http.send();
   }
 
+  exitSchedule() {
+    if(window.confirm("Are you sure you want to leave this schedule?")) {
+      window.location = "/Home";
+    }
+    else {
+      //Do Nothing
+    }
+  }
+
   /*
   componentDidMount() --> When the page first loads, send a request to check to see if the schedule
   already exists in the database. If it does, populate the schedule with the class events that are
@@ -275,6 +284,9 @@ class Schedule extends Component {
   display all necessary course information in the sidebar for the user to search
   */
   async componentDidMount() {
+    if(global.reload) {
+      this.forceUpdate();
+    } 
     if(this.state.myRef) {
       await axios.get('http://localhost:5000/api/getScheduleInfo')
       .then((response) => {
@@ -328,11 +340,11 @@ class Schedule extends Component {
     return (
         <div id="main-schedule-div">
             <Navbar bg="dark" variant="dark" expand="lg">
-              <Navbar.Brand href="/home">Course Pilot</Navbar.Brand>
+              <Navbar.Brand>Course Pilot</Navbar.Brand>
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="mr-auto">
-                  <Nav.Link href="/home">Scheduling</Nav.Link>
+                  <Nav.Link href="/Home">Scheduling</Nav.Link>
                   <Nav.Link href="/degree">Degree Report</Nav.Link> 
                   <Nav.Link href="/majors">Majors and Minors</Nav.Link> 
                   <Nav.Link href="/profile">Profile</Nav.Link> 
@@ -361,7 +373,7 @@ class Schedule extends Component {
             <Button onClick={this.saveSchedule} variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
                 Save Schedule
             </Button>
-            <Button href="/home" variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
+            <Button onClick={this.exitSchedule} variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
               Exit
             </Button>
             <Button onClick={this.deleteSchedule} variant="secondary" type="submit" id="delete-schedule" className="signup-form-field">
