@@ -3,6 +3,7 @@ import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react"
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import axios from 'axios'
+import Form from 'react-bootstrap/Form'
 import '../static/styles/Schedule-Style.css'
 import Button from 'react-bootstrap/Button'
 
@@ -30,8 +31,7 @@ global.endTime = ""; // End time of the class that was added
 global.conflict = false; // Keep track of any time conflicts in the schedule
 global.removedCourses = [] // List of courses that the user has removed from the schedule
 global.className = ""; // Name of the class that was added
-global.cont = true;
-global.reload = false;
+global.formSubmitting = false;
 
 
 class Schedule extends Component {
@@ -114,7 +114,7 @@ class Schedule extends Component {
   */
   addClass(e) {
     var course_code;
-    global.cont = true;
+    var cont = true;
     // If the user has clicked an element, and it is an a tag (i.e. it is a course)
     if(e.target && e.target.nodeName === "A") {
       // Get all of the course information from the ID of the element
@@ -145,12 +145,13 @@ class Schedule extends Component {
       global.classAdded = {text};
       global.className = text.substring(0, text.indexOf("-") - 9);
       global.classEvents.forEach(element => {
-        console.log(element);
-        if(element["text"] == course_code && global.cont) {
+        if(element["text"] == course_code && cont) {
           alert("Error: You have already added this course to your schedule");
-          global.cont = false;
+          cont = false;
         }
       });
+
+      var id = 1
     }
 
     /*
@@ -159,7 +160,8 @@ class Schedule extends Component {
     adding the course will cause a time conflict. Otherwise, add the course to the schedule
     state variable and update the page. 
     */
-    if(global.classAdded && global.cont) { 
+    if(global.classAdded && cont) { 
+      global.courses.push(global.classAdded.text)
       // For each day of the course, create a calendar event for the given day
       for(var i = 0; i < days.length; i++) {
         var res = "";
@@ -188,7 +190,7 @@ class Schedule extends Component {
         })
 
         // If adding the course does not result in a time conflict, add the course to the schedule
-        if(!global.conflict && global.cont) {
+        if(!global.conflict) {
           global.classEvents.push({
             "id": 1,
             "text": global.className,
@@ -207,12 +209,10 @@ class Schedule extends Component {
       // Alert the user of potential time conflicts. 
       if(global.conflict) {
         global.conflict = false;
-        global.cont = false;
+        cont = false;
         alert("Error: Adding '" + global.classAdded.text + "' will cause a time conflict.");
-      } 
-      else {
-        global.courses.push(global.classAdded.text);
       }
+      console.log(global.courses);
     }
   }
 
@@ -239,6 +239,7 @@ class Schedule extends Component {
         window.location = "/Home";
       }
     }
+    global.formSubmitting = true;
     http.send(params);
   }
 
@@ -255,24 +256,17 @@ class Schedule extends Component {
       if(http.readyState === 4) {
         if(this.responseText == "success") {
           alert("Schedule Deleted Successfully");
+          global.formSubmitting = true;
           window.location = "/Home";
         } 
         else {
           alert("Whoops... That didn't seem to work");
+          global.formSubmitting = true;
           window.location = "/Home";
         }
       }
     }
     http.send();
-  }
-
-  exitSchedule() {
-    if(window.confirm("Are you sure you want to leave this schedule?")) {
-      window.location = "/Home";
-    }
-    else {
-      //Do Nothing
-    }
   }
 
   /*
@@ -284,9 +278,6 @@ class Schedule extends Component {
   display all necessary course information in the sidebar for the user to search
   */
   async componentDidMount() {
-    if(global.reload) {
-      this.forceUpdate();
-    } 
     if(this.state.myRef) {
       await axios.get('http://localhost:5000/api/getScheduleInfo')
       .then((response) => {
@@ -337,14 +328,22 @@ class Schedule extends Component {
   // HTML Code for the Schedule Page to display course list and schedule component. 
   render() {
     var {...config} = this.state;
+    window.addEventListener("beforeunload", function(e) {
+      if(global.formSubmitting) {
+        return undefined;
+      }
+      var confirmationMessage = "Are you sure you want to leave this page?";
+      (e || window.event).returnValue = confirmationMessage;
+      return confirmationMessage;
+    });
     return (
         <div id="main-schedule-div">
             <Navbar bg="dark" variant="dark" expand="lg">
-              <Navbar.Brand>Course Pilot</Navbar.Brand>
+              <Navbar.Brand href="/home">Course Pilot</Navbar.Brand>
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="mr-auto">
-                  <Nav.Link href="/Home">Scheduling</Nav.Link>
+                  <Nav.Link href="/home">Scheduling</Nav.Link>
                   <Nav.Link href="/degree">Degree Report</Nav.Link> 
                   <Nav.Link href="/majors">Majors and Minors</Nav.Link> 
                   <Nav.Link href="/profile">Profile</Nav.Link> 
@@ -373,7 +372,7 @@ class Schedule extends Component {
             <Button onClick={this.saveSchedule} variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
                 Save Schedule
             </Button>
-            <Button onClick={this.exitSchedule} variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
+            <Button href="/home" variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
               Exit
             </Button>
             <Button onClick={this.deleteSchedule} variant="secondary" type="submit" id="delete-schedule" className="signup-form-field">
