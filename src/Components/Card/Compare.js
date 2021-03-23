@@ -50,6 +50,11 @@ class Schedule extends Component {
   // HTML for the compare schedule page
   render() {
     var {...config} = this.state; // Set state variables for the page
+    window.addEventListener("beforeunload", function(e) {
+      var confirmationMessage = "Are you sure you want to leave this page?";
+      (e || window.event).returnValue = confirmationMessage;
+      return confirmationMessage;
+    });
     return (
         <div>
             <Navbar bg="dark" variant="dark" expand="lg">
