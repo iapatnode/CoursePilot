@@ -1041,7 +1041,6 @@ def get_new_schedule():
                                     "backColor": "#926DD6"
                             }
                             return_list.append(entry)
-            pprint(return_list)
             return json.dumps(return_list)
     # If there was an error with any of the above conditions, return an empty list (no classes)
     data = json.dumps(
@@ -1161,27 +1160,25 @@ def autoGenerate():
       
 
 
-        for course in RecommendedCourses:
-            print(course.courseSection)
-            print(course.courseCode)
-            print(course.dayAvail)
-            print(course.semesterAvail)
-            print(course.startTime)
-            print(course.endTime)
+        # for course in RecommendedCourses:
+        #     print(course.courseSection)
+        #     print(course.courseCode)
+        #     print(course.dayAvail)
+        #     print(course.semesterAvail)
+        #     print(course.startTime)
+        #     print(course.endTime)
         for course in RecommendedCourses:
             #print(course.courseName)
             classInsert = "INSERT into ScheduleClass (scheduleName, email, courseSection, courseCode, meetingDays, classSemester, startTime, endTime) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
             cursor.execute(classInsert, (schedule_name, user_email, course.courseSection, course.courseCode, course.dayAvail, course.semesterAvail, course.startTime, course.endTime))
-        conn.commit()
+            conn.commit()
 
 
 
 
         schedule_url = "http://localhost:3000/Schedule"
 
-        url = '{}?{}'.format(schedule_url, schedule_name)
-
-        return redirect(url)
+        return redirect(schedule_url)
 
 @app.route("/api/getAllMajorsAndMinors", methods=["GET"])
 def getAllMajorsAndMinors():

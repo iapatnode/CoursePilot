@@ -266,7 +266,9 @@ class Schedule extends Component {
         }
       }
     }
-    http.send();
+    if(window.confirm("Click 'OK' if you are sure you want to delete this schedule.")) {
+      http.send();
+    }
   }
 
   /*
