@@ -48,7 +48,7 @@ schedule_name = ""
 compare_schedule_one = ""
 compare_schedule_two = ""
 
-requirement_yr = ""
+requirement_year = ""
 
 
 """
@@ -150,6 +150,7 @@ def sign_up():
         # On a post request, get all user data from the form received. 
         valid = True
         cont = True
+        global requirement_year
         return_message = ""
         data = request.data.decode("utf-8")
         json_data = json.loads(data)
@@ -785,7 +786,7 @@ def profile():
 def changeMajor():
     cursor = conn.cursor()
     valid = True
-    global requirement_yr
+    global requirement_year
     global user_email
     data = request.data.decode("utf-8")
     json_data = json.loads(data)
@@ -831,7 +832,7 @@ def changeMajor():
             studentDegreeQuery = "select degreeID from MajorMinor where degreeName = %s and reqYear = %s and isMinor = %s"
             for m in major:
                 mid = 0
-                cursor.execute(studentDegreeQuery, (m, requirement_yr, 0))
+                cursor.execute(studentDegreeQuery, (m, 2017, 0))
                 result = cursor.fetchall()
                 for row in result:
                     mid = row[0]
@@ -857,7 +858,7 @@ def changeMajor():
 def changeMinor():
     cursor = conn.cursor()
     valid = True
-    global requirement_yr
+    global requirement_year
     global user_email
     data = request.data.decode("utf-8")
     json_data = json.loads(data)
@@ -903,7 +904,7 @@ def changeMinor():
             studentDegreeQuery = "select degreeID from MajorMinor where degreeName = %s and reqYear = %s and isMinor = %s"
             for m in minor:
                 mid = 0
-                cursor.execute(studentDegreeQuery, (m, requirement_yr, 1))
+                cursor.execute(studentDegreeQuery, (m, 2017, 1))
                 result = cursor.fetchall()
                 for row in result:
                     mid = row[0]
