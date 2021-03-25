@@ -63,13 +63,11 @@ user, redirect them back to the login page.
 """
 @app.route("/api/login", methods=["POST"])
 def login():
-    global user_email
     if request.method == "POST":
         data = request.data.decode("utf-8")
         json_data = json.loads(data)
         email = json_data.get("email")
         password = json_data.get("password")
-        print(f"Password: {password}")
         valid = True
         cont = True
         return_message = ""
@@ -87,8 +85,6 @@ def login():
                 if cont:
                     return_message = "Error: Must use GCC email"
                     cont = False
-            else:
-                user_email = email
         
         #Check to see that a password was entered
         if password is None or password == "":
@@ -318,13 +314,12 @@ POST: When a post request is received, we know that the user is trying to make a
 @app.route("/api/home", methods=["GET", "POST"])
 def home():
     # Variable to tell which user is logged in and what semester they have selected for their schedule
-    global user_email
     global semester_selection
 
     if request.method == "GET":
         all_schedules = []
         cursor = conn.cursor()
-        print(f"Email: {user_email}")
+        user_email = request.args.get("email")
 
         # Get user schedules from the database
         get_schedules_query = ('''

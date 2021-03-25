@@ -29,15 +29,15 @@ export const Login = ()  => {
              email: email,
              password: password ,
         }
-        
-        axios.post('/api/login', parameters).then(response => {
+        var url = "/api/login?email=" + email;
+        axios.post(url, parameters).then(response => {
             var response = response.data.text;
             console.log(response);
             if(response != "success") {
                 alert(response);
             }
             else {
-                window.location = '/Home';
+                window.location = "/Home?email=" + email;
             }
         })
         .catch(err => {

@@ -124,7 +124,11 @@ export const Home = ()=> {
     Stores the result of the get request in the success variable, and sets loading to false. 
     */
     useEffect(() => {
-        axios.get("/api/home").then(response => {
+        console.log("URL: " + window.location);
+        var url_array = String(window.location).split("=")
+        var email = url_array[1];
+        console.log(email);
+        axios.get("/api/home?email=" + email).then(response => {
             setSuccess(response.data);
             setLoading(false);
         });
