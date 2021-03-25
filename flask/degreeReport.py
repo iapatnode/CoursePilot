@@ -52,8 +52,6 @@ def getMajorRequirements(degreeId):
 
         degreeReq = cursor.fetchall()
 
-        #TODO: CHECK IF DEGREEREQ IS EMPTY
-
         reqCats = []
 
         for category in degreeReq:
@@ -143,14 +141,14 @@ def getStudentCourses(email):
                 "req_cat": course[1]
             }
             courses.append(courseDict)
+
+        cursor.close()
         
         return courses
 
     except Error as error:
         print("Unable to select courses..." + str(error))
         return []
-    
-    cursor.close()
 
 
 def deleteStudentCourses(email, courses):
@@ -171,4 +169,33 @@ def deleteStudentCourses(email, courses):
         print("Unable to delete course..." + str(error))
     
     cursor.close()
+
+def getAllCourses():
+    cursor = conn.cursor()
+
+    selectQuery = "select courseCode, courseName from Course"
+
+    try:
+        cursor.execute(selectQuery)
+
+        dbCourses = cursor.fetchall()
+
+        courses = []
+
+        for course in dbCourses:
+            courseDict = {
+                "course_code": course[0],
+                "course_name": course[1]
+            }
+            courses.append(courseDict)
+
+        print(courses)
+
+        cursor.close()
+
+        return courses
+
+    except Error as error:
+        print("Unable to get courses..." + str(error))
+        return []
 

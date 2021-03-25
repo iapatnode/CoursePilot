@@ -857,7 +857,9 @@ def degree_report():
 
         studentCourses = report.getStudentCourses(user_email)
 
-        studentReqDetails = [studentDegreeReqs, studentCourses]
+        courses = report.getAllCourses()
+
+        studentReqDetails = [studentDegreeReqs, studentCourses, courses]
 
         return json.dumps(studentReqDetails)
         
@@ -865,14 +867,14 @@ def degree_report():
         data = request.data.decode("utf-8")
         json_data = json.loads(data)
 
-        addCourses = json_data.get("add")
-        deleteCourses = json_data.get("remove")
+        addCheckedCourses = json_data.get("checkedAdd")
+        deleteUncheckedCourses = json_data.get("checkedRemove")
 
-        print(f'{addCourses}')
-        print(f'/n{deleteCourses}')
+        print(f'{addCheckedCourses}')
+        print(f'/n{deleteUncheckedCourses}')
 
-        report.insertStudentCourses(user_email, addCourses)
-        report.deleteStudentCourses(user_email, deleteCourses)
+        report.insertStudentCourses(user_email, addCheckedCourses)
+        report.deleteStudentCourses(user_email, deleteUncheckedCourses)
 
         return redirect("http://localhost:3000/degreereport")
 
