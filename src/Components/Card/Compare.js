@@ -12,6 +12,10 @@ import '../static/styles/Compare-Style.css'
 
 global.classEvents = []; // Global variable keep track of class events for schedule component
 global.courses = []; // Global variable keep track of which courses are in the schedule
+global.scheduleOne = String(window.location).split("?")[1];
+global.scheduleOne = String(global.scheduleOne).split("&")[0];
+global.scheduleTwo = String(window.location).split("?")[1];
+global.scheduleTwo = String(global.scheduletwo).split("&")[0];
 
 
 class Schedule extends Component {
@@ -32,7 +36,7 @@ class Schedule extends Component {
   for the schedules the user has selected to compare, set state variables accordingly. 
   */
   async componentDidMount() {
-    await axios.get('http://localhost:5000/api/loadComparedSchedules')
+    await axios.get('http://localhost:5000/api/loadComparedSchedules?' + global.scheduleOne + "&" + global.scheduleTwo + "&email=dybasjt17@gcc.edu")
       .then((response) => {
         this.setState({
             columns: [
@@ -62,10 +66,10 @@ class Schedule extends Component {
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="mr-auto">
-                  <Nav.Link href="/home">Scheduling</Nav.Link>
-                  <Nav.Link href="/degree">Degree Report</Nav.Link> 
-                  <Nav.Link href="/majors">Majors and Minors</Nav.Link> 
-                  <Nav.Link href="/profile">Profile</Nav.Link> 
+                  <Nav.Link href={"/home?email=" + global.email}>Scheduling</Nav.Link>
+                  <Nav.Link href={"/degree?email=" + global.email}>Degree Report</Nav.Link> 
+                  <Nav.Link href={"/majors?email=" + global.email}>Majors and Minors</Nav.Link> 
+                  <Nav.Link href={"/profile?email=" + global.email}>Profile</Nav.Link> 
               </Nav>
               </Navbar.Collapse>
             </Navbar>

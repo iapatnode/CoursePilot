@@ -88,13 +88,13 @@ export const SignUp = () => {
              graduation_year: graduation 
         }
         
-        axios.post('/api/signup', parameters).then(response => {
+        axios.post('/api/signup?email=' + email, parameters).then(response => {
             var response = response.data.text;
             if(response.includes("Error")) {
                 alert(response);
             }
             else {
-                window.location = "/Home";
+                window.location = "/Home?email=" + email;
             }
         })
         .catch(err => {

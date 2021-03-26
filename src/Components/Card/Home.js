@@ -12,6 +12,7 @@ import Logo from '../static/images/logo.jpg'
 
 
 global.semester=""; // Global variable for which semester the user has chosen
+global.email = String(window.location).split("?")[1];
 
 
 /*
@@ -26,6 +27,8 @@ export const Home = ()=> {
     const [compare, setCompare] = useState(false); // Variable to determine whether or not to show compare modal
     const [scheduleName, setScheduleName] = useState();
     const [scheduleSemester, setScheduleSemester] = useState();
+    const [compareOne, setCompareOne] = useState();
+    const [compareTwo, setCompareTwo] = useState();
 
     const handleScheduleName = (e) => {
         setScheduleName(e.target.value);
@@ -33,6 +36,14 @@ export const Home = ()=> {
 
     const handleScheduleSemester = (e) => {
         setScheduleSemester(e.target.value);
+    }
+
+    const handleCompareOne = (e) => {
+        setCompareOne(e.target.value)
+    }
+
+    const handleCompareTwo = (e) => {
+        setCompareTwo(e.target.value)
     }
 
     /*
@@ -46,15 +57,14 @@ export const Home = ()=> {
     const handleCloseCompare = () => setCompare(false);
     const handleCloseAuto = () => setShowAuto(false);
 
-
     /*
     makePostRequest() --> Method used to send a post request with the given parameters
     to the provided url. Catches an error if there are invalid parameters or invalid
     url provided
     */
-    function makePostRequest(path, params) {
+    function makePostRequest(path) {
         return new Promise(function (resolve, reject) {
-            axios.post(path, params).then(
+            axios.post(path).then(
                 (response) => {
                     var result = response.data;
                     console.log('Processing request');
@@ -78,10 +88,9 @@ export const Home = ()=> {
         let params = {
             "name": e.target.innerText
         }
-        var result = await makePostRequest('/api/existingSchedule', params);
-        if(result == "good") {
-            window.location = "/Schedule";
-        }
+        var queryString = String(window.location).split("?")[1]
+        queryString = queryString + "&ScheduleName=" + e.target.innerText;
+        window.location = "/Schedule?" + queryString;
     }
 
     function createSchedule() {
@@ -107,8 +116,8 @@ export const Home = ()=> {
                 "schedule-name": scheduleName,
                 "schedule-semester": semester
            }
-           axios.post('/api/home', parameters).then(response => {
-            window.location = "/Schedule"
+           axios.post('/api/home?email=' + global.email, parameters).then(response => {
+            window.location = "/Schedule?email=" + global.email + "&ScheduleName=" + scheduleName + "&semester=" + semester;
         })
         .catch(err => {
             if (err.response) {
@@ -126,9 +135,8 @@ export const Home = ()=> {
     useEffect(() => {
         console.log("URL: " + window.location);
         var url_array = String(window.location).split("=")
-        var email = url_array[1];
-        console.log(email);
-        axios.get("/api/home?email=" + email).then(response => {
+        global.email = url_array[1];
+        axios.get("/api/home?email=" + global.email).then(response => {
             setSuccess(response.data);
             setLoading(false);
         });
@@ -147,10 +155,10 @@ export const Home = ()=> {
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="mr-auto">
-                  <Nav.Link href="/home">Scheduling</Nav.Link>
-                  <Nav.Link href="/degree">Degree Report</Nav.Link> 
-                  <Nav.Link href="/majors">Majors and Minors</Nav.Link> 
-                  <Nav.Link href="/profile">Profile</Nav.Link> 
+                  <Nav.Link href={"/home?email=" + global.email}>Scheduling</Nav.Link>
+                  <Nav.Link href={"/degree?email=" + global.email}>Degree Report</Nav.Link> 
+                  <Nav.Link href={"/majors?email=" + global.email}>Majors and Minors</Nav.Link> 
+                  <Nav.Link href={"/profile?email=" + global.email}>Profile</Nav.Link> 
               </Nav>
               </Navbar.Collapse>
             </Navbar>
@@ -192,7 +200,7 @@ export const Home = ()=> {
                             <Modal.Title>Auto-Generate Schedule</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                            <Form method="post" action="/api/autoGenerate">
+                            <Form method="post" action={"/api/autoGenerate?email=" + global.email + "&semester=" + scheduleSemester + "&name=" + scheduleName}>
                                 <Form.Group>
                                     <Form.Control type="text" placeholder="Enter Schedule Name" id="auto-schedule-name" name="schedule-name"></Form.Control>
                                     <Form.Control as="select" id="schedule-semester" name="schedule-semester">
@@ -239,22 +247,22 @@ export const Home = ()=> {
                         <Modal.Title>Compare Two Schedules</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Form method="post" action="/api/compare">
+                        <Form method="post" action={"localhost:3000/api/Schedule?scheduleOne=" + compareOne + "&scheduleTwo=" + compareTwo + "&email=" + global.email}>
                             <Form.Group>   
                                 <Form.Control as="select" id="schedule-one" name="schedule-one">
                                     {success.map((value, index) => {
-                                        return <option key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
+                                        return <option onChange={handleCompareOne} key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
                                     })}
                                 </Form.Control>
                                 <Form.Control as="select" id="schedule-two" name="schedule-two">
                                     {success.map((value, index) => {
-                                        return <option key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
+                                        return <option onChange={handleCompareTwo} key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
                                     })}
                                 </Form.Control>
                                 <Button variant="secondary" onClick={handleCloseCompare}>
                                     Cancel
                                 </Button>
-                                <Button variant="primary" type="submit" id="compare-schedule" className="signup-form-field">
+                                <Button variant="primary" onClick={window.location = "localhost:3000/Schedule?scheduleOne=" + compareOne + "&scheduleTwo=" + compareTwo + "&email=" + global.email} type="submit" id="compare-schedule" className="signup-form-field">
                                    Compare Selected Schedules
                                 </Button>
                             </Form.Group>

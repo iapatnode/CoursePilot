@@ -4,8 +4,12 @@ import '../static/styles/Majors-Style.css'
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import {DropdownButton, Dropdown} from 'react-bootstrap'
-
 import CoolTabs from 'react-cool-tabs';
+import Image from 'react-bootstrap/Image'
+import Logo from '../static/images/logo.jpg'
+
+global.email = String(window.location).split("?")[1]
+global.email = String(global.email).split("=")[1]
 
 export const Majors = () => {
 
@@ -22,7 +26,7 @@ export const Majors = () => {
     var minorList = document.createElement("ul");
 
     function getMajorsAndMinorsData(requirementYear) {
-        axios.get('http://localhost:5000/api/getAllMajorsAndMinors').then((response) => {
+        axios.get('http://localhost:5000/api/getAllMajorsAndMinors?email=' + global.email).then((response) => {
             const firstResponse = response.data[requirementYear];
             const majorResponse = firstResponse["majors"];
             const minorResponse = firstResponse["minors"];
@@ -239,20 +243,18 @@ export const Majors = () => {
 
     return (
         <div id="main-content">
-            
-            <Navbar bg="dark" variant="dark" expand="lg">
-            <Navbar.Brand href="/home">Course Pilot</Navbar.Brand>
-            <Navbar.Toggle aria-controls="basic-navbar-nav" />
-            <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="mr-auto">
-                <Nav.Link href="/home">Scheduling</Nav.Link>
-                <Nav.Link href="/degree">Degree Report</Nav.Link> 
-                <Nav.Link href="/majors">Majors and Minors</Nav.Link> 
-                <Nav.Link href="/profile">Profile</Nav.Link> 
-                
-        </Nav>
-        </Navbar.Collapse>
-        </Navbar>
+           <Navbar bg="dark" variant="dark" expand="lg">
+              <Navbar.Brand><Image src={Logo} style={{height: 50}}/></Navbar.Brand>
+              <Navbar.Toggle aria-controls="basic-navbar-nav" />
+              <Navbar.Collapse id="basic-navbar-nav">
+              <Nav className="mr-auto">
+                  <Nav.Link href={"/home?email=" + global.email}>Scheduling</Nav.Link>
+                  <Nav.Link href={"/degree?email=" + global.email}>Degree Report</Nav.Link> 
+                  <Nav.Link href={"/majors?email=" + global.email}>Majors and Minors</Nav.Link> 
+                  <Nav.Link href={"/profile?email=" + global.email}>Profile</Nav.Link> 
+              </Nav>
+              </Navbar.Collapse>
+            </Navbar>
         <div class="req-content">
             <div class="reqYear" className="req-buttons">
                 <div id="columnTitle" >Requirement Year</div>

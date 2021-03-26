@@ -6,9 +6,13 @@ import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import Form from 'react-bootstrap/Form'
 import Select from 'react-select'
+import Image from 'react-bootstrap/Image'
+import Logo from '../static/images/logo.jpg'
 
 
 global.loggedOut = false;
+global.email = String(window.location).split("?")[1]
+global.email = String(global.email).split("=")[1];
 
 function signOut() {
     if(global.loggedOut == false) {
@@ -63,10 +67,10 @@ export const Profile = () => {
              major: majorSelectedValue,
         }
         
-        axios.post('/api/changeMajor', parameters).finally(response => {
+        axios.post('/api/changeMajor?email=' + global.email, parameters).finally(response => {
             alert(response);
             setShowMajor(false);
-            window.location = '/Profile';
+            window.location = '/Profile?email=' + global.email;
         })
         .catch(err => {
             if (err.response) {
@@ -80,10 +84,10 @@ export const Profile = () => {
              minor: minorSelectedValue,
         }
         
-        axios.post('/api/changeMinor', parameters).finally(response => {
+        axios.post('/api/changeMinor?email=' + global.email, parameters).finally(response => {
             alert(response);
             setShowMinor(false);
-            window.location = '/Profile';
+            window.location = '/Profile?email=' + global.email;
         })
         .catch(err => {
             if (err.response) {
@@ -139,7 +143,7 @@ export const Profile = () => {
     }
 
     useEffect(() => {
-        axios.get("/api/profile").then(response => {
+        axios.get("/api/profile?email=" + global.email).then(response => {
             console.log(response.data["email"]);
             setSuccess(response.data);
             setReady(true);
@@ -169,16 +173,16 @@ export const Profile = () => {
     return (
         <div id="main-content">
             <Navbar bg="dark" variant="dark" expand="lg">
-                <Navbar.Brand href="/home">Course Pilot</Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse id="basic-navbar-nav">
-                <Nav className="mr-auto">
-                    <Nav.Link href="/home">Scheduling</Nav.Link>
-                    <Nav.Link href="/degree">Degree Report</Nav.Link> 
-                    <Nav.Link href="/majors">Majors and Minors</Nav.Link> 
-                    <Nav.Link href="/profile">Profile</Nav.Link> 
-                </Nav>
-                </Navbar.Collapse>
+              <Navbar.Brand><Image src={Logo} style={{height: 50}}/></Navbar.Brand>
+              <Navbar.Toggle aria-controls="basic-navbar-nav" />
+              <Navbar.Collapse id="basic-navbar-nav">
+              <Nav className="mr-auto">
+                  <Nav.Link href={"/home?email=" + global.email}>Scheduling</Nav.Link>
+                  <Nav.Link href={"/degree?email=" + global.email}>Degree Report</Nav.Link> 
+                  <Nav.Link href={"/majors?email=" + global.email}>Majors and Minors</Nav.Link> 
+                  <Nav.Link href={"/profile?email=" + global.email}>Profile</Nav.Link> 
+              </Nav>
+              </Navbar.Collapse>
             </Navbar>
 
         <div className="container">

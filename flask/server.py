@@ -314,12 +314,11 @@ POST: When a post request is received, we know that the user is trying to make a
 @app.route("/api/home", methods=["GET", "POST"])
 def home():
     # Variable to tell which user is logged in and what semester they have selected for their schedule
-    global semester_selection
-
+    semester_selection = request.args.get("semester")
+    user_email = request.args.get("email")
     if request.method == "GET":
         all_schedules = []
         cursor = conn.cursor()
-        user_email = request.args.get("email")
 
         # Get user schedules from the database
         get_schedules_query = ('''
@@ -413,14 +412,16 @@ POST: When a post request is received, the route takes all of the courses that
 """
 @app.route('/api/schedule', methods=["GET", "POST"])
 def schedule():
-    global schedule_name
-    global user_email
-    global semester_selection
+    semester_selection = request.args.get("semester")
+    user_email = request.args.get("email")
+    schedule_name = request.args.get("ScheduleName")
+    print(f"{semester_selection} {user_email}, {schedule_name}")
 
     if request.method == "GET":
         cursor = conn.cursor()
         classArray = []
         courseArray = []
+
         
         # Select the schedule that the user has created
         cursor.execute('''
@@ -465,9 +466,10 @@ def schedule():
         return json.dumps(courseArray)
     
     if request.method == "POST":
-        global semester_selection
         return_text = ""
         cursor = conn.cursor()
+        print(schedule_name)
+        print(user_email)
 
         # Get data from the semester form that the user submitted
         data = request.data.decode("utf-8")
@@ -491,9 +493,9 @@ def schedule():
             ''', (f"%{(schedule_name)}%", f"%{(user_email)}%",))
 
         semester = cursor.fetchall()
-        for result in semester:
-            semester_current = result[0]
-        semester_selection = semester_current
+        # for result in semester:
+        #     semester_current = result[0]
+        # semester_selection = semester_current
 
         #Do some formatting with the strings to get course name, codes, etc...
         if json_data.get("courses"):
@@ -588,8 +590,9 @@ POST: When the user posts to this endpoint, the following code removed
 """
 @app.route("/api/delete", methods=["POST"])
 def delete_schedule():
-    global schedule_name
-    global user_email
+    schedule_name = request.args.get("ScheduleName")
+    user_email = request.args.get("email")
+    print(f"{user_email}, {schedule_name}")
     cursor = conn.cursor()
     cursor.execute('''
         delete from ScheduleClass WHERE email like %s AND scheduleName like %s;
@@ -616,11 +619,9 @@ POST: When the user sends a post request to this url, we set two variables indic
 def compare_schedules():
     cursor = conn.cursor()
     if request.method == "POST":
-        global compare_schedule_one
-        global compare_schedule_two
         data = request.form
-        compare_schedule_one = data.get('schedule-one')
-        compare_schedule_two = data.get('schedule-two')
+        compare_schedule_one = request.args.get('scheduleOne')
+        compare_schedule_two = data.get('schedule')
         return redirect("http://localhost:3000/compare")
     return ""
 
@@ -634,17 +635,23 @@ GET: When the user sends a get request, we execute a query that loads all of the
      for the two schedules that the user chose to compare. We then return this list of 
      dictionaries to the compare page to be displayed to the user. 
 """
-@app.route("/api/loadComparedSchedules", methods=["GET"])
+@app.route("/api/loadComparedSchedules", methods=["GET", "POST"])
 def get_data_compare():
     cursor = conn.cursor()
-    if request.method == "GET":
+    if request.method == "POST" or request.method == "GET":
         return_list = []
         course_codes = []
-        global schedule_name
-        global user_email
-        global semester_selection
-        global compare_schedule_one
-        global compare_schedule_two
+        # global schedule_name
+        # global user_email
+        # global semester_selection
+        # global compare_schedule_one
+        # global compare_schedule_two
+        compare_schedule_one = request.args.get("scheduleOne")
+        compare_schedule_two = request.args.get("scheduleTwo")
+        user_email = request.args.get("email")
+        print(f"{compare_schedule_one} {compare_schedule_two} {user_email}")
+        semester_selection = "fall"
+        schedule_name = "bruh"
         backColor = ""
 
         # Make sure that the user did not only select one schedule to compare. 
@@ -748,7 +755,7 @@ def get_data_compare():
 @app.route("/api/profile", methods=["GET", "POST"])
 def profile():
     if request.method == "GET":
-        global user_email
+        user_email = request.args.get("email")
         passwrd = ""
         majors = []
         minors = []
@@ -782,7 +789,7 @@ def changeMajor():
     cursor = conn.cursor()
     valid = True
     global requirement_year
-    global user_email
+    user_email = request.args.get("email")
     data = request.data.decode("utf-8")
     json_data = json.loads(data)
     major = json_data.get("major")
@@ -853,8 +860,8 @@ def changeMajor():
 def changeMinor():
     cursor = conn.cursor()
     valid = True
-    global requirement_year
-    global user_email
+    requirement_year = 2017
+    user_email = request.args.get("email")
     data = request.data.decode("utf-8")
     json_data = json.loads(data)
     minor = json_data.get("minor")
@@ -962,9 +969,9 @@ def get_new_schedule():
     if request.method == "GET":
         return_list = []
         course_codes = []
-        global schedule_name
-        global user_email
-        global semester_selection
+
+        schedule_name = request.args.get("ScheduleName")
+        user_email = request.args.get("email")
 
         # Make sure the user entered a schedule name, get all courses in that schedule
         if schedule_name != "":
@@ -1067,7 +1074,8 @@ def get_existing_schedule():
 
 @app.route("/api/degreereport", methods=["GET", "POST"])
 def degree_report():
-    global user_email
+    user_email = request.args.get("email")
+    print(user_email)
 
     if request.method == "GET":
 
@@ -1093,7 +1101,7 @@ def degree_report():
         report.insertStudentCourses(user_email, addCourses)
         report.deleteStudentCourses(user_email, deleteCourses)
 
-        return redirect("http://localhost:3000/degreereport")
+        return redirect(f"http://localhost:3000/degreereport?email={user_email}")
 
 
 
@@ -1101,8 +1109,9 @@ def degree_report():
 @app.route("/api/autoGenerate", methods=["GET", "POST"])
 def autoGenerate():
     #TODO: Return user data retrieved from database tables as needed
-    global user_email
-    global semester_selection
+    user_email = request.args.get("email")
+    semester_selection = request.args.get("semester")
+    schedule_name = request.args.get("name")
     if request.method == "GET":
 
         print("YEET")
@@ -1131,7 +1140,6 @@ def autoGenerate():
 
     if request.method == "POST":
         cursor = conn.cursor()
-        global schedule_name
         schedule_name = request.form.get("schedule-name")
         schedule_semester = request.form.get("schedule-semester")
         semester_selection = request.form.get("schedule-semester")
@@ -1171,13 +1179,13 @@ def autoGenerate():
 
 
 
-        schedule_url = "http://localhost:3000/Schedule"
+        schedule_url = f"http://localhost:3000/Schedule?email={user_email}&ScheduleName={schedule_name}"
 
         return redirect(schedule_url)
 
 @app.route("/api/getAllMajorsAndMinors", methods=["GET"])
 def getAllMajorsAndMinors():
-    global user_email
+    user_email = request.args.get("email")
     print(f"User email: {user_email}")
     all = MinorRecommendation.getEverythingJSON(user_email)
     return json.dumps(all)
