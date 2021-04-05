@@ -23,6 +23,9 @@ export const Report = () => {
     const [unchecked, setUnchecked] = useState([]);
 
     useEffect(() => {
+        console.log("URL: " + window.location);
+        var url_array = String(window.location).split("=")
+        global.email = url_array[1];
         axios.get("/api/degreereport?email=" + global.email).then(response => {
             setSuccess(response.data);
             setLoading(false);
@@ -36,7 +39,7 @@ export const Report = () => {
         }
 
         axios.post('/api/degreereport?email=' + global.email, parameters).finally(response => {
-            window.location = '/degreereport?email=' + global.email;
+            alert("I made it out of the server code");
         }).catch(err => {
             if (err.response) {
                 console.log("BAD!");
@@ -100,8 +103,8 @@ export const Report = () => {
 
             <div>
                 <h3> { "Total Hours: "} { success[0]["degree_hours"] } </h3>  
-                <Form id="degree_report" method="post">      
-                <Button variant="primary" type="submit" value="Submit" onClick={submitListener}>
+                <Form id="degree_report">      
+                <Button variant="primary" value="Submit" onClick={submitListener}>
                             Save Changes
                 </Button>
 

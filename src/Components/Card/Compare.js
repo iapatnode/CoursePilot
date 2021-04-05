@@ -15,7 +15,8 @@ global.courses = []; // Global variable keep track of which courses are in the s
 global.scheduleOne = String(window.location).split("?")[1];
 global.scheduleOne = String(global.scheduleOne).split("&")[0];
 global.scheduleTwo = String(window.location).split("?")[1];
-global.scheduleTwo = String(global.scheduletwo).split("&")[0];
+global.scheduleTwo = String(window.location).split("&")[1];
+global.email = String(window.location).split("&")[2];
 
 
 class Schedule extends Component {
@@ -36,7 +37,8 @@ class Schedule extends Component {
   for the schedules the user has selected to compare, set state variables accordingly. 
   */
   async componentDidMount() {
-    await axios.get('http://localhost:5000/api/loadComparedSchedules?' + global.scheduleOne + "&" + global.scheduleTwo + "&email=dybasjt17@gcc.edu")
+    console.log(global.email)
+    await axios.get('http://localhost:5000/api/loadComparedSchedules?' + global.scheduleOne + "&" + global.scheduleTwo + "&email=" + global.email)
       .then((response) => {
         this.setState({
             columns: [
@@ -66,10 +68,10 @@ class Schedule extends Component {
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="mr-auto">
-                  <Nav.Link href={"/home?email=" + global.email}>Scheduling</Nav.Link>
-                  <Nav.Link href={"/degree?email=" + global.email}>Degree Report</Nav.Link> 
-                  <Nav.Link href={"/majors?email=" + global.email}>Majors and Minors</Nav.Link> 
-                  <Nav.Link href={"/profile?email=" + global.email}>Profile</Nav.Link> 
+                  <Nav.Link href={"/home?" + global.email}>Scheduling</Nav.Link>
+                  <Nav.Link href={"/degree?" + global.email}>Degree Report</Nav.Link> 
+                  <Nav.Link href={"/majors?" + global.email}>Majors and Minors</Nav.Link> 
+                  <Nav.Link href={"/profile?" + global.email}>Profile</Nav.Link> 
               </Nav>
               </Navbar.Collapse>
             </Navbar>
@@ -86,7 +88,7 @@ class Schedule extends Component {
 
                 </div>
             </div>
-            <Button href="/home" variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
+            <Button href={"/home?" + global.email} variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
               Exit
             </Button>
         </div>

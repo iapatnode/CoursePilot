@@ -77,6 +77,13 @@ export const Home = ()=> {
         });
     }
 
+    function handleSubmit() {
+        var scheduleOne = document.getElementById("schedule-one").value
+        var scheduleTwo = document.getElementById("schedule-two").value
+        window.location = "/Compare?scheduleOne=" + scheduleOne + "&scheduleTwo=" + scheduleTwo + "&email=" + global.email;
+        //window.location = "localhost:3000/Schedule?scheduleOne=" + compareOne + "&scheduleTwo=" + compareTwo + "&email=" + global.email;
+    }
+
     /*
     Function that uses the makePostRequest method above to send a request to the 
     below URL when the user selects to view an existing schedule. Will result
@@ -93,7 +100,8 @@ export const Home = ()=> {
         window.location = "/Schedule?" + queryString;
     }
 
-    function createSchedule() {
+    async function createSchedule(event) {
+        event.preventDefault();
         console.log(scheduleName);
         var makeRequest = true;
         success.forEach(element => {
@@ -116,8 +124,14 @@ export const Home = ()=> {
                 "schedule-name": scheduleName,
                 "schedule-semester": semester
            }
-           axios.post('/api/home?email=' + global.email, parameters).then(response => {
-            window.location = "/Schedule?email=" + global.email + "&ScheduleName=" + scheduleName + "&semester=" + semester;
+           await axios.post('/api/home?email=' + global.email, parameters).then(response => {
+            alert(response.data);
+            if(response.data !== "Created Schedule Successfully") {
+                alert(response.data);
+            }
+            else {
+                window.location = "/Schedule?email=" + global.email + "&ScheduleName=" + scheduleName + "&semester=" + semester;
+            }
         })
         .catch(err => {
             if (err.response) {
@@ -136,6 +150,7 @@ export const Home = ()=> {
         console.log("URL: " + window.location);
         var url_array = String(window.location).split("=")
         global.email = url_array[1];
+        console.log(global.email)
         axios.get("/api/home?email=" + global.email).then(response => {
             setSuccess(response.data);
             setLoading(false);
@@ -224,7 +239,7 @@ export const Home = ()=> {
                         <Modal.Title>Create New Schedule - Enter Name</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Form>
+                        <div>
                             <Form.Group>
                                 <Form.Control onChange={handleScheduleName} type="text" placeholder="Enter Schedule Name" id="enter-schedule-name" name="schedule-name"></Form.Control>
                                 <Form.Control onChange={handleScheduleSemester} as="select" id="schedule-semester" name="schedule-semester">
@@ -238,7 +253,7 @@ export const Home = ()=> {
                                     Create Schedule
                                 </Button>
                             </Form.Group>
-                        </Form>
+                        </div>
                     </Modal.Body>
                 </Modal>
 
@@ -247,7 +262,7 @@ export const Home = ()=> {
                         <Modal.Title>Compare Two Schedules</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Form method="post" action={"localhost:3000/api/Schedule?scheduleOne=" + compareOne + "&scheduleTwo=" + compareTwo + "&email=" + global.email}>
+                        <Form>
                             <Form.Group>   
                                 <Form.Control as="select" id="schedule-one" name="schedule-one">
                                     {success.map((value, index) => {
@@ -262,7 +277,7 @@ export const Home = ()=> {
                                 <Button variant="secondary" onClick={handleCloseCompare}>
                                     Cancel
                                 </Button>
-                                <Button variant="primary" onClick={window.location = "localhost:3000/Schedule?scheduleOne=" + compareOne + "&scheduleTwo=" + compareTwo + "&email=" + global.email} type="submit" id="compare-schedule" className="signup-form-field">
+                                <Button variant="primary" onClick={handleSubmit} id="compare-schedule" className="signup-form-field">
                                    Compare Selected Schedules
                                 </Button>
                             </Form.Group>

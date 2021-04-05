@@ -34,9 +34,7 @@ global.conflict = false; // Keep track of any time conflicts in the schedule
 global.removedCourses = [] // List of courses that the user has removed from the schedule
 global.className = ""; // Name of the class that was added
 global.formSubmitting = false;
-global.email = String(window.location).split("?")[1]
-global.email = String(global.email).split("&")[0]
-global.email = String(global.email).split("=")[1]
+global.email = "";
 
 
 class Schedule extends Component {
@@ -242,12 +240,16 @@ class Schedule extends Component {
       if(http.readyState == 4) {
         alert(this.responseText);
         global.courses = [];
-        var email = queryString.split("&")[1]
         window.location = "/Home?" + String(queryString).split("&")[0];
       }
     }
     global.formSubmitting = true;
     http.send(params);
+  }
+
+  exitSchedule(location) {
+    var queryString = String(window.location).split("?")[1];
+    window.location = "/Home?" + String(queryString).split("&")[0];
   }
 
   /*
@@ -294,6 +296,9 @@ class Schedule extends Component {
   display all necessary course information in the sidebar for the user to search
   */
   async componentDidMount() {
+    global.email = String(window.location).split("?")[1]
+    global.email = String(global.email).split("&")[0]
+    global.email = String(global.email).split("=")[1]
     console.log(global.email)
     if(this.state.myRef) {
       var queryString = String(window.location).split("?")[1]
@@ -361,7 +366,7 @@ class Schedule extends Component {
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="mr-auto">
-                  <Nav.Link href={"/home?email=" + global.email}>Scheduling</Nav.Link>
+                  <Nav.Link href={"/Home?email=" + global.email}>Scheduling</Nav.Link>
                   <Nav.Link href={"/degree?email=" + global.email}>Degree Report</Nav.Link> 
                   <Nav.Link href={"/majors?email=" + global.email}>Majors and Minors</Nav.Link> 
                   <Nav.Link href={"/profile?email=" + global.email}>Profile</Nav.Link> 
@@ -390,7 +395,7 @@ class Schedule extends Component {
             <Button onClick={this.saveSchedule} variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
                 Save Schedule
             </Button>
-            <Button href={"/home?email=" + global.email.split("&")[0]} variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
+            <Button onClick={this.exitSchedule} variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
               Exit
             </Button>
             <Button onClick={this.deleteSchedule} variant="secondary" type="submit" id="delete-schedule" className="signup-form-field">

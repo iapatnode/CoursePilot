@@ -11,8 +11,7 @@ import Logo from '../static/images/logo.jpg'
 
 
 global.loggedOut = false;
-global.email = String(window.location).split("?")[1]
-global.email = String(global.email).split("=")[1];
+global.email = ""
 
 function signOut() {
     if(global.loggedOut == false) {
@@ -143,8 +142,10 @@ export const Profile = () => {
     }
 
     useEffect(() => {
+        global.email = String(window.location).split("?")[1]
+        global.email = String(global.email).split("=")[1];
         axios.get("/api/profile?email=" + global.email).then(response => {
-            console.log(response.data["email"]);
+            console.log(response.data);
             setSuccess(response.data);
             setReady(true);
         });
@@ -152,6 +153,7 @@ export const Profile = () => {
 
     if(isFirstRun.current){
         if(ready) {
+            console.log(global.email)
             axios.get("/api/signup").then(response => {
                 setDegreeInfo(response.data);
                 setPopulate(true);
@@ -188,7 +190,7 @@ export const Profile = () => {
         <div className="container">
             <div className="row">
                 <div className="col">
-                    <p> Current Email: {success["email"]} </p>
+                    <p> Current Email: {global.email} </p>
                     <div id="button-container">
                         <Button variant="primary" onClick={handleShowPassword}> Change Password </Button>
                             <Modal show={showPassword} onHide={handleClosePassword}>

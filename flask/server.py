@@ -3,13 +3,11 @@ from flask_cors import CORS
 import os, re, json
 from datetime import datetime
 from mysql.connector import connect, Error
-
 import AutoGenerateSchedule as AGS
 import MinorRecomendation as MinorRecommendation
-
 import dbQueries as db_queries
 import degreeReport as report
-from pprint import pprint
+
 
 #Flask App Setup
 app = Flask(__name__)
@@ -350,7 +348,6 @@ def home():
         schedule_name = json_data.get("schedule-name")
         schedule_semester = json_data.get("schedule-semester")
         semester_selection = json_data.get("schedule-semester")
-        print(f"{schedule_name}, {schedule_semester}, {semester_selection}")
         created_at = datetime.now()
         formatted_date = created_at.strftime('%Y-%m-%d %H:%M:%S')
 
@@ -376,11 +373,9 @@ def search():
         ''', (f"%{(search_val)}%",))
 
         class_table = cursor.fetchall()
-        print(class_table)
 
         result_string = ""
         for row in class_table:
-            print(row)
             course_dict = {
                 "course_code": row[0],
                 "course_semester": row[1],
@@ -415,7 +410,6 @@ def schedule():
     semester_selection = request.args.get("semester")
     user_email = request.args.get("email")
     schedule_name = request.args.get("ScheduleName")
-    print(f"{semester_selection} {user_email}, {schedule_name}")
 
     if request.method == "GET":
         cursor = conn.cursor()
@@ -468,8 +462,6 @@ def schedule():
     if request.method == "POST":
         return_text = ""
         cursor = conn.cursor()
-        print(schedule_name)
-        print(user_email)
 
         # Get data from the semester form that the user submitted
         data = request.data.decode("utf-8")
@@ -592,7 +584,6 @@ POST: When the user posts to this endpoint, the following code removed
 def delete_schedule():
     schedule_name = request.args.get("ScheduleName")
     user_email = request.args.get("email")
-    print(f"{user_email}, {schedule_name}")
     cursor = conn.cursor()
     cursor.execute('''
         delete from ScheduleClass WHERE email like %s AND scheduleName like %s;
@@ -649,7 +640,7 @@ def get_data_compare():
         compare_schedule_one = request.args.get("scheduleOne")
         compare_schedule_two = request.args.get("scheduleTwo")
         user_email = request.args.get("email")
-        print(f"{compare_schedule_one} {compare_schedule_two} {user_email}")
+        user_email = user_email[6:]
         semester_selection = "fall"
         schedule_name = "bruh"
         backColor = ""
@@ -657,8 +648,8 @@ def get_data_compare():
         # Make sure that the user did not only select one schedule to compare. 
         if schedule_name != "" or schedule_name == "":
             # Get all courses in the two selected schedules
-            schedule_info_query = "select * from ScheduleClass where email = %s and scheduleName = %s or scheduleName = %s"
-            cursor.execute(schedule_info_query, (user_email, compare_schedule_one, compare_schedule_two,))
+            schedule_info_query = "select * from ScheduleClass where scheduleName = %s or scheduleName = %s and email = %s"
+            cursor.execute(schedule_info_query, (compare_schedule_one, compare_schedule_two, user_email,))
             results = cursor.fetchall()
 
             # For each class gotten, set the background colors of the calendar events according to which schedule they are apart of
@@ -743,7 +734,6 @@ def get_data_compare():
                                     "days": row[4]
                             }
                             return_list.append(entry)
-            pprint(return_list)
             # Return the list of class events. 
             return json.dumps(return_list)
     data = json.dumps(
@@ -819,11 +809,8 @@ def changeMajor():
             # Workflow 2/3: Search each entry in major minor database to determine whether the id represents a minor, add to list
             for result in results:
                 isMinor = result[4]
-                print(result)
                 if(result[4]) == 1:
                     minors.append(result[1])
-            
-            print(minors)
 
             # Workflow 4: Delete StudentMajorMinor info
             deleteStudentDegree = "delete from StudentMajorMinor where email = %s"
@@ -840,7 +827,6 @@ def changeMajor():
                     mid = row[0]
                     addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
                     cursor.execute(addToMajorMinor, (user_email, mid))
-                    print("Inserted one major")
                     conn.commit()
                 
             # Workflow 6: Add back minor info
@@ -851,7 +837,6 @@ def changeMajor():
 
         except Error as error:
             #If you cannot insert the invidual into the database, print error and reroute
-            print("Insertion in database unsuccessful: " + str(error))
             return redirect("http//localhost:3000/Profile")
 
     return "good"
@@ -891,11 +876,8 @@ def changeMinor():
             # Workflow 2/3: Search each entry in major minor database to determine whether the id represents a minor, add to list
             for result in results:
                 isMajor = result[4]
-                print(result)
                 if(result[4]) == 0:
                     majors.append(result[1])
-            
-            print(majors)
 
             # Workflow 4: Delete StudentMajorMinor info
             deleteStudentDegree = "delete from StudentMajorMinor where email = %s"
@@ -912,7 +894,6 @@ def changeMinor():
                     mid = row[0]
                     addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
                     cursor.execute(addToMajorMinor, (user_email, mid))
-                    print("Inserted one minor")
                     conn.commit()
                 
             # Workflow 6: Add back minor info
@@ -923,7 +904,6 @@ def changeMinor():
 
         except Error as error:
             #If you cannot insert the invidual into the database, print error and reroute
-            print("Insertion in database unsuccessful: " + str(error))
             return redirect("http//localhost:3000/Profile")
 
     return "good"
@@ -1075,7 +1055,6 @@ def get_existing_schedule():
 @app.route("/api/degreereport", methods=["GET", "POST"])
 def degree_report():
     user_email = request.args.get("email")
-    print(user_email)
 
     if request.method == "GET":
 
@@ -1095,9 +1074,6 @@ def degree_report():
         addCourses = json_data.get("add")
         deleteCourses = json_data.get("remove")
 
-        print(f'{addCourses}')
-        print(f'/n{deleteCourses}')
-
         report.insertStudentCourses(user_email, addCourses)
         report.deleteStudentCourses(user_email, deleteCourses)
 
@@ -1113,20 +1089,14 @@ def autoGenerate():
     semester_selection = request.args.get("semester")
     schedule_name = request.args.get("name")
     if request.method == "GET":
-
-        print("YEET")
-        # email = session.get("email")
-        # print(email)
         all_schedules = []
         cursor = conn.cursor()
-        print(f"email: {user_email}")
         get_schedules_query = ('''
             SELECT * FROM Schedule WHERE email = %s;
             ''')
         cursor.execute(get_schedules_query, (user_email,))
         result = cursor.fetchall()
         for schedule in result:
-            # print(schedule)
             all_schedules.append(
                 {
                     "scheduleName": schedule[0],
@@ -1135,7 +1105,6 @@ def autoGenerate():
                     "scheduleSemester": schedule[3]
                 }
             )
-        # print(all_schedules)
         return json.dumps(all_schedules)
 
     if request.method == "POST":
@@ -1146,7 +1115,6 @@ def autoGenerate():
         created_at = datetime.now()
         formatted_date = created_at.strftime('%Y-%m-%d %H:%M:%S')
         session["schedule_semester"] = schedule_semester #Test to load courses and whatnot
-        print(f"{schedule_name} {formatted_date} {user_email} {schedule_semester}")
 
         insert_schedule_query = "INSERT INTO Schedule values (%s, %s, %s, %s)"
         cursor.execute(insert_schedule_query, (schedule_name, formatted_date, user_email, schedule_semester))
@@ -1155,8 +1123,6 @@ def autoGenerate():
         semester = semester_selection
 
         RecommendedCourses = AGS.GetAutoGeneratedSchedule(user_email, semester)
-
-        print("I AM ALIVE")
 
         #classInsert = "INSERT into ScheduleClass (scheduleName, email, courseSection, courseCode, meetingDays, classSemester) VALUES (%s, %s, %s, %s, %s, %s)"
         #cursor.execute(classInsert, (schedule_name, user_email, RecommendedCourses[0].courseSection, RecommendedCourses[0].courseCode, RecommendedCourses[0].dayAvail, RecommendedCourses[0].semesterAvail))
@@ -1186,6 +1152,5 @@ def autoGenerate():
 @app.route("/api/getAllMajorsAndMinors", methods=["GET"])
 def getAllMajorsAndMinors():
     user_email = request.args.get("email")
-    print(f"User email: {user_email}")
     all = MinorRecommendation.getEverythingJSON(user_email)
     return json.dumps(all)

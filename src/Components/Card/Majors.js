@@ -8,9 +8,6 @@ import CoolTabs from 'react-cool-tabs';
 import Image from 'react-bootstrap/Image'
 import Logo from '../static/images/logo.jpg'
 
-global.email = String(window.location).split("?")[1]
-global.email = String(global.email).split("=")[1]
-
 export const Majors = () => {
 
     //const [isLoading, setLoading] = useState(true);
@@ -26,7 +23,10 @@ export const Majors = () => {
     var minorList = document.createElement("ul");
 
     function getMajorsAndMinorsData(requirementYear) {
-        axios.get('http://localhost:5000/api/getAllMajorsAndMinors?email=' + global.email).then((response) => {
+        var email = String(window.location).split("?")[1];
+        email = String(email).split("=")[1]
+        console.log(email);
+        axios.get('http://localhost:5000/api/getAllMajorsAndMinors?email=' + email).then((response) => {
             const firstResponse = response.data[requirementYear];
             const majorResponse = firstResponse["majors"];
             const minorResponse = firstResponse["minors"];
@@ -248,10 +248,10 @@ export const Majors = () => {
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="mr-auto">
-                  <Nav.Link href={"/home?email=" + global.email}>Scheduling</Nav.Link>
-                  <Nav.Link href={"/degree?email=" + global.email}>Degree Report</Nav.Link> 
-                  <Nav.Link href={"/majors?email=" + global.email}>Majors and Minors</Nav.Link> 
-                  <Nav.Link href={"/profile?email=" + global.email}>Profile</Nav.Link> 
+                  <Nav.Link href={"/home?" + String(window.location).split("?")[1]}>Scheduling</Nav.Link>
+                  <Nav.Link href={"/degree?" + String(window.location).split("?")[1]}>Degree Report</Nav.Link> 
+                  <Nav.Link href={"/majors?" + String(window.location).split("?")[1]}>Majors and Minors</Nav.Link> 
+                  <Nav.Link href={"/profile?" + String(window.location).split("?")[1]}>Profile</Nav.Link> 
               </Nav>
               </Navbar.Collapse>
             </Navbar>
