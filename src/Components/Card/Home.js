@@ -125,7 +125,7 @@ export const Home = ()=> {
                 "schedule-semester": semester
            }
            await axios.post('/api/home?email=' + global.email, parameters).then(response => {
-            alert(response.data);
+            //alert(response.data);
             if(response.data !== "Created Schedule Successfully") {
                 alert(response.data);
             }
@@ -136,7 +136,7 @@ export const Home = ()=> {
         .catch(err => {
             if (err.response) {
                 alert("Error: There was a problem with creating your schedule");
-                window.location = "/Home";
+                window.location = "/Home?email=" + global.email;
             }
         })
         }

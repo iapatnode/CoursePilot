@@ -67,7 +67,7 @@ export const Profile = () => {
         }
         
         axios.post('/api/changeMajor?email=' + global.email, parameters).finally(response => {
-            alert(response);
+            alert("Major Changed Successfully");
             setShowMajor(false);
             window.location = '/Profile?email=' + global.email;
         })
@@ -84,7 +84,7 @@ export const Profile = () => {
         }
         
         axios.post('/api/changeMinor?email=' + global.email, parameters).finally(response => {
-            alert(response);
+            alert("Minor Changed Successfully");
             setShowMinor(false);
             window.location = '/Profile?email=' + global.email;
         })
@@ -101,7 +101,7 @@ export const Profile = () => {
             newPassword: newPasswordValue,
         }
 
-        console.log(parameters);
+        console.log(success);
 
         var message = "";
 
@@ -135,7 +135,7 @@ export const Profile = () => {
             })
             .catch(err => {
                 if (err.response) {
-                console.log("BAD!");
+                    alert("Whoops... something went wrong there")
                 }
             })
         }
@@ -278,9 +278,6 @@ export const Profile = () => {
                                 </Modal.Body>
                             </Modal>
                     </div>
-                    <Button variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
-                        Save Changes
-                    </Button>
                     <Button onClick={signOut} variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
                         Log Out
                     </Button>

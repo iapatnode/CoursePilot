@@ -742,6 +742,7 @@ def profile():
             # majors.append(result[1])
             passwrd = result[1]
         conn.commit()
+        print(f"Password: {passwrd}")
         return {
             "email": user_email,
             "majors": majors, 
@@ -889,6 +890,8 @@ def changePassword():
     json_data = json.loads(data)
     oldPassword = json_data.get("oldPassword")
     newPassword = json_data.get("newPassword")
+    user_email = request.args.get("email")
+    print(f"New Password: {newPassword} ----- Old Password: {oldPassword}")
     valid = False
     cursor = conn.cursor()
     getUserPassword = "select passwrd from Student where email = %s"
