@@ -34,7 +34,6 @@ export const SignUp = () => {
             axios.get("/api/signup").then(response => {
                 setSuccess(response.data);
                 setLoading(false);
-                console.log(response);
             });
         }
     }, []);
@@ -89,13 +88,18 @@ export const SignUp = () => {
              graduation_year: graduation 
         }
         
-        axios.post('/api/signup', parameters).finally(response => {
-            alert("Account Creation Successful!");
-            window.location = '/Home';
+        axios.post('/api/signup?email=' + email, parameters).then(response => {
+            var response = response.data.text;
+            if(response.includes("Error")) {
+                alert(response);
+            }
+            else {
+                window.location = "/Home?email=" + email;
+            }
         })
         .catch(err => {
             if (err.response) {
-                console.log("BAD!");
+                alert("Error: Make sure all fields have been completed");
             }
         })
     }

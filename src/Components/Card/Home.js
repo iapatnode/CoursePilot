@@ -12,6 +12,7 @@ import Logo from '../static/images/logo.jpg'
 
 
 global.semester=""; // Global variable for which semester the user has chosen
+global.email = String(window.location).split("?")[1];
 
 
 /*
@@ -24,6 +25,26 @@ export const Home = ()=> {
     const [showAuto, setShowAuto] = useState(false);
     const [redirect, setRedirect] = useState(false);
     const [compare, setCompare] = useState(false); // Variable to determine whether or not to show compare modal
+    const [scheduleName, setScheduleName] = useState();
+    const [scheduleSemester, setScheduleSemester] = useState();
+    const [compareOne, setCompareOne] = useState();
+    const [compareTwo, setCompareTwo] = useState();
+
+    const handleScheduleName = (e) => {
+        setScheduleName(e.target.value);
+    }
+
+    const handleScheduleSemester = (e) => {
+        setScheduleSemester(e.target.value);
+    }
+
+    const handleCompareOne = (e) => {
+        setCompareOne(e.target.value)
+    }
+
+    const handleCompareTwo = (e) => {
+        setCompareTwo(e.target.value)
+    }
 
     /*
     The below functions are used to open and close the new schedule modal. Used as 
@@ -36,15 +57,14 @@ export const Home = ()=> {
     const handleCloseCompare = () => setCompare(false);
     const handleCloseAuto = () => setShowAuto(false);
 
-
     /*
     makePostRequest() --> Method used to send a post request with the given parameters
     to the provided url. Catches an error if there are invalid parameters or invalid
     url provided
     */
-    function makePostRequest(path, params) {
+    function makePostRequest(path) {
         return new Promise(function (resolve, reject) {
-            axios.post(path, params).then(
+            axios.post(path).then(
                 (response) => {
                     var result = response.data;
                     console.log('Processing request');
@@ -55,6 +75,13 @@ export const Home = ()=> {
                     }
             );
         });
+    }
+
+    function handleSubmit() {
+        var scheduleOne = document.getElementById("schedule-one").value
+        var scheduleTwo = document.getElementById("schedule-two").value
+        window.location = "/Compare?scheduleOne=" + scheduleOne + "&scheduleTwo=" + scheduleTwo + "&email=" + global.email;
+        //window.location = "localhost:3000/Schedule?scheduleOne=" + compareOne + "&scheduleTwo=" + compareTwo + "&email=" + global.email;
     }
 
     /*
@@ -68,9 +95,50 @@ export const Home = ()=> {
         let params = {
             "name": e.target.innerText
         }
-        var result = await makePostRequest('/api/existingSchedule', params);
-        if(result == "good") {
-            window.location = "/Schedule";
+        var queryString = String(window.location).split("?")[1]
+        queryString = queryString + "&ScheduleName=" + e.target.innerText;
+        window.location = "/Schedule?" + queryString;
+    }
+
+    async function createSchedule(event) {
+        event.preventDefault();
+        console.log(scheduleName);
+        var makeRequest = true;
+        success.forEach(element => {
+            if(scheduleName == element["scheduleName"]) {
+                alert("Error: You cannot add two schedules with the same name");
+                makeRequest = false;
+            }
+        });
+        if(makeRequest) {
+            var semester = ""
+            if(scheduleSemester === undefined) {
+                console.log("hm");
+                semester = "fall"
+            }
+            else {
+                semester = "spring";
+            }
+            console.log(semester);
+            const parameters = {
+                "schedule-name": scheduleName,
+                "schedule-semester": semester
+           }
+           await axios.post('/api/home?email=' + global.email, parameters).then(response => {
+            //alert(response.data);
+            if(response.data !== "Created Schedule Successfully") {
+                alert(response.data);
+            }
+            else {
+                window.location = "/Schedule?email=" + global.email + "&ScheduleName=" + scheduleName + "&semester=" + semester;
+            }
+        })
+        .catch(err => {
+            if (err.response) {
+                alert("Error: There was a problem with creating your schedule");
+                window.location = "/Home?email=" + global.email;
+            }
+        })
         }
     }
 
@@ -79,7 +147,11 @@ export const Home = ()=> {
     Stores the result of the get request in the success variable, and sets loading to false. 
     */
     useEffect(() => {
-        axios.get("/api/home").then(response => {
+        console.log("URL: " + window.location);
+        var url_array = String(window.location).split("=")
+        global.email = url_array[1];
+        console.log(global.email)
+        axios.get("/api/home?email=" + global.email).then(response => {
             setSuccess(response.data);
             setLoading(false);
         });
@@ -98,18 +170,20 @@ export const Home = ()=> {
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="mr-auto">
-                  <Nav.Link href="/home">Scheduling</Nav.Link>
-                  <Nav.Link href="/degree">Degree Report</Nav.Link> 
-                  <Nav.Link href="/majors">Majors and Minors</Nav.Link> 
-                  <Nav.Link href="/profile">Profile</Nav.Link> 
+                  <Nav.Link href={"/home?email=" + global.email}>Scheduling</Nav.Link>
+                  <Nav.Link href={"/degree?email=" + global.email}>Degree Report</Nav.Link> 
+                  <Nav.Link href={"/majors?email=" + global.email}>Majors and Minors</Nav.Link> 
+                  <Nav.Link href={"/profile?email=" + global.email}>Profile</Nav.Link> 
               </Nav>
               </Navbar.Collapse>
             </Navbar>
-            <h1 id="home-header"> Schedules </h1>
+            <div className="container-fluid" id="home-header">
+                <h1 id="home-header"> Schedules </h1>
+            </div>
             <div className="container" id="schedule-list-view">
                 <div className="row">
                     <div className="col-md-4" id="names">
-                        <h2> Name </h2>
+                        <h2 id="name-header"> Name </h2>
                         <ul>
                             {success.map((value, index) => {
                                 return <li id="schedule-name" onClick={clickListener} key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></li>
@@ -117,7 +191,7 @@ export const Home = ()=> {
                         </ul>
                     </div>
                     <div className="col-md-4" id="semesters">
-                        <h2> Semester </h2>
+                        <h2 id="semester-header"> Semester </h2>
                         <ul>
                             {success.map((value, index) => {
                                 return <li id="schedule-semester" key={index} value={value["scheduleSemester"]}>{value["scheduleSemester"]}<br></br></li>
@@ -125,7 +199,7 @@ export const Home = ()=> {
                         </ul>
                     </div>
                     <div className="col-md-4" id="dates">
-                        <h2> Date Modified </h2> 
+                        <h2 id="date-header"> Date Modified </h2> 
                         <ul>
                             {success.map((value, index) => {
                                 return <li id="schedule-date" key={index} value={value["dateModified"]}>{value["dateModified"]}</li>
@@ -141,7 +215,7 @@ export const Home = ()=> {
                             <Modal.Title>Auto-Generate Schedule</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                            <Form method="post" action="/api/autoGenerate">
+                            <Form method="post" action={"/api/autoGenerate?email=" + global.email + "&semester=" + scheduleSemester + "&name=" + scheduleName}>
                                 <Form.Group>
                                     <Form.Control type="text" placeholder="Enter Schedule Name" id="auto-schedule-name" name="schedule-name"></Form.Control>
                                     <Form.Control as="select" id="schedule-semester" name="schedule-semester">
@@ -165,21 +239,21 @@ export const Home = ()=> {
                         <Modal.Title>Create New Schedule - Enter Name</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Form method="post" action="/api/home">
+                        <div>
                             <Form.Group>
-                                <Form.Control type="text" placeholder="Enter Schedule Name" id="enter-schedule-name" name="schedule-name"></Form.Control>
-                                <Form.Control as="select" id="schedule-semester" name="schedule-semester">
+                                <Form.Control onChange={handleScheduleName} type="text" placeholder="Enter Schedule Name" id="enter-schedule-name" name="schedule-name"></Form.Control>
+                                <Form.Control onChange={handleScheduleSemester} as="select" id="schedule-semester" name="schedule-semester">
                                     <option value="fall">Fall</option>
                                     <option value="spring">Spring</option>
                                 </Form.Control>
                                 <Button variant="secondary" onClick={handleClose}>
                                     Cancel
                                 </Button>
-                                <Button variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
+                                <Button onClick={createSchedule} variant="primary" id="signup-form-submit" className="signup-form-field">
                                     Create Schedule
                                 </Button>
                             </Form.Group>
-                        </Form>
+                        </div>
                     </Modal.Body>
                 </Modal>
 
@@ -188,25 +262,22 @@ export const Home = ()=> {
                         <Modal.Title>Compare Two Schedules</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <Form method="post" action="/api/compare">
-                            <Form.Group>
-                                
+                        <Form>
+                            <Form.Group>   
                                 <Form.Control as="select" id="schedule-one" name="schedule-one">
                                     {success.map((value, index) => {
-
-                                    return <option key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
-                                        })}
+                                        return <option onChange={handleCompareOne} key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
+                                    })}
                                 </Form.Control>
                                 <Form.Control as="select" id="schedule-two" name="schedule-two">
                                     {success.map((value, index) => {
-
-                                    return <option key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
-                                        })}
+                                        return <option onChange={handleCompareTwo} key={index} value={value["scheduleName"]}>{value["scheduleName"]}</option>
+                                    })}
                                 </Form.Control>
                                 <Button variant="secondary" onClick={handleCloseCompare}>
                                     Cancel
                                 </Button>
-                                <Button variant="primary" type="submit" id="compare-schedule" className="signup-form-field">
+                                <Button variant="primary" onClick={handleSubmit} id="compare-schedule" className="signup-form-field">
                                    Compare Selected Schedules
                                 </Button>
                             </Form.Group>
