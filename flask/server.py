@@ -33,22 +33,6 @@ def connection():
 #Creates global variable that creates connection to database
 conn = connection()
 
-#User Email Variable
-user_email = ""
-
-#Semester Selection Variable
-semester_selection = ""
-
-#Get schedule name
-schedule_name = ""
-
-#Schedule Names when we compare schedules
-compare_schedule_one = ""
-compare_schedule_two = ""
-
-requirement_year = ""
-
-
 """
 /API/LOGIN ROUTE
 -----------------
@@ -144,7 +128,6 @@ def sign_up():
         # On a post request, get all user data from the form received. 
         valid = True
         cont = True
-        global requirement_year
         return_message = ""
         data = request.data.decode("utf-8")
         json_data = json.loads(data)
@@ -259,7 +242,6 @@ def sign_up():
             #DBMS connection cleanup
             cursor.close()
 
-            global user_email
             user_email = email
 
             return {
@@ -340,7 +322,6 @@ def home():
 
     if request.method == "POST":
         cursor = conn.cursor()
-        global schedule_name
 
         # Get schedule name and semester from the request form
         data = request.data.decode("utf-8")
@@ -632,11 +613,6 @@ def get_data_compare():
     if request.method == "POST" or request.method == "GET":
         return_list = []
         course_codes = []
-        # global schedule_name
-        # global user_email
-        # global semester_selection
-        # global compare_schedule_one
-        # global compare_schedule_two
         compare_schedule_one = request.args.get("scheduleOne")
         compare_schedule_two = request.args.get("scheduleTwo")
         user_email = request.args.get("email")
@@ -778,7 +754,6 @@ def profile():
 def changeMajor():
     cursor = conn.cursor()
     valid = True
-    global requirement_year
     user_email = request.args.get("email")
     data = request.data.decode("utf-8")
     json_data = json.loads(data)
@@ -914,7 +889,6 @@ def changePassword():
     json_data = json.loads(data)
     oldPassword = json_data.get("oldPassword")
     newPassword = json_data.get("newPassword")
-    global user_email
     valid = False
     cursor = conn.cursor()
     getUserPassword = "select passwrd from Student where email = %s"
@@ -1046,7 +1020,6 @@ def get_existing_schedule():
     if request.method == "POST":
         data = request.data.decode("utf-8")
         json_data = json.loads(data)
-        global schedule_name
         schedule_name = json_data.get("name").rstrip()
         return "good"
     else:
