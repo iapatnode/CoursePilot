@@ -739,9 +739,12 @@ def profile():
                     minors.append(row[1])
                 else:
                     majors.append(row[1])
-            # majors.append(result[1])
             passwrd = result[1]
-        conn.commit()
+        # conn.commit()
+        password_query = "select passwrd from Student where email = %s"
+        cursor.execute(password_query, (user_email,))
+        results = cursor.fetchone()
+        passwrd = results[0]
         print(f"Password: {passwrd}")
         return {
             "email": user_email,
@@ -904,10 +907,9 @@ def changePassword():
         updateUserPassword = "update Student set passwrd = %s where email = %s"
         cursor.execute(updateUserPassword, (newPassword, user_email,))
         conn.commit()
+        return  "success"
     else:
-        return {
-            "response": "error"
-        }
+        return "error"
     
     
 """

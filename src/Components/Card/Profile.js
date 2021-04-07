@@ -32,6 +32,7 @@ export const Profile = () => {
     const [minorSelectedValue, setMinorSelectedValue] = useState([]);
     const [majorSelectedValue, setMajorSelectedValue] = useState([]);
     const [newPasswordValue, setNewPasswordValue] = useState();
+    const [confirmPasswordValue, setConfirmPasswordValue] = useState();
     const [oldPasswordValue, setOldPasswordValue] = useState();
     const [populate, setPopulate] = useState(false);
     const minorOptions = []
@@ -59,6 +60,10 @@ export const Profile = () => {
 
     const handleOldPasswordChange = (e) => {
         setOldPasswordValue(e.target.value);
+    }
+
+    const handleConfirmPasswordChange = (e) => {
+        setConfirmPasswordValue(e.target.value);
     }
  
     const handleMajorSubmit = (e) => {
@@ -101,7 +106,7 @@ export const Profile = () => {
             newPassword: newPasswordValue,
         }
 
-        console.log(success);
+        console.log(oldPasswordValue);
 
         var message = "";
 
@@ -121,15 +126,19 @@ export const Profile = () => {
             message = "Error: Password must contain special characters";
         }
 
-        else if(success["passwrd"] != newPasswordValue) {
+        else if(success["passwrd"] != oldPasswordValue) {
             message = "Error: Current password was incorrect";
+        }
+
+        else if(newPasswordValue != confirmPasswordValue) {
+            message = "Error: New passwords must match"
         }
 
         if (message != "") {
             alert(message);
         }
         if(message == "") {
-            axios.post('/api/changePassword', parameters).finally(response => {
+            axios.post('/api/changePassword?email=' + global.email, parameters).finally(response => {
                 alert("Password Changed Successfully");
                 setShowPassword(false);
             })
@@ -153,7 +162,6 @@ export const Profile = () => {
 
     if(isFirstRun.current){
         if(ready) {
-            console.log(global.email)
             axios.get("/api/signup").then(response => {
                 setDegreeInfo(response.data);
                 setPopulate(true);
@@ -217,6 +225,15 @@ export const Profile = () => {
                                                 id="password-field" 
                                                 className="signup-form-field" 
                                                 placeholder="Enter New Password">
+                                            </Form.Control>
+                                            <Form.Label> Confirm New Password </Form.Label>
+                                            <Form.Control 
+                                                onChange={handleConfirmPasswordChange} 
+                                                type="password" 
+                                                name="confirm-password" 
+                                                id="password-field" 
+                                                className="signup-form-field" 
+                                                placeholder="Confirm New Password">
                                             </Form.Control>
                                         </Form.Group>
                                         <Button variant="primary" onClick={handlePasswordSubmit}> Confirm New Password </Button>
