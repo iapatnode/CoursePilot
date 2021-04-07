@@ -851,15 +851,16 @@ def degree_report():
     global user_email
 
     if request.method == "GET":
-
         degreeIds = report.getStudentMajors(user_email)
-        studentDegreeReqs = report.getMajorRequirements(degreeIds[0][0])
 
-        studentCourses = report.getStudentCourses(user_email)
+        # NOTE: each major is its own tuple
+        studentDegreeReqs = report.getMajorRequirements(degreeIds[0][0])
 
         courses = report.getAllCourses()
 
-        studentReqDetails = [studentDegreeReqs, studentCourses, courses]
+        parsedCourses = report.parseStudentCourses(user_email, studentDegreeReqs)
+
+        studentReqDetails = [studentDegreeReqs, courses, parsedCourses]
 
         return json.dumps(studentReqDetails)
         
@@ -868,17 +869,19 @@ def degree_report():
         json_data = json.loads(data)
 
         addCheckedCourses = json_data.get("checkedAdd")
-        deleteUncheckedCourses = json_data.get("checkedRemove")
+        addSelectedCourses = json_data.get("selectedAdd")
+        deleteCheckedCourses = json_data.get("checkedRemove")
+        deleteSelectedCourses = json_data.get("selectedRemove")
 
-        print(f'{addCheckedCourses}')
-        print(f'/n{deleteUncheckedCourses}')
+        print(f'\n\nSelected courses: {addSelectedCourses}')
+        print(f'\n\nUnselected courses: {deleteSelectedCourses}')
 
-        report.insertStudentCourses(user_email, addCheckedCourses)
-        report.deleteStudentCourses(user_email, deleteUncheckedCourses)
+        # report.insertStudentCourses(user_email, addCheckedCourses)
+        # report.insertStudentCourses(user_email, addSelectedCourses)
+        # report.deleteStudentCourses(user_email, deleteCheckedCourses)
+        # report.deleteStudentCourses(user_email, deleteSelectedCourses)
 
         return redirect("http://localhost:3000/degreereport")
-
-
 
 
 @app.route("/api/autoGenerate", methods=["GET", "POST"])
