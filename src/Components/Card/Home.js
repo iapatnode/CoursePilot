@@ -105,11 +105,17 @@ export const Home = ()=> {
         console.log(scheduleName);
         var makeRequest = true;
         success.forEach(element => {
-            if(scheduleName == element["scheduleName"]) {
-                alert("Error: You cannot add two schedules with the same name");
-                makeRequest = false;
+            if(makeRequest) {
+                if(scheduleName == element["scheduleName"]) {
+                    alert("Error: You cannot add two schedules with the same name");
+                    makeRequest = false;
+                }
             }
         });
+        if(scheduleName == "" || scheduleName  == null) {
+            alert("Error: You must give your schedule a name")
+            makeRequest = false;
+        }
         if(makeRequest) {
             var semester = ""
             if(scheduleSemester === undefined) {
