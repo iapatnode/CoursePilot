@@ -37,6 +37,8 @@ export const Profile = () => {
     const [populate, setPopulate] = useState(false);
     const minorOptions = []
     const majorOptions = []
+    const selectedMajors = []
+    const selectedMinors = []
 
     const handleCloseMajor = () => setShowMajor(false);
     const handleShowMajor = () => setShowMajor(true);
@@ -168,6 +170,12 @@ export const Profile = () => {
                 setLoading(false);
                 setReady(false);
             });
+            success.majors.forEach(element => {
+                majorSelectedValue.push(element);
+            })
+            success.minors.forEach(element => {
+                minorSelectedValue.push(element);
+            })
         }
     }
 
@@ -198,12 +206,12 @@ export const Profile = () => {
         <div className="container">
             <div className="row">
                 <div className="col">
-                    <p> Current Email: {global.email} </p>
-                    <div id="button-container">
-                        <Button variant="primary" onClick={handleShowPassword}> Change Password </Button>
+                    <h1> Hello,  {global.email} </h1>
+                    <h2> Major(s): {success["majors"].join(", ")} </h2>
+                    <h2> Minor(s): {success["minors"].join(", ")} </h2>
                             <Modal show={showPassword} onHide={handleClosePassword}>
                                 <Modal.Header closeButton>
-                                    <Modal.Title>Change Email</Modal.Title>
+                                    <Modal.Title>Change Password</Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
                                     <Form action="/api/changePassword" method="POST">
@@ -240,10 +248,6 @@ export const Profile = () => {
                                     </Form>
                                 </Modal.Body>
                             </Modal>
-                    </div>
-                    <p> Current Majors: {success["majors"]} </p>
-                    <div id="button-container">
-                        <Button variant="primary" onClick={handleShowMajor}> Change Major </Button>
                             <Modal show={showMajor} onHide={handleCloseMajor}>
                                 <Modal.Header closeButton>
                                     <Modal.Title>Choose Major(s)</Modal.Title>
@@ -267,10 +271,6 @@ export const Profile = () => {
                                     <Button variant="primary" onClick={handleMajorSubmit}> Confirm Major(s) </Button>
                                 </Modal.Body>
                             </Modal>
-                    </div>
-                    <p> Current Minors: {success["minors"]} </p>
-                    <div id="button-container">
-                        <Button variant="primary" onClick={handleShowMinor}> Change Minor </Button>
                             <Modal show={showMinor} onHide={handleCloseMinor}>
                                 <Modal.Header closeButton>
                                     <Modal.Title>Choose Minor(s)</Modal.Title>
@@ -294,7 +294,11 @@ export const Profile = () => {
                                     <Button variant="primary" onClick={handleMinorSubmit}> Confirm Minor(s) </Button>
                                 </Modal.Body>
                             </Modal>
-                    </div>
+                        <div id="secondary_buttons">
+                            <Button variant="primary" onClick={handleShowPassword}> Change Password </Button>
+                            <Button variant="primary" onClick={handleShowMajor}> Change Major </Button>
+                            <Button variant="primary" onClick={handleShowMinor}> Change Minor </Button>
+                        </div>
                     <Button onClick={signOut} variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
                         Log Out
                     </Button>
