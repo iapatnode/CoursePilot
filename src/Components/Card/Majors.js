@@ -7,6 +7,8 @@ import {DropdownButton, Dropdown} from 'react-bootstrap'
 import CoolTabs from 'react-cool-tabs';
 import Image from 'react-bootstrap/Image'
 import Logo from '../static/images/logo.jpg'
+import Accordion from 'react-bootstrap/Accordion'
+import Card from 'react-bootstrap/Card'
 
 export const Majors = () => {
 
@@ -248,12 +250,34 @@ export const Majors = () => {
   searchbar on the side column. Courses that match the pattern that the user enters are displayed, 
   while all others are hidden. 
   */
-  function classFilter() {
+  function majorFilter() {
     var input, filter, ul, li, a, i, txtValue;
     input = document.getElementById("myInput");
     console.log(input)
     filter = input.value.toUpperCase();
     ul = document.getElementById("MajorList");
+    li = ul.getElementsByTagName("li");
+    for (i = 0; i < li.length; i++) {
+        a = li[i].getElementsByTagName("a")[0];
+        txtValue = a.textContent || a.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+        } else {
+            li[i].style.display = "none";
+        }
+    }
+  }
+        /*
+  MinorFilter() --> Helper function used to display courses that the user searches for using the 
+  searchbar on the side column. Courses that match the pattern that the user enters are displayed, 
+  while all others are hidden. 
+  */
+  function minorFilter() {
+    var input, filter, ul, li, a, i, txtValue;
+    input = document.getElementById("minorInput");
+    console.log(input)
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("MinorList");
     li = ul.getElementsByTagName("li");
     for (i = 0; i < li.length; i++) {
         a = li[i].getElementsByTagName("a")[0];
@@ -291,9 +315,34 @@ export const Majors = () => {
 
             <h2> Search Majors </h2>
                 <div id="div1">
-                <input type="text" id="myInput" onKeyUp={classFilter} placeholder="Search for Class" title="Type in a name"></input>
+                <input type="text" id="myInput" onKeyUp={majorFilter} placeholder="Search for Major" title="Type in a name"></input>
                 <ul id="courses"></ul>
                 </div>
+
+            <h2> Search Minors </h2>
+                <div id="div1">
+                <input type="text" id="minorInput" onKeyUp={minorFilter} placeholder="Search for Minor" title="Type in a name"></input>
+                <ul id="courses"></ul>
+                </div>
+
+                <Accordion defaultActiveKey="0">
+  <Card>
+    <Accordion.Toggle as={Card.Header} eventKey="0">
+      Click me!
+    </Accordion.Toggle>
+    <Accordion.Collapse eventKey="0">
+      <Card.Body>Hello! I'm the body</Card.Body>
+    </Accordion.Collapse>
+  </Card>
+  <Card>
+    <Accordion.Toggle as={Card.Header} eventKey="1">
+      Click me!
+    </Accordion.Toggle>
+    <Accordion.Collapse eventKey="1">
+      <Card.Body>Hello! I'm another body</Card.Body>
+    </Accordion.Collapse>
+  </Card>
+</Accordion>
             <CoolTabs
                 tabKey={'1'}
                 style={{ width:  1500, height:  650, background:  'blue', margin: 20,}}

@@ -238,7 +238,7 @@ export const Home = ()=> {
                             </Form>
                         </Modal.Body>
                     </Modal>
-                <Button variant="primary" id="home-page-secondary-button" onClick={handleShow}> Create New Schedule </Button>
+                <Button variant="primary" id="create-schedule-button" onClick={handleShow}> Create New Schedule </Button>
                 <Button variant="primary" id="home-page-secondary-button" onClick={handleCompare}> Compare Two Schedules </Button>
                 <Modal show={show} onHide={handleClose}>
                     <Modal.Header closeButton>

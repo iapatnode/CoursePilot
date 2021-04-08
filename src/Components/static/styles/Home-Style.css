@@ -65,3 +65,9 @@ ul {
     border-radius: 8px;
     padding: 1%;
 }
+
+#create-schedule-button {
+    background-color: #926DD6;
+    border-color: #926DD6;
+    height: 60px;
+}
