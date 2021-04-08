@@ -32,7 +32,6 @@ export const Login = ()  => {
         var url = "/api/login?email=" + email;
         axios.post(url, parameters).then(response => {
             var response = response.data.text;
-            console.log(response);
             if(response != "success") {
                 alert(response);
             }
