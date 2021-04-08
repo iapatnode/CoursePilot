@@ -441,8 +441,14 @@ def schedule():
         return json.dumps(courseArray)
     
     if request.method == "POST":
-        return_text = ""
         cursor = conn.cursor()
+        # Update the time that the schedule was last modified
+        created_at = datetime.now()
+        formatted_date = created_at.strftime('%Y-%m-%d %H:%M:%S')
+        update_schedule = "UPDATE Schedule SET dateModified = %s where scheduleName = %s and email = %s"
+        cursor.execute(update_schedule, (formatted_date, schedule_name, user_email,))
+
+        return_text = ""
 
         # Get data from the semester form that the user submitted
         data = request.data.decode("utf-8")
