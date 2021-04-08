@@ -6,6 +6,8 @@ import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Checkbox from '@material-ui/core/Checkbox'
+import TextField from '@material-ui/core/TextField'
+import Autocomplete from '@material-ui/lab/Autocomplete'
 import Image from 'react-bootstrap/Image'
 import Logo from '../static/images/logo.jpg'
 
@@ -16,6 +18,7 @@ export const Report = () => {
     
     const [isLoading, setLoading] = useState(true);
     const [success, setSuccess] = useState();
+    const[show, setShow] = useState(false);
 
     const [checked, setChecked] = useState([]);
     const [unchecked, setUnchecked] = useState([]);
@@ -28,6 +31,8 @@ export const Report = () => {
         global.email = url_array[1];
         axios.get("/api/degreereport?email=" + global.email).then(response => {
             setSuccess(response.data);
+            setChecked(response.data[2]["checked"]);
+            setSelected(response.data[2]["selected"])
             setLoading(false);
         });
     }, []);
