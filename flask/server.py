@@ -9,6 +9,8 @@ import dbQueries as db_queries
 import degreeReport as report
 
 
+#Which users are logged in
+
 #Flask App Setup
 app = Flask(__name__)
 CORS(app)
@@ -815,6 +817,11 @@ def changeMajor():
                 addMinors = "insert into StudentMajorMinor values (%s, %s)"
                 cursor.execute(addMinors, (user_email, minor))
                 conn.commit()
+            
+            # Delete courses that Student has taken (fixes bug in Degree report)
+            delete_courses_query = "delete from StudentCourses where email = %s"
+            cursor.execute(delete_courses_query, (user_email,))
+            conn.commit()
 
         except Error as error:
             #If you cannot insert the invidual into the database, print error and reroute
