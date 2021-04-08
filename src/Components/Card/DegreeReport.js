@@ -6,8 +6,11 @@ import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Checkbox from '@material-ui/core/Checkbox'
-import TextField from '@material-ui/core/TextField'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+import Image from 'react-bootstrap/Image'
+import Logo from '../static/images/logo.jpg'
+
+global.email = String(window.location).split("?")[1];
+global.email = String(global.email).split("=")[1]
 
 export const Report = () => {
     
@@ -20,10 +23,11 @@ export const Report = () => {
     const [unselected, setUnselected] = useState([]);
 
     useEffect(() => {
-        axios.get("/api/degreereport").then(response => {
-            setSuccess(response.data)
-            setChecked(response.data[2]["checked"]);
-            setSelected(response.data[2]["selected"]);
+        console.log("URL: " + window.location);
+        var url_array = String(window.location).split("=")
+        global.email = url_array[1];
+        axios.get("/api/degreereport?email=" + global.email).then(response => {
+            setSuccess(response.data);
             setLoading(false);
         });
     }, []);
@@ -36,8 +40,8 @@ export const Report = () => {
             "selectedRemove": unselected
         }
 
-        axios.post('/api/degreereport', parameters).finally(response => {
-            window.location = '/degreereport';
+        axios.post('/api/degreereport?email=' + global.email, parameters).finally(response => {
+            alert("I made it out of the server code");
         }).catch(err => {
             if(err.response) {
                 console.log("BAD!");
@@ -107,16 +111,16 @@ export const Report = () => {
     return (
         <div id="main-content">
             <Navbar bg="dark" variant="dark" expand="lg">
-                <Navbar.Brand href="/home">Course Pilot</Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav"/>
-                <Navbar.Collapse id="basic-navbar-nav">
-                    <Nav className="mr-auto">
-                        <Nav.Link href="/home">Scheduling</Nav.Link>
-                        <Nav.Link href="/degree">Degree Report</Nav.Link>
-                        <Nav.Link href="/majors">Majors and Minors</Nav.Link>
-                        <Nav.Link href="/profile">Profile</Nav.Link>
-                    </Nav>
-                </Navbar.Collapse>
+              <Navbar.Brand><Image src={Logo} style={{height: 50}}/></Navbar.Brand>
+              <Navbar.Toggle aria-controls="basic-navbar-nav" />
+              <Navbar.Collapse id="basic-navbar-nav">
+              <Nav className="mr-auto">
+                  <Nav.Link href={"/home?email=" + global.email}>Scheduling</Nav.Link>
+                  <Nav.Link href={"/degree?email=" + global.email}>Degree Report</Nav.Link> 
+                  <Nav.Link href={"/majors?email=" + global.email}>Majors and Minors</Nav.Link> 
+                  <Nav.Link href={"/profile?email=" + global.email}>Profile</Nav.Link> 
+              </Nav>
+              </Navbar.Collapse>
             </Navbar>
 
             <div>

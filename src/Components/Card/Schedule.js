@@ -6,6 +6,8 @@ import axios from 'axios'
 import Form from 'react-bootstrap/Form'
 import '../static/styles/Schedule-Style.css'
 import Button from 'react-bootstrap/Button'
+import Logo from '../static/images/logo.jpg'
+import Image from 'react-bootstrap/Image'
 
 
 // Styles used for the calendaty component
@@ -31,6 +33,8 @@ global.endTime = ""; // End time of the class that was added
 global.conflict = false; // Keep track of any time conflicts in the schedule
 global.removedCourses = [] // List of courses that the user has removed from the schedule
 global.className = ""; // Name of the class that was added
+global.formSubmitting = false;
+global.email = "";
 
 
 class Schedule extends Component {
@@ -221,7 +225,8 @@ class Schedule extends Component {
   */
   saveSchedule() {
     var http = new XMLHttpRequest();
-    var url = '/api/schedule';
+    var queryString = String(window.location).split("?")[1];
+    var url = '/api/schedule?' + queryString + "&semester=fall";
     var params = JSON.stringify(
       {
         courses: global.courses,
@@ -235,10 +240,16 @@ class Schedule extends Component {
       if(http.readyState == 4) {
         alert(this.responseText);
         global.courses = [];
-        window.location = "/Home";
+        window.location = "/Home?" + String(queryString).split("&")[0];
       }
     }
+    global.formSubmitting = true;
     http.send(params);
+  }
+
+  exitSchedule(location) {
+    var queryString = String(window.location).split("?")[1];
+    window.location = "/Home?" + String(queryString).split("&")[0];
   }
 
   /*
@@ -248,21 +259,32 @@ class Schedule extends Component {
   */
   deleteSchedule() {
     var http = new XMLHttpRequest();
-    var url = '/api/delete';
+    var queryString = String(window.location).split("?")[1]
+    var email = queryString.split("&")[0]
+    var scheduleName = queryString.split("&")[1];
+    scheduleName = scheduleName.split("=")[1]
+    // scheduleName = scheduleName.replaceAll("%20", " ");
+    console.log(scheduleName);
+    var queryString = String(window.location).split("?")[1]
+    var url = '/api/delete?' + queryString;
     http.open("POST", url, true);
     http.onreadystatechange = function() {
       if(http.readyState === 4) {
         if(this.responseText == "success") {
           alert("Schedule Deleted Successfully");
-          window.location = "/Home";
+          global.formSubmitting = true;
+          window.location = "/Home?" + email;
         } 
         else {
           alert("Whoops... That didn't seem to work");
-          window.location = "/Home";
+          global.formSubmitting = true;
+          window.location = "/Home?" + email;
         }
       }
     }
-    http.send();
+    if(window.confirm("Click 'OK' if you are sure you want to delete this schedule.")) {
+      http.send();
+    }
   }
 
   /*
@@ -274,8 +296,13 @@ class Schedule extends Component {
   display all necessary course information in the sidebar for the user to search
   */
   async componentDidMount() {
+    global.email = String(window.location).split("?")[1]
+    global.email = String(global.email).split("&")[0]
+    global.email = String(global.email).split("=")[1]
+    console.log(global.email)
     if(this.state.myRef) {
-      await axios.get('http://localhost:5000/api/getScheduleInfo')
+      var queryString = String(window.location).split("?")[1]
+      await axios.get('http://localhost:5000/api/getScheduleInfo?' + queryString) 
       .then((response) => {
           this.setState({
               columns: [
@@ -290,7 +317,7 @@ class Schedule extends Component {
           global.classEvents = response.data;
           console.log(global.classEvents);
       })
-      await axios.get('http://localhost:5000/api/schedule')
+      await axios.get('http://localhost:5000/api/schedule?' + queryString)
       .then((response) => {
           response.data.forEach(element => {
             var para = document.createElement("li");
@@ -324,17 +351,25 @@ class Schedule extends Component {
   // HTML Code for the Schedule Page to display course list and schedule component. 
   render() {
     var {...config} = this.state;
+    window.addEventListener("beforeunload", function(e) {
+      if(global.formSubmitting) {
+        return undefined;
+      }
+      var confirmationMessage = "Are you sure you want to leave this page?";
+      (e || window.event).returnValue = confirmationMessage;
+      return confirmationMessage;
+    });
     return (
         <div id="main-schedule-div">
             <Navbar bg="dark" variant="dark" expand="lg">
-              <Navbar.Brand href="/home">Course Pilot</Navbar.Brand>
+              <Navbar.Brand><Image src={Logo} style={{height: 50}}/></Navbar.Brand>
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="mr-auto">
-                  <Nav.Link href="/home">Scheduling</Nav.Link>
-                  <Nav.Link href="/degree">Degree Report</Nav.Link> 
-                  <Nav.Link href="/majors">Majors and Minors</Nav.Link> 
-                  <Nav.Link href="/profile">Profile</Nav.Link> 
+                  <Nav.Link href={"/Home?email=" + global.email}>Scheduling</Nav.Link>
+                  <Nav.Link href={"/degree?email=" + global.email}>Degree Report</Nav.Link> 
+                  <Nav.Link href={"/majors?email=" + global.email}>Majors and Minors</Nav.Link> 
+                  <Nav.Link href={"/profile?email=" + global.email}>Profile</Nav.Link> 
               </Nav>
               </Navbar.Collapse>
             </Navbar>
@@ -360,7 +395,7 @@ class Schedule extends Component {
             <Button onClick={this.saveSchedule} variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
                 Save Schedule
             </Button>
-            <Button href="/home" variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
+            <Button onClick={this.exitSchedule} variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
               Exit
             </Button>
             <Button onClick={this.deleteSchedule} variant="secondary" type="submit" id="delete-schedule" className="signup-form-field">
