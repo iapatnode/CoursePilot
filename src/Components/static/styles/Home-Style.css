@@ -1,9 +1,7 @@
 #schedule-name, #schedule-semester, #schedule-date {
     margin-top: 1.0rem;
     margin-bottom: 1.0rem;
-
 }
-
 
 ul {
     list-style-type: none;
@@ -28,10 +26,12 @@ ul {
 #home-header {
     margin-top: 3vh;
     width: 100%;
+    color: black;
 }
 
-#main-content {
+#main-content-home {
     height: 100vh;
+    background-color: darkgray;
 }
 
 #names, #dates, #semesters {
@@ -61,7 +61,11 @@ ul {
 }
 
 #name-header, #date-header, #semester-header {
-    background-color: #926DD6;
-    border-radius: 8px;
-    padding: 1%;
+    text-decoration: underline;
+    color: black;
+}
+
+#schedule-list-view {
+    background-color: lightgray;
+    border-radius: 2%;
 }

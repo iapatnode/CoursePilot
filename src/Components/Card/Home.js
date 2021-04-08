@@ -142,7 +142,7 @@ export const Home = ()=> {
 
     // HTML content of the home page. 
     return(
-        <div id="main-content">
+        <div id="main-content-home">
             <Navbar bg="dark" variant="dark" expand="lg">
               <Navbar.Brand><Image src={Logo} style={{height: 50}}/></Navbar.Brand>
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -162,7 +162,7 @@ export const Home = ()=> {
                 <div className="row">
                     <div className="col-md-4" id="names">
                         <h2 id="name-header"> Name </h2>
-                        <ul>
+                        <ul className="home-ul">
                             {success.map((value, index) => {
                                 return <li id="schedule-name" onClick={clickListener} key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></li>
                             })}
@@ -170,7 +170,7 @@ export const Home = ()=> {
                     </div>
                     <div className="col-md-4" id="semesters">
                         <h2 id="semester-header"> Semester </h2>
-                        <ul>
+                        <ul className="home-ul">
                             {success.map((value, index) => {
                                 return <li id="schedule-semester" key={index} value={value["scheduleSemester"]}>{value["scheduleSemester"]}<br></br></li>
                             })}
@@ -178,7 +178,7 @@ export const Home = ()=> {
                     </div>
                     <div className="col-md-4" id="dates">
                         <h2 id="date-header"> Date Modified </h2> 
-                        <ul>
+                        <ul className="home-ul">
                             {success.map((value, index) => {
                                 return <li id="schedule-date" key={index} value={value["dateModified"]}>{value["dateModified"]}</li>
                             })}

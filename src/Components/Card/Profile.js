@@ -8,6 +8,7 @@ import Form from 'react-bootstrap/Form'
 import Select from 'react-select'
 import Image from 'react-bootstrap/Image'
 import Logo from '../static/images/logo.jpg'
+import '../static/styles/Profile-Style.css'
 
 
 global.loggedOut = false;
@@ -186,7 +187,7 @@ export const Profile = () => {
     }
 
     return (
-        <div id="main-content">
+        <div id="main-content-profile">
             <Navbar bg="dark" variant="dark" expand="lg">
               <Navbar.Brand><Image src={Logo} style={{height: 50}}/></Navbar.Brand>
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -203,9 +204,15 @@ export const Profile = () => {
         <div className="container">
             <div className="row">
                 <div className="col">
-                    <h1> Hello,  {global.email} </h1>
-                    <h2> Major(s): {success["majors"].join(", ")} </h2>
-                    <h2> Minor(s): {success["minors"].join(", ")} </h2>
+                    <h1 id="profile-h1"> Hello,  {global.email} </h1>
+                    <div id="user-data-div">
+                        <h1 id="account-info"> Account Information </h1>
+                        <h2 className="profile-h2"> Major(s): {success["majors"].join(", ")} </h2>
+                        <h2 className="profile-h2"> Minor(s): {success["minors"].join(", ")} </h2>
+                        <Button variant="primary" className="profile-button" onClick={handleShowPassword}> Change Password </Button>
+                        <Button variant="primary" className="profile-button" onClick={handleShowMajor}> Change Major </Button>
+                        <Button variant="primary" className="profile-button" onClick={handleShowMinor}> Change Minor </Button>
+                    </div>
                             <Modal show={showPassword} onHide={handleClosePassword}>
                                 <Modal.Header closeButton>
                                     <Modal.Title>Change Password</Modal.Title>
@@ -291,11 +298,6 @@ export const Profile = () => {
                                     <Button variant="primary" onClick={handleMinorSubmit}> Confirm Minor(s) </Button>
                                 </Modal.Body>
                             </Modal>
-                        <div id="secondary_buttons">
-                            <Button variant="primary" onClick={handleShowPassword}> Change Password </Button>
-                            <Button variant="primary" onClick={handleShowMajor}> Change Major </Button>
-                            <Button variant="primary" onClick={handleShowMinor}> Change Minor </Button>
-                        </div>
                     <Button onClick={signOut} variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
                         Log Out
                     </Button>
