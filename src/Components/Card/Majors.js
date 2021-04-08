@@ -22,6 +22,8 @@ export const Majors = () => {
     var recMinorList = document.createElement("ul");
     var minorList = document.createElement("ul");
 
+    
+
     function getMajorsAndMinorsData(requirementYear) {
         var email = String(window.location).split("?")[1];
         email = String(email).split("=")[1]
@@ -241,6 +243,29 @@ export const Majors = () => {
         getMajors();
     }
 
+      /*
+  ClassFilter() --> Helper function used to display courses that the user searches for using the 
+  searchbar on the side column. Courses that match the pattern that the user enters are displayed, 
+  while all others are hidden. 
+  */
+  function classFilter() {
+    var input, filter, ul, li, a, i, txtValue;
+    input = document.getElementById("myInput");
+    console.log(input)
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("MajorList");
+    li = ul.getElementsByTagName("li");
+    for (i = 0; i < li.length; i++) {
+        a = li[i].getElementsByTagName("a")[0];
+        txtValue = a.textContent || a.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+        } else {
+            li[i].style.display = "none";
+        }
+    }
+  }
+
     return (
         <div id="main-content">
            <Navbar bg="dark" variant="dark" expand="lg">
@@ -264,6 +289,11 @@ export const Majors = () => {
                 <button onClick={() => {getMajorsAndMinors("2020")}} className="req-button">2020-2021</button> */}
             </div>
 
+            <h2> Search Majors </h2>
+                <div id="div1">
+                <input type="text" id="myInput" onKeyUp={classFilter} placeholder="Search for Class" title="Type in a name"></input>
+                <ul id="courses"></ul>
+                </div>
             <CoolTabs
                 tabKey={'1'}
                 style={{ width:  1500, height:  650, background:  'blue', margin: 20,}}
@@ -284,11 +314,14 @@ export const Majors = () => {
                 rightContent={
                     <div>
                         <div id="sortingButton">
+
                             <DropdownButton id="dropdown-basic-button" title="Sort by">
                                 <Dropdown.Item onClick={getMinors}>A-Z</Dropdown.Item>
+
                                 <Dropdown.Item onClick={getMinorsRec}>Recommended</Dropdown.Item>
                             </DropdownButton>
                         </div>
+                
 
                 <div id="MinorList"> Click on a requirement year to view minors. It can take up to 10 seconds to display. </div> 
                 </div>
