@@ -6,7 +6,6 @@ import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import '../static/styles/Home-Style.css'
-import Link from 'react-router-dom/Link'
 import Image from 'react-bootstrap/Image'
 import Logo from '../static/images/logo.jpg'
 
@@ -23,7 +22,6 @@ export const Home = ()=> {
     const [success, setSuccess] = useState(); // State variable used to store response of initial get request
     const [show, setShow] = useState(false); // Variable to determine whether or not to show modal to create new schedule
     const [showAuto, setShowAuto] = useState(false);
-    const [redirect, setRedirect] = useState(false);
     const [compare, setCompare] = useState(false); // Variable to determine whether or not to show compare modal
     const [scheduleName, setScheduleName] = useState();
     const [scheduleSemester, setScheduleSemester] = useState();
@@ -57,25 +55,6 @@ export const Home = ()=> {
     const handleCloseCompare = () => setCompare(false);
     const handleCloseAuto = () => setShowAuto(false);
 
-    /*
-    makePostRequest() --> Method used to send a post request with the given parameters
-    to the provided url. Catches an error if there are invalid parameters or invalid
-    url provided
-    */
-    function makePostRequest(path) {
-        return new Promise(function (resolve, reject) {
-            axios.post(path).then(
-                (response) => {
-                    var result = response.data;
-                    console.log('Processing request');
-                    resolve(result)
-                },
-                    (error) => {
-                        reject(error)
-                    }
-            );
-        });
-    }
 
     function handleSubmit() {
         var scheduleOne = document.getElementById("schedule-one").value
@@ -91,7 +70,6 @@ export const Home = ()=> {
     schedule they selected. 
     */
     async function clickListener(e) {
-        console.log(e.target.innerText);
         let params = {
             "name": e.target.innerText
         }
@@ -102,7 +80,6 @@ export const Home = ()=> {
 
     async function createSchedule(event) {
         event.preventDefault();
-        console.log(scheduleName);
         var makeRequest = true;
         success.forEach(element => {
             if(makeRequest) {
@@ -119,19 +96,16 @@ export const Home = ()=> {
         if(makeRequest) {
             var semester = ""
             if(scheduleSemester === undefined) {
-                console.log("hm");
                 semester = "fall"
             }
             else {
                 semester = "spring";
             }
-            console.log(semester);
             const parameters = {
                 "schedule-name": scheduleName,
                 "schedule-semester": semester
            }
            await axios.post('/api/home?email=' + global.email, parameters).then(response => {
-            //alert(response.data);
             if(response.data !== "Created Schedule Successfully") {
                 alert(response.data);
             }
@@ -153,10 +127,8 @@ export const Home = ()=> {
     Stores the result of the get request in the success variable, and sets loading to false. 
     */
     useEffect(() => {
-        console.log("URL: " + window.location);
         var url_array = String(window.location).split("=")
         global.email = url_array[1];
-        console.log(global.email)
         axios.get("/api/home?email=" + global.email).then(response => {
             setSuccess(response.data);
             setLoading(false);
