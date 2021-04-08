@@ -80,7 +80,7 @@ export const Profile = () => {
         })
         .catch(err => {
             if (err.response) {
-                console.log("BAD!");
+                alert("Whoops... looks like something went wrong there");
             }
         })
     }
@@ -97,7 +97,7 @@ export const Profile = () => {
         })
         .catch(err => {
             if (err.response) {
-                console.log("BAD!");
+                alert("Whoops... looks like something went wrong");
             }
         })
     }
@@ -107,8 +107,6 @@ export const Profile = () => {
             oldPassword: oldPasswordValue,
             newPassword: newPasswordValue,
         }
-
-        console.log(oldPasswordValue);
 
         var message = "";
 
@@ -156,7 +154,6 @@ export const Profile = () => {
         global.email = String(window.location).split("?")[1]
         global.email = String(global.email).split("=")[1];
         axios.get("/api/profile?email=" + global.email).then(response => {
-            console.log(response.data);
             setSuccess(response.data);
             setReady(true);
         });
