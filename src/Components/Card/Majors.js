@@ -7,6 +7,8 @@ import {DropdownButton, Dropdown} from 'react-bootstrap'
 import CoolTabs from 'react-cool-tabs';
 import Image from 'react-bootstrap/Image'
 import Logo from '../static/images/logo.jpg'
+import Accordion from 'react-bootstrap/Accordion'
+import Card from 'react-bootstrap/Card'
 
 export const Majors = () => {
 
@@ -18,9 +20,11 @@ export const Majors = () => {
     var state = {activeIndex: 0};
  
     
-    var majorList = document.createElement("Accordion");
+    var majorList = document.createElement("ul");
     var recMinorList = document.createElement("ul");
     var minorList = document.createElement("ul");
+
+    
 
     function getMajorsAndMinorsData(requirementYear) {
         var email = String(window.location).split("?")[1];
@@ -35,11 +39,10 @@ export const Majors = () => {
                 //majors.push(element);
                 var name = element["name"];
                 var requirements = element["requiredClasses"];
-                var majorInformationAccordion = document.createElement("Accordion.Collapse");
-                majorInformationAccordion.setAttribute("eventKey", "0");
-                var majorInformationCardBody = document.createElement("Card.Body");
-                majorInformationCardBody.setAttribute("id", "columnTitle");
-                majorInformationCardBody.appendChild(document.createTextNode("Requirements:"));
+                var majorInformationNode = document.createElement("li");
+                var majorTitle = document.createElement("div");
+                majorTitle.setAttribute("id", "columnTitle");
+                majorTitle.appendChild(document.createTextNode("Requirements:"));
 
                 //var classesRequiredString = "Requirements: "
                 majorInformationNode.appendChild(majorTitle);
@@ -70,20 +73,25 @@ export const Majors = () => {
                     var currentRequirementNode = document.createElement("div");
                     currentRequirementNode.setAttribute("id", "requirementInformation");
                     currentRequirementNode.appendChild(document.createTextNode(currentRequirementString));
-                    majorInformationCardBody.appendChild(currentRequirementNode);
+                    majorInformationNode.appendChild(currentRequirementNode);
                 })
-                var majorCard = document.createElement("Card");
-                var majorName = document.createElement("Card.Header");
-                var majorAccordion = document.createElement("Accordion.Toggle");
-                majorAccordion.setAttribute("as", "{Button}")
-                majorAccordion.setAttribute("variant", "link");
-                majorAccordion.setAttribute("eventKey", "0");
+                var para = document.createElement("li");
+                var tag = document.createElement("a");
+                tag.setAttribute("class", "majorButton")
+                para.setAttribute("id", name);
                 
                 var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
                 //var moreInformationNode = document.createTextNode(classesRequiredString);
-                majorAccordion.appendChild(node);
-                majorName.appendChild(majorAccordion);
-                majorCard.appendChild(majorName);
+                tag.appendChild(node);
+                //tag.addEventListener("click", this.loadMajor(name));
+                tag.addEventListener("click", function() {
+                    if (para.nextSibling != null) {
+                        //majorList.insertBefore(moreInformationNode, para.nextSibling);
+                        majorList.insertBefore(majorInformationNode, para.nextSibling);
+                    }
+                });
+                para.appendChild(tag);
+                majorList.appendChild(para);
             });
             minorResponse.forEach(element => {
                 var name = element["name"];
@@ -137,13 +145,11 @@ export const Majors = () => {
                 tag.appendChild(node);
                 tag.addEventListener("click", function() {
                     if (para.nextSibling != null) {
-                        //minorList.insertBefore(minorInformationNode, para.nextSibling);
-                        para.nextSibling.style('display', 'flex');
+                        minorList.insertBefore(minorInformationNode, para.nextSibling);
                     }
                 });
                 para.appendChild(tag);
                 minorList.appendChild(para);
-                minorList.appendChild(minorInformationNode);
             });
             recMinorResponse.forEach(element => {
                 var name = element["name"];
@@ -198,13 +204,11 @@ export const Majors = () => {
                 tag.appendChild(node);
                 tag.addEventListener("click", function() {
                     if (para.nextSibling != null) {
-                        //recMinorList.insertBefore(minorInformationNode, para.nextSibling);
-                        para.nextSibling.style('display', 'flex');
+                        recMinorList.insertBefore(minorInformationNode, para.nextSibling);
                     }
                 });
                 para.appendChild(tag);
                 recMinorList.appendChild(para);
-                recMinorList.appendChild(minorInformationNode);
             });
         })
     }
@@ -241,6 +245,51 @@ export const Majors = () => {
         getMajors();
     }
 
+      /*
+  ClassFilter() --> Helper function used to display courses that the user searches for using the 
+  searchbar on the side column. Courses that match the pattern that the user enters are displayed, 
+  while all others are hidden. 
+  */
+  function majorFilter() {
+    var input, filter, ul, li, a, i, txtValue;
+    input = document.getElementById("myInput");
+    console.log(input)
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("MajorList");
+    li = ul.getElementsByTagName("li");
+    for (i = 0; i < li.length; i++) {
+        a = li[i].getElementsByTagName("a")[0];
+        txtValue = a.textContent || a.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+        } else {
+            li[i].style.display = "none";
+        }
+    }
+  }
+        /*
+  MinorFilter() --> Helper function used to display courses that the user searches for using the 
+  searchbar on the side column. Courses that match the pattern that the user enters are displayed, 
+  while all others are hidden. 
+  */
+  function minorFilter() {
+    var input, filter, ul, li, a, i, txtValue;
+    input = document.getElementById("minorInput");
+    console.log(input)
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("MinorList");
+    li = ul.getElementsByTagName("li");
+    for (i = 0; i < li.length; i++) {
+        a = li[i].getElementsByTagName("a")[0];
+        txtValue = a.textContent || a.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+        } else {
+            li[i].style.display = "none";
+        }
+    }
+  }
+
     return (
         <div id="main-content">
            <Navbar bg="dark" variant="dark" expand="lg">
@@ -264,6 +313,36 @@ export const Majors = () => {
                 <button onClick={() => {getMajorsAndMinors("2020")}} className="req-button">2020-2021</button> */}
             </div>
 
+            <h2> Search Majors </h2>
+                <div id="div1">
+                <input type="text" id="myInput" onKeyUp={majorFilter} placeholder="Search for Major" title="Type in a name"></input>
+                <ul id="courses"></ul>
+                </div>
+
+            <h2> Search Minors </h2>
+                <div id="div1">
+                <input type="text" id="minorInput" onKeyUp={minorFilter} placeholder="Search for Minor" title="Type in a name"></input>
+                <ul id="courses"></ul>
+                </div>
+
+                <Accordion defaultActiveKey="0">
+  <Card>
+    <Accordion.Toggle as={Card.Header} eventKey="0">
+      Click me!
+    </Accordion.Toggle>
+    <Accordion.Collapse eventKey="0">
+      <Card.Body>Hello! I'm the body</Card.Body>
+    </Accordion.Collapse>
+  </Card>
+  <Card>
+    <Accordion.Toggle as={Card.Header} eventKey="1">
+      Click me!
+    </Accordion.Toggle>
+    <Accordion.Collapse eventKey="1">
+      <Card.Body>Hello! I'm another body</Card.Body>
+    </Accordion.Collapse>
+  </Card>
+</Accordion>
             <CoolTabs
                 tabKey={'1'}
                 style={{ width:  1500, height:  650, background:  'blue', margin: 20,}}
@@ -284,11 +363,14 @@ export const Majors = () => {
                 rightContent={
                     <div>
                         <div id="sortingButton">
+
                             <DropdownButton id="dropdown-basic-button" title="Sort by">
                                 <Dropdown.Item onClick={getMinors}>A-Z</Dropdown.Item>
+
                                 <Dropdown.Item onClick={getMinorsRec}>Recommended</Dropdown.Item>
                             </DropdownButton>
                         </div>
+                
 
                 <div id="MinorList"> Click on a requirement year to view minors. It can take up to 10 seconds to display. </div> 
                 </div>
