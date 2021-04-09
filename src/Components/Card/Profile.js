@@ -15,10 +15,11 @@ global.loggedOut = false;
 global.email = ""
 
 function signOut() {
-    if(global.loggedOut == false) {
-        global.loggedOut = true;
-        window.location = "/";
-    }
+    axios.post("/api/logout?email=" + global.email).then(response => {
+        if(response.data.text == "success") {
+            window.location = "/"
+        }
+    })
 }
 
 export const Profile = () => {

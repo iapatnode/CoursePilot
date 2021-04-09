@@ -7,9 +7,12 @@ import AutoGenerateSchedule as AGS
 import MinorRecomendation as MinorRecommendation
 import dbQueries as db_queries
 import degreeReport as report
+import string
+import random
 
 
 #Which users are logged in
+user_dict = {}
 
 #Flask App Setup
 app = Flask(__name__)
@@ -99,8 +102,16 @@ def login():
             cursor.close()
 
         if valid:
+            uid = ""
+            if not email in user_dict:
+                letters = string.ascii_letters
+                uid = ''.join(random.choice(letters) for i in range(32))
+                print(f"UID: {uid}")
+                user_dict[email] = uid
+            else:
+                uid = user_dict[email]
             return {
-                "text": "success"
+                "text": uid
             }
         
         #If the user's credentials are not found, redirect them back to the login page
@@ -245,9 +256,14 @@ def sign_up():
             cursor.close()
 
             user_email = email
-
+            uid = ""
+            if not email in user_dict:
+                letters = string.ascii_letters
+                uid = ''.join(random.choice(letters) for i in range(32))
+                print(f"UID: {uid}")
+                user_dict[email] = uid
             return {
-                "text": return_message
+                "text": uid
             }
         else:
             return {
@@ -298,6 +314,10 @@ def home():
     # Variable to tell which user is logged in and what semester they have selected for their schedule
     semester_selection = request.args.get("semester")
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     if request.method == "GET":
         all_schedules = []
         cursor = conn.cursor()
@@ -392,6 +412,11 @@ POST: When a post request is received, the route takes all of the courses that
 def schedule():
     semester_selection = request.args.get("semester")
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
+    print(f"Email in schedule route {user_email}")
     schedule_name = request.args.get("ScheduleName")
 
     if request.method == "GET":
@@ -570,6 +595,10 @@ POST: When the user posts to this endpoint, the following code removed
 def delete_schedule():
     schedule_name = request.args.get("ScheduleName")
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     cursor = conn.cursor()
     cursor.execute('''
         delete from ScheduleClass WHERE email like %s AND scheduleName like %s;
@@ -622,6 +651,11 @@ def get_data_compare():
         compare_schedule_two = request.args.get("scheduleTwo")
         user_email = request.args.get("email")
         user_email = user_email[6:]
+        global user_dict
+        for entry in user_dict: 
+            if user_dict[entry] == user_email:
+                user_email = entry
+        print(f"{user_email} {compare_schedule_one} {compare_schedule_two}")
         semester_selection = "fall"
         schedule_name = "bruh"
         backColor = ""
@@ -727,6 +761,10 @@ def get_data_compare():
 def profile():
     if request.method == "GET":
         user_email = request.args.get("email")
+        global user_dict
+        for entry in user_dict: 
+            if user_dict[entry] == user_email:
+                user_email = entry
         passwrd = ""
         majors = []
         minors = []
@@ -763,6 +801,10 @@ def changeMajor():
     cursor = conn.cursor()
     valid = True
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     data = request.data.decode("utf-8")
     json_data = json.loads(data)
     major = json_data.get("major")
@@ -835,6 +877,10 @@ def changeMinor():
     valid = True
     requirement_year = 2017
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     data = request.data.decode("utf-8")
     json_data = json.loads(data)
     minor = json_data.get("minor")
@@ -903,6 +949,10 @@ def changePassword():
     oldPassword = json_data.get("oldPassword")
     newPassword = json_data.get("newPassword")
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     valid = False
     cursor = conn.cursor()
     getUserPassword = "select passwrd from Student where email = %s"
@@ -918,6 +968,21 @@ def changePassword():
         return  "success"
     else:
         return "error"
+    
+@app.route("/api/logout", methods=["POST"])
+def logout():
+    user_email = request.args.get("email")
+    global user_dict
+    email = ""
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            email = entry
+    if entry != "":
+        del user_dict[entry]
+    return {
+        "text": "success"
+    }
+
     
     
 """
@@ -939,6 +1004,10 @@ def get_new_schedule():
 
         schedule_name = request.args.get("ScheduleName")
         user_email = request.args.get("email")
+        global user_dict
+        for entry in user_dict: 
+            if user_dict[entry] == user_email:
+                user_email = entry
 
         # Make sure the user entered a schedule name, get all courses in that schedule
         if schedule_name != "":
@@ -1041,6 +1110,10 @@ def get_existing_schedule():
 @app.route("/api/degreereport", methods=["GET", "POST"])
 def degree_report():
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
 
     if request.method == "GET":
 
@@ -1072,6 +1145,11 @@ def degree_report():
 def autoGenerate():
     #TODO: Return user data retrieved from database tables as needed
     user_email = request.args.get("email")
+    uid = user_email
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     semester_selection = request.args.get("semester")
     schedule_name = request.args.get("name")
     if request.method == "GET":
@@ -1118,12 +1196,16 @@ def autoGenerate():
 
 
 
-        schedule_url = f"http://localhost:3000/Schedule?email={user_email}&ScheduleName={schedule_name}"
+        schedule_url = f"http://localhost:3000/Schedule?email={uid}&ScheduleName={schedule_name}"
 
         return redirect(schedule_url)
 
 @app.route("/api/getAllMajorsAndMinors", methods=["GET"])
 def getAllMajorsAndMinors():
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     all = MinorRecommendation.getEverythingJSON(user_email)
     return json.dumps(all)

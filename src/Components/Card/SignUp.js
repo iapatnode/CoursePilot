@@ -94,7 +94,7 @@ export const SignUp = () => {
                 alert(response);
             }
             else {
-                window.location = "/Home?email=" + email;
+                window.location = "/Home?email=" + response;
             }
         })
         .catch(err => {

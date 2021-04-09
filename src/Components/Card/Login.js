@@ -32,12 +32,14 @@ export const Login = ()  => {
         var url = "/api/login?email=" + email;
         axios.post(url, parameters).then(response => {
             var response = response.data.text;
-            if(response != "success") {
-                alert(response);
-            }
-            else {
-                window.location = "/Home?email=" + email;
-            }
+            console.log(response);
+            // if(response != "success") {
+            //     alert(response);
+            // }
+            // else {
+            //     window.location = "/Home?email=" + email;
+            // }
+            window.location = "/Home?email=" + response;
         })
         .catch(err => {
             if (err.response) {
