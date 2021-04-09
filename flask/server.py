@@ -103,7 +103,6 @@ def login():
             if not email in user_dict:
                 letters = string.ascii_letters
                 uid = ''.join(random.choice(letters) for i in range(32))
-                print(f"UID: {uid}")
                 user_dict[email] = uid
             else:
                 uid = user_dict[email]
@@ -257,7 +256,6 @@ def sign_up():
             if not email in user_dict:
                 letters = string.ascii_letters
                 uid = ''.join(random.choice(letters) for i in range(32))
-                print(f"UID: {uid}")
                 user_dict[email] = uid
             return {
                 "text": uid
@@ -413,7 +411,6 @@ def schedule():
     for entry in user_dict: 
         if user_dict[entry] == user_email:
             user_email = entry
-    print(f"Email in schedule route {user_email}")
     schedule_name = request.args.get("ScheduleName")
 
     if request.method == "GET":
@@ -652,7 +649,6 @@ def get_data_compare():
         for entry in user_dict: 
             if user_dict[entry] == user_email:
                 user_email = entry
-        print(f"{user_email} {compare_schedule_one} {compare_schedule_two}")
         semester_selection = "fall"
         schedule_name = "bruh"
         backColor = ""
