@@ -5,8 +5,6 @@ from datetime import datetime
 from mysql.connector import connect, Error
 import AutoGenerateSchedule as AGS
 import MinorRecomendation as MinorRecommendation
-import dbQueries as db_queries
-import degreeReport as report
 import string
 import random
 

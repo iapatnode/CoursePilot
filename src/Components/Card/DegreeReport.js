@@ -44,7 +44,7 @@ export const Report = () => {
         }
 
         axios.post('/api/degreereport?email=' + global.email, parameters).finally(response => {
-            alert("I made it out of the server code");
+            alert("Saved Changes Successfully");
         }).catch(err => {
             if(err.response) {
                 console.log("BAD!");

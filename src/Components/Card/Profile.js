@@ -205,7 +205,7 @@ export const Profile = () => {
         <div className="container">
             <div className="row">
                 <div className="col">
-                    <h1 id="profile-h1"> Hello,  {global.email} </h1>
+                    <h1 id="profile-h1"> Hello,  {success.email} </h1>
                     <div id="user-data-div">
                         <h1 id="account-info"> Account Information </h1>
                         <h2 className="profile-h2"> Major(s): {success["majors"].join(", ")} </h2>
