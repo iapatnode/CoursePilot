@@ -33,13 +33,12 @@ export const Login = ()  => {
         axios.post(url, parameters).then(response => {
             var response = response.data.text;
             console.log(response);
-            // if(response != "success") {
-            //     alert(response);
-            // }
-            // else {
-            //     window.location = "/Home?email=" + email;
-            // }
-            window.location = "/Home?email=" + response;
+            if(response.includes("Error")) {
+                alert(response);
+            }
+            else {
+                window.location = "/Home?email=" + response;
+            }
         })
         .catch(err => {
             if (err.response) {

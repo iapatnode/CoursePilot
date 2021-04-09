@@ -1185,9 +1185,12 @@ def autoGenerate():
         formatted_date = created_at.strftime('%Y-%m-%d %H:%M:%S')
         session["schedule_semester"] = schedule_semester #Test to load courses and whatnot
 
-        insert_schedule_query = "INSERT INTO Schedule values (%s, %s, %s, %s)"
-        cursor.execute(insert_schedule_query, (schedule_name, formatted_date, user_email, schedule_semester))
-        conn.commit()
+        try:
+            insert_schedule_query = "INSERT INTO Schedule values (%s, %s, %s, %s)"
+            cursor.execute(insert_schedule_query, (schedule_name, formatted_date, user_email, schedule_semester))
+            conn.commit()
+        except Exception:
+            return redirect(f"http://localhost:3000/Home?email={uid}")
 
         semester = semester_selection
 
