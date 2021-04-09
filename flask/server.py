@@ -1050,17 +1050,17 @@ def degree_report():
         json_data = json.loads(data)
 
         addCheckedCourses = json_data.get("checkedAdd")
-        # addSelectedCourses = json_data.get("selectedAdd")
+        addSelectedCourses = json_data.get("selectedAdd")
         deleteCheckedCourses = json_data.get("checkedRemove")
-        # deleteSelectedCourses = json_data.get("selectedRemove")
+        deleteSelectedCourses = json_data.get("selectedRemove")
 
         # print(f'\n\nSelected courses: {addSelectedCourses}')
         # print(f'\n\nUnselected courses: {deleteSelectedCourses}')
 
         insertStudentCourses(user_email, addCheckedCourses)
-        # insertStudentCourses(user_email, addSelectedCourses)
+        insertStudentCourses(user_email, addSelectedCourses)
         deleteStudentCourses(user_email, deleteCheckedCourses)
-        # deleteStudentCourses(user_email, deleteSelectedCourses)
+        deleteStudentCourses(user_email, deleteSelectedCourses)
 
         return redirect(f"http://localhost:3000/api/degreereport?email={user_email}")
 

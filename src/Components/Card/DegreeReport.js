@@ -18,9 +18,9 @@ export const Report = () => {
     const [isLoading, setLoading] = useState(true);
     const [success, setSuccess] = useState();
 
-    const [checked, setChecked] = useState();
+    const [checked, setChecked] = useState([]);
     const [unchecked, setUnchecked] = useState([]);
-    const [selected, setSelected] = useState();
+    const [selected, setSelected] = useState([]);
     const [unselected, setUnselected] = useState([]);
 
     useEffect(() => {
@@ -44,10 +44,10 @@ export const Report = () => {
         }
 
         axios.post('/api/degreereport?email=' + global.email, parameters).finally(response => {
-            alert("I made it out of the server code");
+            alert("Changes saved!");
         }).catch(err => {
             if(err.response) {
-                console.log("BAD!");
+                console.log(err.response);
             }
         })
     }
@@ -58,7 +58,6 @@ export const Report = () => {
      * @param {*} reqCat the requirement category under which the course falls
      * @returns true if the course has been checked, false otherwise
      */
-    // THIS WORKS AND IS TESTED
     function isChecked(courseCode, reqCat) {
         for(const course of checked) {
             if(course["course_code"] == courseCode && course["req_category"] == reqCat) {
@@ -74,7 +73,6 @@ export const Report = () => {
      * @param {*} reqCat the requirement category that we want to check if any completed courses fall under
      * @returns a list of courses (format: courseCode + courseName) that have been completed for that requirement category
      */
-    //THIS WORKS AND HAS BEEN TESTED!!
     function isSelected(reqCat) {
         var selectedCourses = []
 
@@ -89,7 +87,7 @@ export const Report = () => {
 
     /**
      * Event handler for when a box is checked or unchecked,
-     * Adds checked courses to a list of completed courses and removes if previously marked as unchecked
+     * Adds checked courses to a list of completed courses and removes from list of unchecked/unselected courses
      * Adds unchecked courses to list of previously completed courses and removes from current completed list
      * @param {} event the event that happened (i.e., box was checked or unchecked)
      * @param {*} courseCode the course code
@@ -97,14 +95,14 @@ export const Report = () => {
      * @param {*} reqCat the requirement category that the course falls under
      * @param {*} reqYear the requirement year of the student
      */
-    //WORKS, NEEDS TO BE TESTED MORE
     const handleChecked = (event, courseCode, courseName, reqCat, reqYear) => {
         //Checks if course has already been marked as completed in some other category and alerts the user if so
         if(event.target.checked && (checked.some(e => e.course_code == courseCode && e.req_category != reqCat) || selected.some(e => e.course_code == courseCode))) {
             alert(courseCode + " " + courseName + " has already been marked as completed.")
         }
+
         //handles when course was marked as completed
-        else if(event.target.checked) {
+        if(event.target.checked) {
             setUnchecked(unchecked.filter((course) => course.course_code !== courseCode || course.req_category !== reqCat))
             setUnselected(unselected.filter((course) => course.course_code !== courseCode || course.req_category !== reqCat))
             setChecked(checked.concat({course_code: courseCode, course_name: courseName, req_category: reqCat, req_yr: reqYear}))
@@ -114,12 +112,79 @@ export const Report = () => {
             setChecked(checked.filter((course) => course.course_code !== courseCode || course.req_category !== reqCat))
             setUnchecked(unchecked.concat({course_code: courseCode, course_name: courseName, req_category: reqCat, req_yr: reqYear}))
         }
+    }
 
-        console.log("Checked: ")
-        console.log(checked)
+    /**
+     * Event handler for when for when a course is selected
+     * Adds deselected courses to a list of previously selected courses and removes from list of selected courses
+     * Adds selected courses to a list of selected courses, removes from previously selected/checked courses
+     * @param {*} courses the list of updated completed courses for the given requirement category
+     * @param {*} reqCat the requirement category that the courses fall under
+     * @param {*} reqYear the requirement year of the student
+     */
+    const handleSelect = (courses, reqCat, reqYear) => {
 
-        console.log("Unchecked: ")
-        console.log(unchecked)
+        // Parses course codes and course names from the format of courseCode + courseName
+        var completedCourses = []
+        
+        for(const course of courses) {
+            const courseSplit = course.split(" ")
+            const courseCode = courseSplit[0] + " " + courseSplit[1]
+
+            var courseName = ""
+
+            for(var i = 2; i < courseSplit.length - 1; i++) {
+                courseName += courseSplit[i] + " "
+            }
+
+            courseName += courseSplit[courseSplit.length - 1]
+
+            completedCourses.push({course_code: courseCode, course_name: courseName})
+        }
+
+        // Grabs every course that is in the requirement category and marked as complete
+        var completedCategoryCourses = []
+
+        for(const course of selected) {
+            if(course.req_category === reqCat) {
+                completedCategoryCourses.push({course_code: course.course_code, course_name: course.course_name})
+            }
+        }
+
+        // Tells us whether we deleted a course or marked a new course as compelte
+        var isDeletion = false
+
+        // Adds every class that has been removed to a list of deleted courses
+        var deletedCourses = []
+
+        for(const course of completedCategoryCourses) {
+            // If course is in the completed courses list but not in the updated completed courses list for the requirement category, then it has been deleted
+            if(completedCourses.some(e => e.course_code == course.course_code) === false) {
+                isDeletion = true
+                deletedCourses.push({course_code: course.course_code, course_name: course.course_name, req_category: reqCat, req_yr: reqYear})
+            }
+        }
+
+        if(isDeletion === true) {
+            // Updates the list of selected courses to not include the deleted courses
+            setSelected(selected.filter((course) => deletedCourses.some(e => e.course_code == course.course_code) === false || course.req_category !== reqCat))
+            // Adds deleted courses to the list of deselected courses
+            setUnselected(unselected.concat(deletedCourses))
+        }
+        else {
+            const completedCourse= completedCourses[completedCourses.length - 1]
+
+            // Alerts user if course has already been marked complete somewhere on the page
+            if(selected.some(e => e.course_code == completedCourse.course_code) || checked.some(e => e.course_code == completedCourse.course_code)) {
+                alert(completedCourse.course_code + " " + completedCourse.course_name + " has already been marked as completed.")
+            }
+
+            // Updates the unselected and unchecked lists (which contain courses that were unmarked) to not include the course that was just marked as completed
+            setUnselected(unselected.filter((course) => course.course_code !== completedCourse.course_code || course.req_category !== reqCat))
+            setUnchecked(unchecked.filter((course) => course.course_code !== completedCourse.course_code || course.req_category !== reqCat))
+            // Updates the list of selected courses to include the courses we are adding
+            setSelected(selected.concat({course_code: completedCourse.course_code, course_name: completedCourse.course_name, req_category: reqCat, req_yr: reqYear}))
+        }
     }
 
     if(isLoading) {
@@ -186,6 +251,7 @@ export const Report = () => {
                                             multiple
                                             options={success[1].map((course) => course["course_code"] + " " + course["course_name"])}
                                             style={{width: 600}}
+                                            onChange = {(event, inputValue) => handleSelect(inputValue, req["req_category"], success[0]["req_yr"])}
                                             renderInput = {(params) =>
                                                 <TextField {...params}
                                                     label="Enter course"
