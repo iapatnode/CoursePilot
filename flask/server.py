@@ -1026,18 +1026,33 @@ def get_existing_schedule():
     else:
         return "blah"
 
+'''
+/API/DEGREEREPORT
+-------------------
+This is the endpoint that handles the user adding and removing courses from the Degree Report page
+
+GET: sets up the Degree report page with the necessary information about the database from the student: 
+     degree name, requirement categories, requirement courses, courses completed
+
+POST: The user sends a post request when they submit the form that is the Degree Report page. When they
+      do, the courses that they have selected are added to the database (if not yet in the datase) and
+      the courses they have unmarked are removed from the database (if in the database)
+'''
 @app.route("/api/degreereport", methods=["GET", "POST"])
 def degree_report():
     user_email = request.args.get("email")
 
     if request.method == "GET":
+        # Gets the ids of all majors of the students
         degreeIds = getStudentMajors(user_email)
 
-        # NOTE: each major is its own tuple
+        # Gets the degree details of the first major of the student
         studentDegreeReqs = getMajorRequirements(degreeIds[0][0])
 
+        # Gets all courses in the database
         courses = getAllCourses()
 
+        # Gets all courses the student has taken: parsed into selected courses and checked courses
         parsedCourses = parseStudentCourses(user_email, studentDegreeReqs)
 
         studentReqDetails = [studentDegreeReqs, courses, parsedCourses]
@@ -1053,11 +1068,11 @@ def degree_report():
         deleteCheckedCourses = json_data.get("checkedRemove")
         deleteSelectedCourses = json_data.get("selectedRemove")
 
-        # print(f'\n\nSelected courses: {addSelectedCourses}')
-        # print(f'\n\nUnselected courses: {deleteSelectedCourses}')
-
+        # Adds completed courses to the database
         insertStudentCourses(user_email, addCheckedCourses)
         insertStudentCourses(user_email, addSelectedCourses)
+
+        # Removes now incompleted courses from the database
         deleteStudentCourses(user_email, deleteCheckedCourses)
         deleteStudentCourses(user_email, deleteSelectedCourses)
 
