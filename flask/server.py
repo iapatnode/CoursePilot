@@ -4,6 +4,12 @@ import os, re, json
 from datetime import datetime
 from mysql.connector import connect, Error
 import MinorRecomendation as MinorRecommendation
+import string
+import random
+
+
+#Which users are logged in
+user_dict = {}
 
 #Flask App Setup
 app = Flask(__name__)
@@ -93,8 +99,15 @@ def login():
             cursor.close()
 
         if valid:
+            uid = ""
+            if not email in user_dict:
+                letters = string.ascii_letters
+                uid = ''.join(random.choice(letters) for i in range(32))
+                user_dict[email] = uid
+            else:
+                uid = user_dict[email]
             return {
-                "text": "success"
+                "text": uid
             }
         
         #If the user's credentials are not found, redirect them back to the login page
@@ -239,9 +252,13 @@ def sign_up():
             cursor.close()
 
             user_email = email
-
+            uid = ""
+            if not email in user_dict:
+                letters = string.ascii_letters
+                uid = ''.join(random.choice(letters) for i in range(32))
+                user_dict[email] = uid
             return {
-                "text": return_message
+                "text": uid
             }
         else:
             return {
@@ -292,6 +309,10 @@ def home():
     # Variable to tell which user is logged in and what semester they have selected for their schedule
     semester_selection = request.args.get("semester")
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     if request.method == "GET":
         all_schedules = []
         cursor = conn.cursor()
@@ -342,7 +363,6 @@ def search():
         search_val = ""
         search_val = request.form.get("outlined-search")
         cursor = conn.cursor()
-        classArray = []
         courseArray = []
 
         cursor.execute(''' 
@@ -386,11 +406,14 @@ POST: When a post request is received, the route takes all of the courses that
 def schedule():
     semester_selection = request.args.get("semester")
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     schedule_name = request.args.get("ScheduleName")
 
     if request.method == "GET":
         cursor = conn.cursor()
-        classArray = []
         courseArray = []
 
         
@@ -437,18 +460,22 @@ def schedule():
         return json.dumps(courseArray)
     
     if request.method == "POST":
-        return_text = ""
         cursor = conn.cursor()
+        # Update the time that the schedule was last modified
+        created_at = datetime.now()
+        formatted_date = created_at.strftime('%Y-%m-%d %H:%M:%S')
+        update_schedule = "UPDATE Schedule SET dateModified = %s where scheduleName = %s and email = %s"
+        cursor.execute(update_schedule, (formatted_date, schedule_name, user_email,))
+
+        return_text = ""
 
         # Get data from the semester form that the user submitted
         data = request.data.decode("utf-8")
         json_data = json.loads(data)
         code_pt_1 = ""
-        code_pt_2 = ""
         section = ""
         codes = []
         sections = []
-        classes = []
 
         #Delete courses that were removed from the schedule
         for course in json_data.get("removed"):
@@ -462,9 +489,6 @@ def schedule():
             ''', (f"%{(schedule_name)}%", f"%{(user_email)}%",))
 
         semester = cursor.fetchall()
-        # for result in semester:
-        #     semester_current = result[0]
-        # semester_selection = semester_current
 
         #Do some formatting with the strings to get course name, codes, etc...
         if json_data.get("courses"):
@@ -474,7 +498,6 @@ def schedule():
                 code_pt_1 = course_string[0: index + 4]
                 section = course[-1]
                 code = code_pt_1.replace("-", " ")
-                course_w_section = f"{code} {section}"
                 codes.append(code)
                 sections.append(section)
 
@@ -561,6 +584,10 @@ POST: When the user posts to this endpoint, the following code removed
 def delete_schedule():
     schedule_name = request.args.get("ScheduleName")
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     cursor = conn.cursor()
     cursor.execute('''
         delete from ScheduleClass WHERE email like %s AND scheduleName like %s;
@@ -613,6 +640,10 @@ def get_data_compare():
         compare_schedule_two = request.args.get("scheduleTwo")
         user_email = request.args.get("email")
         user_email = user_email[6:]
+        global user_dict
+        for entry in user_dict: 
+            if user_dict[entry] == user_email:
+                user_email = entry
         semester_selection = "fall"
         schedule_name = "bruh"
         backColor = ""
@@ -718,6 +749,10 @@ def get_data_compare():
 def profile():
     if request.method == "GET":
         user_email = request.args.get("email")
+        global user_dict
+        for entry in user_dict: 
+            if user_dict[entry] == user_email:
+                user_email = entry
         passwrd = ""
         majors = []
         minors = []
@@ -741,7 +776,6 @@ def profile():
         cursor.execute(password_query, (user_email,))
         results = cursor.fetchone()
         passwrd = results[0]
-        print(f"Password: {passwrd}")
         return {
             "email": user_email,
             "majors": majors, 
@@ -755,6 +789,10 @@ def changeMajor():
     cursor = conn.cursor()
     valid = True
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     data = request.data.decode("utf-8")
     json_data = json.loads(data)
     major = json_data.get("major")
@@ -809,6 +847,11 @@ def changeMajor():
                 addMinors = "insert into StudentMajorMinor values (%s, %s)"
                 cursor.execute(addMinors, (user_email, minor))
                 conn.commit()
+            
+            # Delete courses that Student has taken (fixes bug in Degree report)
+            delete_courses_query = "delete from StudentCourses where email = %s"
+            cursor.execute(delete_courses_query, (user_email,))
+            conn.commit()
 
         except Error as error:
             #If you cannot insert the invidual into the database, print error and reroute
@@ -822,6 +865,10 @@ def changeMinor():
     valid = True
     requirement_year = 2017
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     data = request.data.decode("utf-8")
     json_data = json.loads(data)
     minor = json_data.get("minor")
@@ -890,7 +937,10 @@ def changePassword():
     oldPassword = json_data.get("oldPassword")
     newPassword = json_data.get("newPassword")
     user_email = request.args.get("email")
-    print(f"New Password: {newPassword} ----- Old Password: {oldPassword}")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     valid = False
     cursor = conn.cursor()
     getUserPassword = "select passwrd from Student where email = %s"
@@ -906,6 +956,21 @@ def changePassword():
         return  "success"
     else:
         return "error"
+    
+@app.route("/api/logout", methods=["POST"])
+def logout():
+    user_email = request.args.get("email")
+    global user_dict
+    email = ""
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            email = entry
+    if entry != "":
+        del user_dict[entry]
+    return {
+        "text": "success"
+    }
+
     
     
 """
@@ -927,6 +992,10 @@ def get_new_schedule():
 
         schedule_name = request.args.get("ScheduleName")
         user_email = request.args.get("email")
+        global user_dict
+        for entry in user_dict: 
+            if user_dict[entry] == user_email:
+                user_email = entry
 
         # Make sure the user entered a schedule name, get all courses in that schedule
         if schedule_name != "":
@@ -1041,6 +1110,10 @@ POST: The user sends a post request when they submit the form that is the Degree
 @app.route("/api/degreereport", methods=["GET", "POST"])
 def degree_report():
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
 
     if request.method == "GET":
         # Gets the ids of all majors of the students
@@ -1083,6 +1156,11 @@ def degree_report():
 def autoGenerate():
     #TODO: Return user data retrieved from database tables as needed
     user_email = request.args.get("email")
+    uid = user_email
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     semester_selection = request.args.get("semester")
     schedule_name = request.args.get("name")
     if request.method == "GET":
@@ -1113,28 +1191,18 @@ def autoGenerate():
         formatted_date = created_at.strftime('%Y-%m-%d %H:%M:%S')
         session["schedule_semester"] = schedule_semester #Test to load courses and whatnot
 
-        insert_schedule_query = "INSERT INTO Schedule values (%s, %s, %s, %s)"
-        cursor.execute(insert_schedule_query, (schedule_name, formatted_date, user_email, schedule_semester))
-        conn.commit()
+        try:
+            insert_schedule_query = "INSERT INTO Schedule values (%s, %s, %s, %s)"
+            cursor.execute(insert_schedule_query, (schedule_name, formatted_date, user_email, schedule_semester))
+            conn.commit()
+        except Exception:
+            return redirect(f"http://localhost:3000/Home?email={uid}")
 
         semester = semester_selection
 
         RecommendedCourses = GetAutoGeneratedSchedule(user_email, semester)
 
-        #classInsert = "INSERT into ScheduleClass (scheduleName, email, courseSection, courseCode, meetingDays, classSemester) VALUES (%s, %s, %s, %s, %s, %s)"
-        #cursor.execute(classInsert, (schedule_name, user_email, RecommendedCourses[0].courseSection, RecommendedCourses[0].courseCode, RecommendedCourses[0].dayAvail, RecommendedCourses[0].semesterAvail))
-      
-
-
-        # for course in RecommendedCourses:
-        #     print(course.courseSection)
-        #     print(course.courseCode)
-        #     print(course.dayAvail)
-        #     print(course.semesterAvail)
-        #     print(course.startTime)
-        #     print(course.endTime)
         for course in RecommendedCourses:
-            #print(course.courseName)
             classInsert = "INSERT into ScheduleClass (scheduleName, email, courseSection, courseCode, meetingDays, classSemester, startTime, endTime) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
             cursor.execute(classInsert, (schedule_name, user_email, course.courseSection, course.courseCode, course.dayAvail, course.semesterAvail, course.startTime, course.endTime))
             conn.commit()
@@ -1142,13 +1210,17 @@ def autoGenerate():
 
 
 
-        schedule_url = f"http://localhost:3000/Schedule?email={user_email}&ScheduleName={schedule_name}"
+        schedule_url = f"http://localhost:3000/Schedule?email={uid}&ScheduleName={schedule_name}"
 
         return redirect(schedule_url)
 
 @app.route("/api/getAllMajorsAndMinors", methods=["GET"])
 def getAllMajorsAndMinors():
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     all = MinorRecommendation.getEverythingJSON(user_email)
     return json.dumps(all)
 

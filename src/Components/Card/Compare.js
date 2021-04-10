@@ -1,9 +1,8 @@
-import React, {Component, useState, useEffect, useRef} from 'react';
-import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react";
+import React, {Component} from 'react';
+import {DayPilotCalendar} from "daypilot-pro-react";
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
-import axios from 'axios'
-import Form from 'react-bootstrap/Form'
+import axios from 'axios'  
 import Button from 'react-bootstrap/Button'
 import Image from 'react-bootstrap/Image'
 import Logo from '../static/images/logo.jpg'
