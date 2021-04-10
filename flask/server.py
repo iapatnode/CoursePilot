@@ -363,7 +363,6 @@ def search():
         search_val = ""
         search_val = request.form.get("outlined-search")
         cursor = conn.cursor()
-        classArray = []
         courseArray = []
 
         cursor.execute(''' 
@@ -415,7 +414,6 @@ def schedule():
 
     if request.method == "GET":
         cursor = conn.cursor()
-        classArray = []
         courseArray = []
 
         
@@ -475,11 +473,9 @@ def schedule():
         data = request.data.decode("utf-8")
         json_data = json.loads(data)
         code_pt_1 = ""
-        code_pt_2 = ""
         section = ""
         codes = []
         sections = []
-        classes = []
 
         #Delete courses that were removed from the schedule
         for course in json_data.get("removed"):
@@ -502,7 +498,6 @@ def schedule():
                 code_pt_1 = course_string[0: index + 4]
                 section = course[-1]
                 code = code_pt_1.replace("-", " ")
-                course_w_section = f"{code} {section}"
                 codes.append(code)
                 sections.append(section)
 
