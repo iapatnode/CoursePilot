@@ -87,6 +87,8 @@ class Schedule extends Component {
 
                 </div>
             </div>
+            <h2 id="legend-schedule-one"> Schedule One: {String(global.scheduleOne.split("=")[1].replaceAll("%20", " "))} </h2>
+            <h2 id="legend-schedule-two"> Schedule Two: {String(global.scheduleTwo.split("=")[1].replaceAll("%20", " "))} </h2>
             <Button href={"/home?" + global.email} variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
               Exit
             </Button>

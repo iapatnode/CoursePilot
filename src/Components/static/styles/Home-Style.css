@@ -1,6 +1,11 @@
-#schedule-name, #schedule-semester, #schedule-date {
+#schedule-name, #schedule-semester, #schedule-date{
     margin-top: 1.0rem;
     margin-bottom: 1.0rem;
+    font-size: 20px;
+}
+
+#schedule-name:hover {
+    color: #926DD6;
 }
 
 ul {
