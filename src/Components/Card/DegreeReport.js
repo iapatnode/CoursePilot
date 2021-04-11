@@ -104,6 +104,10 @@ export const Report = () => {
         });
     }, []);
 
+    /**
+     * Handles when an user saves their changes
+     * @param {*} e the event that happened (save changes button was hit)
+     */
     const submitListener = (e) => {
         const parameters = {
             "checkedAdd": checked,
