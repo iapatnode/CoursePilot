@@ -1,0 +1,32 @@
+#main-content-profile {
+    height: 100vh;
+    background-color: darkgray;
+}
+
+#profile-h1 {
+    margin-top: 3vh;
+    margin-bottom: 4vh;
+    color: black;
+}
+
+.profile-h2 {
+    margin: 2vh;
+}
+
+.profile-button {
+    margin-top: 2vh;
+    margin-bottom: 2vh;
+    background-color: #d89cf6;
+    border-color: #926DD6;
+}
+
+#user-data-div {
+    background-color: lightgray;
+    width: auto;
+    padding: 5%;
+    border-radius: 2%;
+}
+
+#account-info {
+    text-decoration: underline;
+}

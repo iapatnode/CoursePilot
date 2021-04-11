@@ -1,27 +1,13 @@
-import React, {Component, useState, useEffect, useRef} from 'react';
-import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react";
+import React, {Component} from 'react';
+import {DayPilotCalendar} from "daypilot-pro-react";
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import axios from 'axios'
-import Form from 'react-bootstrap/Form'
 import '../static/styles/Schedule-Style.css'
 import Button from 'react-bootstrap/Button'
 import Logo from '../static/images/logo.jpg'
 import Image from 'react-bootstrap/Image'
 
-
-// Styles used for the calendaty component
-const styles = {
-  wrap: {
-    display: "flex"
-  },
-  left: {
-    marginRight: "10px"
-  },
-  main: {
-    flexGrow: "1"
-  }
-};
 
 // Class Variables
 global.addedClass = false; // Variable that tells whether or not the user has added a class
@@ -81,7 +67,6 @@ class Schedule extends Component {
   classFilter() {
     var input, filter, ul, li, a, i, txtValue;
     input = document.getElementById("myInput");
-    console.log(input)
     filter = input.value.toUpperCase();
     ul = document.getElementById("courses");
     li = ul.getElementsByTagName("li");
@@ -143,7 +128,6 @@ class Schedule extends Component {
       */
       var text = e.target.innerText
       var test = e.target.id;
-      console.log(test);
       global.addedClass = true;
       global.classAdded = {text};
       global.className = text.substring(0, text.indexOf("-") - 9);
@@ -215,7 +199,6 @@ class Schedule extends Component {
         cont = false;
         alert("Error: Adding '" + global.classAdded.text + "' will cause a time conflict.");
       }
-      console.log(global.courses);
     }
   }
 
@@ -233,7 +216,6 @@ class Schedule extends Component {
         removed: global.removedCourses,
       }
     );
-    console.log(global.courses);
     http.open("POST", url, true);
 
     http.onreadystatechange = function() {
@@ -263,8 +245,6 @@ class Schedule extends Component {
     var email = queryString.split("&")[0]
     var scheduleName = queryString.split("&")[1];
     scheduleName = scheduleName.split("=")[1]
-    // scheduleName = scheduleName.replaceAll("%20", " ");
-    console.log(scheduleName);
     var queryString = String(window.location).split("?")[1]
     var url = '/api/delete?' + queryString;
     http.open("POST", url, true);
@@ -299,7 +279,6 @@ class Schedule extends Component {
     global.email = String(window.location).split("?")[1]
     global.email = String(global.email).split("&")[0]
     global.email = String(global.email).split("=")[1]
-    console.log(global.email)
     if(this.state.myRef) {
       var queryString = String(window.location).split("?")[1]
       await axios.get('http://localhost:5000/api/getScheduleInfo?' + queryString) 
@@ -315,7 +294,6 @@ class Schedule extends Component {
               events: response.data,
           })
           global.classEvents = response.data;
-          console.log(global.classEvents);
       })
       await axios.get('http://localhost:5000/api/schedule?' + queryString)
       .then((response) => {
@@ -340,10 +318,6 @@ class Schedule extends Component {
             element.appendChild(para);
           })
           document.getElementById("courses").addEventListener("click", this.addClass);
-
-          document.getElementById("myInput").addEventListener("click", function(e) {
-            console.log("bar was clicked")
-          })
       })
     }
   }
