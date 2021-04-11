@@ -29,14 +29,14 @@ ul {
 }
 
 #home-header {
-    margin-top: 3vh;
     width: 100%;
-    color: black;
+    margin-top: 3vh;
+    color: #926DD6;
 }
 
 #main-content-home {
     height: 100vh;
-    background-color: darkgray;
+    background-color: #4B4A4A;
 }
 
 #names, #dates, #semesters {
