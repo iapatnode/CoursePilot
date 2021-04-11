@@ -156,33 +156,27 @@ export const Home = ()=> {
               </Navbar.Collapse>
             </Navbar>
             <div className="container-fluid" id="home-header">
-                <h1 id="home-header"> Schedules </h1>
+                <h1 id="home-header"> My Schedules </h1>
             </div>
             <div className="container" id="schedule-list-view">
                 <div className="row">
                     <div className="col-md-4" id="names">
                         <h2 id="name-header"> Name </h2>
-                        <ul className="home-ul">
-                            {success.map((value, index) => {
-                                return <li id="schedule-name" onClick={clickListener} key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></li>
-                            })}
-                        </ul>
+                        {success.map((value, index) => {
+                            return <p id="schedule-name" onClick={clickListener} key={index} value={value["scheduleName"]}>{value["scheduleName"]}<br></br></p>
+                        })}
                     </div>
                     <div className="col-md-4" id="semesters">
                         <h2 id="semester-header"> Semester </h2>
-                        <ul className="home-ul">
-                            {success.map((value, index) => {
-                                return <li id="schedule-semester" key={index} value={value["scheduleSemester"]}>{value["scheduleSemester"]}<br></br></li>
-                            })}
-                        </ul>
+                        {success.map((value, index) => {
+                            return <p id="schedule-semester" key={index} value={value["scheduleSemester"]}>{value["scheduleSemester"]}<br></br></p>
+                        })}
                     </div>
                     <div className="col-md-4" id="dates">
                         <h2 id="date-header"> Date Modified </h2> 
-                        <ul className="home-ul">
-                            {success.map((value, index) => {
-                                return <li id="schedule-date" key={index} value={value["dateModified"]}>{value["dateModified"]}</li>
-                            })}
-                        </ul>
+                        {success.map((value, index) => {
+                            return <p id="schedule-date" key={index} value={value["dateModified"]}>{value["dateModified"]}</p>
+                        })}
                     </div>
                 </div>
             </div>
