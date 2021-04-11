@@ -30,7 +30,7 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "HOST=coursepilot.gcc.edu PORT=3000 react-scripts start",
     "start-api": "cd flask && flask run",
     "build": "react-scripts build",
     "test": "react-scripts test",
