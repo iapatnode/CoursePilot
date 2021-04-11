@@ -281,7 +281,7 @@ class Schedule extends Component {
     global.email = String(global.email).split("=")[1]
     if(this.state.myRef) {
       var queryString = String(window.location).split("?")[1]
-      await axios.get('http://localhost:5000/api/getScheduleInfo?' + queryString) 
+      await axios.get('http://coursepilot.gcc.edu:5000/api/getScheduleInfo?' + queryString) 
       .then((response) => {
           this.setState({
               columns: [
@@ -295,7 +295,7 @@ class Schedule extends Component {
           })
           global.classEvents = response.data;
       })
-      await axios.get('http://localhost:5000/api/schedule?' + queryString)
+      await axios.get('http://coursepilot.gcc.edu:5000/api/schedule?' + queryString)
       .then((response) => {
           response.data.forEach(element => {
             var para = document.createElement("li");

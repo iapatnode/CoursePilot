@@ -217,7 +217,7 @@ def sign_up():
                 conn.commit()
             except Error as error:
                 #If you cannot insert the invidual into the database, print error and reroute
-                return redirect("http//localhost:3000/SignUp")
+                return redirect("http//coursepilot.gcc.edu:3000/SignUp")
             
             #Adds student major and minor information to database
             try:
@@ -246,7 +246,7 @@ def sign_up():
             
             except Error as error:
                 #If you cannot insert the major/minor into the database, print error and reroute
-                return redirect("http//localhost:3000/SignUp")
+                return redirect("http//coursepilot.gcc.edu:3000/SignUp")
 
             #DBMS connection cleanup
             cursor.close()
@@ -617,7 +617,7 @@ def compare_schedules():
         data = request.form
         compare_schedule_one = request.args.get('scheduleOne')
         compare_schedule_two = data.get('schedule')
-        return redirect("http://localhost:3000/compare")
+        return redirect("http://coursepilot.gcc.edu:3000/compare")
     return ""
 
 
@@ -855,7 +855,7 @@ def changeMajor():
 
         except Error as error:
             #If you cannot insert the invidual into the database, print error and reroute
-            return redirect("http//localhost:3000/Profile")
+            return redirect("http//coursepilot.gcc.edu:3000/Profile")
 
     return "good"
 
@@ -926,7 +926,7 @@ def changeMinor():
 
         except Error as error:
             #If you cannot insert the invidual into the database, print error and reroute
-            return redirect("http//localhost:3000/Profile")
+            return redirect("http//coursepilot.gcc.edu:3000/Profile")
 
     return "good"
 
@@ -1149,7 +1149,7 @@ def degree_report():
         deleteStudentCourses(user_email, deleteCheckedCourses)
         deleteStudentCourses(user_email, deleteSelectedCourses)
 
-        return redirect(f"http://localhost:3000/api/degreereport?email={user_email}")
+        return redirect(f"http://coursepilot.gcc.edu:3000/api/degreereport?email={user_email}")
 
 
 @app.route("/api/autoGenerate", methods=["GET", "POST"])
@@ -1196,7 +1196,7 @@ def autoGenerate():
             cursor.execute(insert_schedule_query, (schedule_name, formatted_date, user_email, schedule_semester))
             conn.commit()
         except Exception:
-            return redirect(f"http://localhost:3000/Home?email={uid}")
+            return redirect(f"http://coursepilot.gcc.edu:3000/Home?email={uid}")
 
         semester = semester_selection
 
@@ -1210,7 +1210,7 @@ def autoGenerate():
 
 
 
-        schedule_url = f"http://localhost:3000/Schedule?email={uid}&ScheduleName={schedule_name}"
+        schedule_url = f"http://coursepilot.gcc.edu:3000/Schedule?email={uid}&ScheduleName={schedule_name}"
 
         return redirect(schedule_url)
 

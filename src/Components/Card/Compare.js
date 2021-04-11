@@ -37,7 +37,7 @@ class Schedule extends Component {
   */
   async componentDidMount() {
     console.log(global.email)
-    await axios.get('http://localhost:5000/api/loadComparedSchedules?' + global.scheduleOne + "&" + global.scheduleTwo + "&email=" + global.email)
+    await axios.get('http://coursepilot.gcc.edu:5000/api/loadComparedSchedules?' + global.scheduleOne + "&" + global.scheduleTwo + "&email=" + global.email)
       .then((response) => {
         this.setState({
             columns: [
