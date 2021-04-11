@@ -16,7 +16,7 @@ global.email = ""
 
 function signOut() {
     axios.post("/api/logout?email=" + global.email).then(response => {
-        if(response.data.text == "success") {
+        if(response.data.text === "success") {
             window.location = "/"
         }
     })
@@ -39,8 +39,6 @@ export const Profile = () => {
     const [populate, setPopulate] = useState(false);
     const minorOptions = []
     const majorOptions = []
-    const selectedMajors = []
-    const selectedMinors = []
 
     const handleCloseMajor = () => setShowMajor(false);
     const handleShowMajor = () => setShowMajor(true);
@@ -116,7 +114,7 @@ export const Profile = () => {
             message = "Error: Password must be at least 8 characters";
         }
 
-        else if(oldPasswordValue == newPasswordValue) {
+        else if(oldPasswordValue === newPasswordValue) {
             message = "Error: New Password and old password cannot be the same";
         }
 
@@ -128,18 +126,18 @@ export const Profile = () => {
             message = "Error: Password must contain special characters";
         }
 
-        else if(success["passwrd"] != oldPasswordValue) {
+        else if(success["passwrd"] !== oldPasswordValue) {
             message = "Error: Current password was incorrect";
         }
 
-        else if(newPasswordValue != confirmPasswordValue) {
+        else if(newPasswordValue !== confirmPasswordValue) {
             message = "Error: New passwords must match"
         }
 
-        if (message != "") {
+        if (message !== "") {
             alert(message);
         }
-        if(message == "") {
+        if(message === "") {
             axios.post('/api/changePassword?email=' + global.email, parameters).finally(response => {
                 alert("Password Changed Successfully");
                 setShowPassword(false);
