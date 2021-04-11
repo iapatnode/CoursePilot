@@ -1,12 +1,12 @@
 #main-content-profile {
     height: 100vh;
-    background-color: darkgray;
+    background-color: #4B4A4A;
 }
 
 #profile-h1 {
     margin-top: 3vh;
     margin-bottom: 4vh;
-    color: black;
+    color: #926DD6;
 }
 
 .profile-h2 {

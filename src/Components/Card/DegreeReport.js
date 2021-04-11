@@ -10,9 +10,75 @@ import TextField from '@material-ui/core/TextField'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import Image from 'react-bootstrap/Image'
 import Logo from '../static/images/logo.jpg'
+import '../static/styles/DegreeReport-Style.css'
+import { makeStyles } from '@material-ui/core/styles'
 
 global.email = String(window.location).split("?")[1];
 global.email = String(global.email).split("=")[1];
+
+// Styling of the autocomplete UI element
+const useStyles = makeStyles((theme) => ({
+    root: {
+        "& .MuiFormLabel-root": {
+            color: "#F7F3F3"
+        },
+
+        "&:hover .MuiFormLabel-root": {
+            color: "#F7F3F3"
+        },
+
+        "&.Mui-focused .MuiFormLabel-root": {
+            color: "#F7F3F3"
+        },
+
+        "& .MuiIconButton-root": {
+            color: "#F7F3F3"
+        }
+    },
+
+    inputRoot: {
+        color: "#F7F3F3",
+        '&[class*="MuiOutlinedInput-root"] .MuiAutocompleted-input:first-child': {
+            paddingLeft: 26
+        },
+        "& .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#d89cf6"
+        },
+        "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#d89cf6"
+        },
+        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#d89cf6"
+        },
+    },
+
+    option: {
+        backgroundColor: "#8E8D8D",
+        color: "#060606",
+        '&[data-focus="true"]': {
+            backgroundColor: "#F7F3F3",
+            borderColor: 'transparent',
+            
+        },
+        '&[aria-selected="true"]': {
+            backgroundColor: "#d89cf6",
+            color: "#060606",
+            borderColor: 'transparent',
+        }
+    },
+
+    tag: {
+        backgroundColor: "#d89cf6",
+
+        "& .MuiChip-label": {
+            color: "#060606",
+        },
+
+        "& .MuiChip-deleteIcon": {
+            color: "#4B4A4A",
+        }
+    },
+}));
 
 export const Report = () => {
     const [isLoading, setLoading] = useState(true);
@@ -22,6 +88,9 @@ export const Report = () => {
     const [unchecked, setUnchecked] = useState([]);
     const [selected, setSelected] = useState([]);
     const [unselected, setUnselected] = useState([]);
+
+    const styles = useStyles();
+
 
     useEffect(() => {
         console.log("URL: " + window.location);
@@ -35,6 +104,10 @@ export const Report = () => {
         });
     }, []);
 
+    /**
+     * Handles when an user saves their changes
+     * @param {*} e the event that happened (save changes button was hit)
+     */
     const submitListener = (e) => {
         const parameters = {
             "checkedAdd": checked,
@@ -210,15 +283,22 @@ export const Report = () => {
                 <meta charSet="UTF-8"></meta>
             </div>
 
-            <h1> { success[0]["degree_name"] } </h1>
+            <div class="container-fluid" id="report-header">
+                <div class="row">
+                    <div class="col-md-12 text-center align-items-center">
+                        <h1> { success[0]["degree_name"] } </h1>
+                        <h3> { "Total Hours: "} { success[0]["degree_hours"] } </h3> 
+                    </div>
 
-            <div>
-                <h3> { "Total Hours: "} { success[0]["degree_hours"] } </h3>  
-                <Form id="degree_report">      
-                <Button variant="primary" value="Submit" onClick={submitListener}>
+                    <Button variant="primary" value="Submit" id="save-change" onClick={submitListener}>
                             Save Changes
-                </Button>
+                    </Button>
+                </div>
+            </div>
 
+            <div id="degree-report-content"> 
+                <Form id="degree_report">      
+                
                 { success[0]["req_details"].map((req) => {
                     return <div>
                         {req["req_courses"].length > 0 ? 
@@ -227,19 +307,23 @@ export const Report = () => {
                                     <h2> {req["req_category"]} </h2> 
                                     <h4> {"Required Hours: "} {req["required_hrs"]} </h4>
                                     <p> {req["req_details"]} </p>
+                                    <div className="col-md-12 text-center">
                                         { req["req_courses"].map((course) => {
                                             return <FormControlLabel control = {
-                                                <Checkbox
-                                                    defaultChecked = {isChecked(course["course_code"], req["req_category"])}
-                                                    name = {req["req_category"] + " " + course["course_name"]}
-                                                    onChange={(event) => handleChecked(event, course["course_code"], course["course_name"], req["req_category"], success[0]["req_yr"])}
-                                                />
-                                            }
-                                            label = {course["course_code"] + " " + course["course_name"]}/>
-                                        })}
+                                                    <Checkbox 
+                                                        style = {{color: "#d89cf6"}}
+                                                        defaultChecked = {isChecked(course["course_code"], req["req_category"])}
+                                                        name = {req["req_category"] + " " + course["course_name"]}
+                                                        onChange={(event) => handleChecked(event, course["course_code"], course["course_name"], req["req_category"], success[0]["req_yr"])}
+                                                    />
+                                                }
+                                                label = {course["course_code"] + " " + course["course_name"]}/>
+                                            })
+                                        }
+                                    </div>
                                 </Form.Group>
                             </div>
-                            : <div className="col-md-12">
+                            : <div className="col-md-12 text-center">
                                 <Form.Group>
                                     <h2> { req["req_category"] }</h2>
                                     <h4> {"Required Hours: "} { req["required_hrs"]} </h4>
@@ -248,6 +332,7 @@ export const Report = () => {
                                         <Autocomplete
                                             defaultValue = {isSelected(req["req_category"])}
                                             id="elective-courses"
+                                            classes={styles}
                                             multiple
                                             options={success[1].map((course) => course["course_code"] + " " + course["course_name"])}
                                             style={{width: 600}}
@@ -256,6 +341,7 @@ export const Report = () => {
                                                 <TextField {...params}
                                                     label="Enter course"
                                                     variant="outlined"
+                                                    fullWidth
                                                 />
                                             }
                                         />
