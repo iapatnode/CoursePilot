@@ -7,24 +7,20 @@ import {DropdownButton, Dropdown} from 'react-bootstrap'
 import CoolTabs from 'react-cool-tabs';
 import Image from 'react-bootstrap/Image'
 import Logo from '../static/images/logo.jpg'
-import Accordion from 'react-bootstrap/Accordion'
-import Card from 'react-bootstrap/Card'
 
 export const Majors = () => {
 
-    //const [isLoading, setLoading] = useState(true);
     const isFirst = useRef(true);
-    //const [success, setSuccess] = useState(null);
-    //const majorCourses = []
 
     var state = {activeIndex: 0};
- 
-    
-    var majorList = document.createElement("ul");
-    var recMinorList = document.createElement("ul");
-    var minorList = document.createElement("ul");
 
-    
+    var majorList = document.createElement("div");
+    var recMinorList = document.createElement("div");
+    var minorList = document.createElement("div");
+
+    majorList.setAttribute("class", "majorminorlist");
+    recMinorList.setAttribute("class", "majorminorlist");
+    minorList.setAttribute("class", "majorminorlist");
 
     function getMajorsAndMinorsData(requirementYear) {
         var email = String(window.location).split("?")[1];
@@ -36,20 +32,13 @@ export const Majors = () => {
             const minorResponse = firstResponse["minors"];
             const recMinorResponse = firstResponse["recMinors"]
             majorResponse.forEach(element => {
-                //majors.push(element);
                 var name = element["name"];
                 var requirements = element["requiredClasses"];
-                var majorInformationNode = document.createElement("li");
-                var majorTitle = document.createElement("div");
-                majorTitle.setAttribute("id", "columnTitle");
-                majorTitle.appendChild(document.createTextNode("Requirements:"));
-
-                //var classesRequiredString = "Requirements: "
-                majorInformationNode.appendChild(majorTitle);
+                var majorRequirementsInformation = document.createElement("div");
+                majorRequirementsInformation.appendChild(document.createTextNode("Requirements:"));
                 requirements.forEach(requirement => {
                     var currentRequirementString = "";
                     currentRequirementString += requirement["name"] + ": ";
-
                     var listLength = requirement["courseList"].length;
                     if (listLength == 0) {
                         currentRequirementString += requirement["numHoursRequired"] + " hours";
@@ -67,46 +56,41 @@ export const Majors = () => {
                             }
                         })
                     }
-                    
                     currentRequirementString += "; ";
-                    //classesRequiredString += currentRequirementString;
                     var currentRequirementNode = document.createElement("div");
-                    currentRequirementNode.setAttribute("id", "requirementInformation");
                     currentRequirementNode.appendChild(document.createTextNode(currentRequirementString));
-                    majorInformationNode.appendChild(currentRequirementNode);
+                    majorRequirementsInformation.appendChild(currentRequirementNode);
                 })
-                var para = document.createElement("li");
-                var tag = document.createElement("a");
-                tag.setAttribute("class", "majorButton")
-                para.setAttribute("id", name);
-                
+
                 var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
-                //var moreInformationNode = document.createTextNode(classesRequiredString);
-                tag.appendChild(node);
-                //tag.addEventListener("click", this.loadMajor(name));
-                tag.addEventListener("click", function() {
-                    if (para.nextSibling != null) {
-                        //majorList.insertBefore(moreInformationNode, para.nextSibling);
-                        majorList.insertBefore(majorInformationNode, para.nextSibling);
-                    }
+                var majorTitleButton = document.createElement("button");
+                majorTitleButton.setAttribute("class", "accordion");
+                majorTitleButton.appendChild(node);
+                var majorPanel = document.createElement("div");
+                majorPanel.setAttribute("class", "panel");
+                majorPanel.appendChild(majorRequirementsInformation);
+
+                majorTitleButton.addEventListener("click", function() {
+                    this.classList.toggle("active");
+                    var panel = this.nextElementSibling;
+                    if (panel.style.display === "block") {
+                        panel.style.display = "none";
+                      } else {
+                        panel.style.display = "block";
+                      }
                 });
-                para.appendChild(tag);
-                majorList.appendChild(para);
+
+                majorList.appendChild(majorTitleButton);
+                majorList.appendChild(majorPanel);
             });
             minorResponse.forEach(element => {
                 var name = element["name"];
                 var requirements = element["requiredClasses"];
-                var classesRequiredString = "Requirements: ";
-                var minorInformationNode = document.createElement("li");
-                var minorTitle = document.createElement("div")
-                minorTitle.setAttribute("id", "columnTitle");
-                minorTitle.appendChild(document.createTextNode("Requirements: "));
-
-
-                minorInformationNode.appendChild(minorTitle);
+                var minorRequirementsInformation = document.createElement("div");
+                minorRequirementsInformation.appendChild(document.createTextNode("Requirements:"));
                 requirements.forEach(requirement => {
                     var currentRequirementString = "";
-
+                    currentRequirementString += requirement["name"] + ": ";
                     var listLength = requirement["courseList"].length;
                     if (listLength == 0) {
                         currentRequirementString += requirement["numHoursRequired"] + " hours";
@@ -122,49 +106,43 @@ export const Majors = () => {
                             else {
                                 currentRequirementString += course + ", ";
                             }
-                            
                         })
                     }
-
-                    
-                    
                     currentRequirementString += "; ";
-                    //classesRequiredString += currentRequirementString;
                     var currentRequirementNode = document.createElement("div");
-                    currentRequirementNode.setAttribute("id", "requirementInformation");
                     currentRequirementNode.appendChild(document.createTextNode(currentRequirementString));
-                    minorInformationNode.appendChild(currentRequirementNode);
+                    minorRequirementsInformation.appendChild(currentRequirementNode);
                 })
-                var para = document.createElement("li");
-                var tag = document.createElement("button");
-                tag.setAttribute("id", "minorButton");
-                para.setAttribute("id", name);
-                var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
 
-                var moreInformationNode = document.createTextNode(classesRequiredString);
-                tag.appendChild(node);
-                tag.addEventListener("click", function() {
-                    if (para.nextSibling != null) {
-                        minorList.insertBefore(minorInformationNode, para.nextSibling);
-                    }
+                var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
+                var minorTitleButton = document.createElement("button");
+                minorTitleButton.setAttribute("class", "accordion");
+                minorTitleButton.appendChild(node);
+                var minorPanel = document.createElement("div");
+                minorPanel.setAttribute("class", "panel");
+                minorPanel.appendChild(minorRequirementsInformation);
+
+                minorTitleButton.addEventListener("click", function() {
+                    this.classList.toggle("active");
+                    var panel = this.nextElementSibling;
+                    if (panel.style.display === "block") {
+                        panel.style.display = "none";
+                      } else {
+                        panel.style.display = "block";
+                      }
                 });
-                para.appendChild(tag);
-                minorList.appendChild(para);
+
+                minorList.appendChild(minorTitleButton);
+                minorList.appendChild(minorPanel);
             });
             recMinorResponse.forEach(element => {
                 var name = element["name"];
                 var requirements = element["requiredClasses"];
-                var classesRequiredString = "Requirements: ";
-                var minorInformationNode = document.createElement("li");
-                var minorTitle = document.createElement("div")
-                minorTitle.setAttribute("id", "columnTitle");
-                minorTitle.appendChild(document.createTextNode("Requirements: "));
-
-
-                minorInformationNode.appendChild(minorTitle);
+                var recMinorRequirementsInformation = document.createElement("div");
+                recMinorRequirementsInformation.appendChild(document.createTextNode("Requirements:"));
                 requirements.forEach(requirement => {
                     var currentRequirementString = "";
-
+                    currentRequirementString += requirement["name"] + ": ";
                     var listLength = requirement["courseList"].length;
                     if (listLength == 0) {
                         currentRequirementString += requirement["numHoursRequired"] + " hours";
@@ -180,35 +158,34 @@ export const Majors = () => {
                             else {
                                 currentRequirementString += course + ", ";
                             }
-                            
                         })
                     }
-
-                    
-                    
                     currentRequirementString += "; ";
-                    //classesRequiredString += currentRequirementString;
                     var currentRequirementNode = document.createElement("div");
-                    currentRequirementNode.setAttribute("id", "requirementInformation");
                     currentRequirementNode.appendChild(document.createTextNode(currentRequirementString));
-                    minorInformationNode.appendChild(currentRequirementNode);
+                    recMinorRequirementsInformation.appendChild(currentRequirementNode);
                 })
-                var para = document.createElement("li");
-                var tag = document.createElement("button");
-                tag.setAttribute("id", "minorButton");
-                para.setAttribute("id", name);
-                // var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
-                var node = document.createTextNode(name );
 
-                var moreInformationNode = document.createTextNode(classesRequiredString);
-                tag.appendChild(node);
-                tag.addEventListener("click", function() {
-                    if (para.nextSibling != null) {
-                        recMinorList.insertBefore(minorInformationNode, para.nextSibling);
-                    }
+                var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
+                var recMinorTitleButton = document.createElement("button");
+                recMinorTitleButton.setAttribute("class", "accordion");
+                recMinorTitleButton.appendChild(node);
+                var recMinorPanel = document.createElement("div");
+                recMinorPanel.setAttribute("class", "panel");
+                recMinorPanel.appendChild(recMinorRequirementsInformation);
+
+                recMinorTitleButton.addEventListener("click", function() {
+                    this.classList.toggle("active");
+                    var panel = this.nextElementSibling;
+                    if (panel.style.display === "block") {
+                        panel.style.display = "none";
+                      } else {
+                        panel.style.display = "block";
+                      }
                 });
-                para.appendChild(tag);
-                recMinorList.appendChild(para);
+
+                recMinorList.appendChild(recMinorTitleButton);
+                recMinorList.appendChild(recMinorPanel);
             });
         })
     }
@@ -325,24 +302,7 @@ export const Majors = () => {
                 <ul id="courses"></ul>
                 </div>
 
-                <Accordion defaultActiveKey="0">
-  <Card>
-    <Accordion.Toggle as={Card.Header} eventKey="0">
-      Click me!
-    </Accordion.Toggle>
-    <Accordion.Collapse eventKey="0">
-      <Card.Body>Hello! I'm the body</Card.Body>
-    </Accordion.Collapse>
-  </Card>
-  <Card>
-    <Accordion.Toggle as={Card.Header} eventKey="1">
-      Click me!
-    </Accordion.Toggle>
-    <Accordion.Collapse eventKey="1">
-      <Card.Body>Hello! I'm another body</Card.Body>
-    </Accordion.Collapse>
-  </Card>
-</Accordion>
+
             <CoolTabs
                 tabKey={'1'}
                 style={{ width:  1500, height:  650, background:  'blue', margin: 20,}}
