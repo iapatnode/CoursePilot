@@ -1,4 +1,4 @@
-#schedule-name, #schedule-semester, #schedule-date{
+#schedule-name, #schedule-semester, #schedule-date {
     margin-top: 1.0rem;
     margin-bottom: 1.0rem;
     font-size: 20px;
@@ -30,17 +30,14 @@ ul {
 }
 
 #home-header {
-    margin-top: 3vh;
     width: 100%;
-    /* color: #F7F3F3; */
-    color: #060606;
+    margin-top: 3vh;
+    color: #926DD6;
 }
 
 #main-content-home {
     height: 100vh;
-    /* background-color: darkgray; */
-    /* background-color: #4B4A4A; */
-    background-color: #8E8D8D;
+    background-color: #4B4A4A;
 }
 
 #names, #dates, #semesters {
