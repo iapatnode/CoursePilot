@@ -23,6 +23,15 @@ export const Majors = () => {
     minorList.setAttribute("class", "majorminorlist");
 
     function getMajorsAndMinorsData(requirementYear) {
+        while (majorList.hasChildNodes()) {
+            majorList.removeChild(majorList.firstChild);
+        }
+        while (recMinorList.hasChildNodes()) {
+            recMinorList.removeChild(recMinorList.firstChild);
+        }
+        while (minorList.hasChildNodes()) {
+            minorList.removeChild(minorList.firstChild);
+        }
         var email = String(window.location).split("?")[1];
         email = String(email).split("=")[1]
         console.log(email);
@@ -285,9 +294,9 @@ export const Majors = () => {
             <div class="reqYear" className="req-buttons">
                 <div id="columnTitle" >Requirement Year</div>
                 <button onClick={() => {getMajorsAndMinors("2017")}} className="req-button">2017-2018</button>
-                {/* <button onClick={() => {getMajorsAndMinors("2018")}} className="req-button">2018-2019</button>
+                <button onClick={() => {getMajorsAndMinors("2018")}} className="req-button">2018-2019</button>
                 <button onClick={() => {getMajorsAndMinors("2019")}} className="req-button">2019-2020</button>
-                <button onClick={() => {getMajorsAndMinors("2020")}} className="req-button">2020-2021</button> */}
+                <button onClick={() => {getMajorsAndMinors("2020")}} className="req-button">2020-2021</button>
             </div>
 
             <h2> Search Majors </h2>
