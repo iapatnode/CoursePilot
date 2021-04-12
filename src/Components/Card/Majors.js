@@ -22,10 +22,6 @@ export const Majors = () => {
     var recMinorList = document.createElement("ul");
     var minorList = document.createElement("ul");
 
-    useEffect(() => {
-        getMajorsAndMinors("2017");
-    }, [])
-
     function getMajorsAndMinorsData(requirementYear) {
         var email = String(window.location).split("?")[1];
         email = String(email).split("=")[1]
