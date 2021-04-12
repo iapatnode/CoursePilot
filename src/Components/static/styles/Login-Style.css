@@ -29,10 +29,12 @@
 }
 
 #login-form-submit {
-    /* margin-top: 2rem; */
+    margin-top: 2vh;
     justify-content: center;
+    text-align: center;
     background-color: #926DD6;
     width: 100%;
+    border-color: #926DD6;
 }
 
 #sign-up-link {

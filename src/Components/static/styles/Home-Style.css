@@ -1,4 +1,4 @@
-#schedule-name, #schedule-semester, #schedule-date{
+#schedule-name, #schedule-semester, #schedule-date {
     margin-top: 1.0rem;
     margin-bottom: 1.0rem;
     font-size: 20px;
@@ -67,10 +67,20 @@ ul {
 
 #name-header, #date-header, #semester-header {
     text-decoration: underline;
-    color: black;
+    color: #060606;
 }
 
 #schedule-list-view {
     background-color: lightgray;
     border-radius: 2%;
+}
+
+.modal-title {
+    color: #060606;
+}
+
+#compare-schedule {
+    background-color: #926DD6;
+    border-color: #926DD6;
+    width: 60%;
 }

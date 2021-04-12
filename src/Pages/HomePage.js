@@ -1,6 +1,5 @@
 import React from 'react'
 import Home from '../Components/Card/Home'
-import Header from "../Components/Headers/AlternativeHeader.js";
 
 
 export const HomePage = ()=> {

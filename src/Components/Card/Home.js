@@ -60,7 +60,6 @@ export const Home = ()=> {
         var scheduleOne = document.getElementById("schedule-one").value
         var scheduleTwo = document.getElementById("schedule-two").value
         window.location = "/Compare?scheduleOne=" + scheduleOne + "&scheduleTwo=" + scheduleTwo + "&email=" + global.email;
-        //window.location = "localhost:3000/Schedule?scheduleOne=" + compareOne + "&scheduleTwo=" + compareTwo + "&email=" + global.email;
     }
 
     /*
@@ -70,9 +69,6 @@ export const Home = ()=> {
     schedule they selected. 
     */
     async function clickListener(e) {
-        let params = {
-            "name": e.target.innerText
-        }
         var queryString = String(window.location).split("?")[1]
         queryString = queryString + "&ScheduleName=" + e.target.innerText;
         window.location = "/Schedule?" + queryString;
@@ -83,13 +79,13 @@ export const Home = ()=> {
         var makeRequest = true;
         success.forEach(element => {
             if(makeRequest) {
-                if(scheduleName == element["scheduleName"]) {
+                if(scheduleName === element["scheduleName"]) {
                     alert("Error: You cannot add two schedules with the same name");
                     makeRequest = false;
                 }
             }
         });
-        if(scheduleName == "" || scheduleName  == null) {
+        if(scheduleName === "" || scheduleName  === null) {
             alert("Error: You must give your schedule a name")
             makeRequest = false;
         }
@@ -184,7 +180,7 @@ export const Home = ()=> {
                 <Button variant="primary" id="home-page-secondary-button" onClick={handleAuto}> Auto Gen Schedule </Button>
                     <Modal show={showAuto} onHide={handleCloseAuto}>
                         <Modal.Header closeButton>
-                            <Modal.Title>Auto-Generate Schedule</Modal.Title>
+                            <Modal.Title class="modal-title">Auto-Generate Schedule</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
                             <Form method="post" action={"/api/autoGenerate?email=" + global.email + "&semester=" + scheduleSemester + "&name=" + scheduleName}>
@@ -208,7 +204,7 @@ export const Home = ()=> {
                 <Button variant="primary" id="home-page-secondary-button" onClick={handleCompare}> Compare Two Schedules </Button>
                 <Modal show={show} onHide={handleClose}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Create New Schedule - Enter Name</Modal.Title>
+                        <Modal.Title class="modal-title">Create New Schedule - Enter Name</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <div>
@@ -231,7 +227,7 @@ export const Home = ()=> {
 
                 <Modal show={compare} onHide={handleCloseCompare}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Compare Two Schedules</Modal.Title>
+                        <Modal.Title class="modal-title">Compare Two Schedules</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <Form>

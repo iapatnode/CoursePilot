@@ -46,9 +46,9 @@ class Schedule extends Component {
         var newEvents = [];
         var newCourses = [];
         global.classEvents.forEach(element => {
-          if(element.text != args.e.text()) {
+          if(element.text !== args.e.text()) {
             newEvents.push(element);
-            if(newCourses.includes(element.text) == false) {
+            if(newCourses.includes(element.text) === false) {
               newCourses.push(element.text)
             }
           }
@@ -87,11 +87,11 @@ class Schedule extends Component {
   */
   titleCase(x) {
     var str = x.toLowerCase();
-    var str = str.split(' ');
-    for(var i = 0; i < str.length; i++) {
-      str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1);
+    var str1 = str.split(' ');
+    for(var i = 0; i < str1.length; i++) {
+      str1[i] = str1[i].charAt(0).toUpperCase() + str1[i].slice(1);
     }
-    return str.join(' ');
+    return str1.join(' ');
   }
 
   /*
@@ -127,18 +127,15 @@ class Schedule extends Component {
       duplicate classes, and the course is not added to the schedule
       */
       var text = e.target.innerText
-      var test = e.target.id;
       global.addedClass = true;
       global.classAdded = {text};
       global.className = text.substring(0, text.indexOf("-") - 9);
       global.classEvents.forEach(element => {
-        if(element["text"] == course_code && cont) {
+        if(element["text"] === course_code && cont) {
           alert("Error: You have already added this course to your schedule");
           cont = false;
         }
       });
-
-      var id = 1
     }
 
     /*
@@ -171,7 +168,7 @@ class Schedule extends Component {
         }
         // Check if adding the course will result in a time conflict. 
         global.classEvents.forEach(element => {
-          if((element.start.value == "2013-03-25T" + global.classTime) && element.resource == res) {
+          if((element.start.value === "2013-03-25T" + global.classTime) && element.resource === res) {
             global.conflict = true;
           }
         })
@@ -219,7 +216,7 @@ class Schedule extends Component {
     http.open("POST", url, true);
 
     http.onreadystatechange = function() {
-      if(http.readyState == 4) {
+      if(http.readyState === 4) {
         alert(this.responseText);
         global.courses = [];
         window.location = "/Home?" + String(queryString).split("&")[0];
@@ -250,7 +247,7 @@ class Schedule extends Component {
     http.open("POST", url, true);
     http.onreadystatechange = function() {
       if(http.readyState === 4) {
-        if(this.responseText == "success") {
+        if(this.responseText === "success") {
           alert("Schedule Deleted Successfully");
           global.formSubmitting = true;
           window.location = "/Home?" + email;

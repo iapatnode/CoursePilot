@@ -13,10 +13,10 @@
     margin: 2vh;
 }
 
-.profile-button {
+#profile-button {
     margin-top: 2vh;
     margin-bottom: 2vh;
-    background-color: #d89cf6;
+    background-color: #926DD6;
     border-color: #926DD6;
 }
 
@@ -29,4 +29,9 @@
 
 #account-info {
     text-decoration: underline;
+}
+
+#change-button {
+    background-color: #926DD6;
+    border-color: #926DD6;
 }
