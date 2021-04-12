@@ -2,7 +2,6 @@
     margin-top: 1.0rem;
     margin-bottom: 1.0rem;
     font-size: 20px;
-    color: lightgray;
 }
 
 #schedule-name:hover {
@@ -68,14 +67,11 @@ ul {
 
 #name-header, #date-header, #semester-header {
     text-decoration: underline;
-    /* color: #060606; */
-    color: #F7F3F3;
+    color: #060606;
 }
 
 #schedule-list-view {
-    /* background-color: #8E8D8D; */
-    background-color: #4B4A4A;
-    border-color: #4B4A4A;
+    background-color: lightgray;
     border-radius: 2%;
 }
 

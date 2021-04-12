@@ -208,13 +208,13 @@ export const Profile = () => {
                         <h1 id="account-info"> Account Information </h1>
                         <h2 className="profile-h2"> Major(s): {success["majors"].join(", ")} </h2>
                         <h2 className="profile-h2"> Minor(s): {success["minors"].join(", ")} </h2>
-                        <Button variant="primary" className="profile-button" onClick={handleShowPassword}> Change Password </Button>
-                        <Button variant="primary" className="profile-button" onClick={handleShowMajor}> Change Major </Button>
-                        <Button variant="primary" className="profile-button" onClick={handleShowMinor}> Change Minor </Button>
+                        <Button variant="primary" id="profile-button" onClick={handleShowPassword}> Change Password </Button>
+                        <Button variant="primary" id="profile-button" onClick={handleShowMajor}> Change Major </Button>
+                        <Button variant="primary" id="profile-button" onClick={handleShowMinor}> Change Minor </Button>
                     </div>
                             <Modal show={showPassword} onHide={handleClosePassword}>
                                 <Modal.Header closeButton>
-                                    <Modal.Title>Change Password</Modal.Title>
+                                    <Modal.Title class="modal-title">Change Password</Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
                                     <Form action="/api/changePassword" method="POST">
@@ -247,13 +247,13 @@ export const Profile = () => {
                                                 placeholder="Confirm New Password">
                                             </Form.Control>
                                         </Form.Group>
-                                        <Button variant="primary" onClick={handlePasswordSubmit}> Confirm New Password </Button>
+                                        <Button variant="primary" id="change-button" type="submit" onClick={handlePasswordSubmit}> Confirm New Password </Button>
                                     </Form>
                                 </Modal.Body>
                             </Modal>
                             <Modal show={showMajor} onHide={handleCloseMajor}>
                                 <Modal.Header closeButton>
-                                    <Modal.Title>Choose Major(s)</Modal.Title>
+                                    <Modal.Title class="modal-title">Choose Major(s)</Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
                                     <Form>
@@ -271,12 +271,12 @@ export const Profile = () => {
                                             />
                                         </Form.Group>
                                     </Form>
-                                    <Button variant="primary" onClick={handleMajorSubmit}> Confirm Major(s) </Button>
+                                    <Button variant="primary" id="change-button" type="submit" onClick={handleMajorSubmit}> Confirm Major(s) </Button>
                                 </Modal.Body>
                             </Modal>
                             <Modal show={showMinor} onHide={handleCloseMinor}>
                                 <Modal.Header closeButton>
-                                    <Modal.Title>Choose Minor(s)</Modal.Title>
+                                    <Modal.Title class="modal-title">Choose Minor(s)</Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
                                     <Form>
@@ -294,7 +294,7 @@ export const Profile = () => {
                                             />
                                         </Form.Group>
                                     </Form>
-                                    <Button variant="primary" onClick={handleMinorSubmit}> Confirm Minor(s) </Button>
+                                    <Button variant="primary" id="change-button" type="submit" onClick={handleMinorSubmit}> Confirm Minor(s) </Button>
                                 </Modal.Body>
                             </Modal>
                     <Button onClick={signOut} variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
