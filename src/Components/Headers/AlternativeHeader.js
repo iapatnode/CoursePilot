@@ -20,12 +20,6 @@ import logo from "./logo.jpg";
 
 // reactstrap components
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  Button,
-  Container,
-  Row,
-  Col,
   Navbar,
   NavbarBrand
 } from "reactstrap";

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Link, Redirect } from 'react-router-dom'
 import axios from 'axios'
 import '../static/styles/SignUp-Style.css'
 import AdminFooter from "../Footers/AdminFooter.js";
