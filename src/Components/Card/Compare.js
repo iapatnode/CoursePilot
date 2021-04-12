@@ -74,24 +74,30 @@ class Schedule extends Component {
               </Nav>
               </Navbar.Collapse>
             </Navbar>
-            <div className="container-fluid">
-                <div className="row">
-                    <div className="col-md-12">
-                        <DayPilotCalendar
-                        {...config}
-                        ref={component => {
-                            this.calendar = component && component.control;
-                        }}
-                        />
-                    </div>
+            <div id="compare-content">
+              <div className="container-fluid">
+                  <div className="row">
+                      <div className="col-md-12">
+                          <DayPilotCalendar
+                          {...config}
+                          ref={component => {
+                              this.calendar = component && component.control;
+                          }}
+                          />
+                      </div>
 
-                </div>
+                  </div>
+              </div>
+              <br/>
+              <div className="row" id="legend">
+                <h2 id="legend-schedule-one"> Schedule One: {String(global.scheduleOne.split("=")[1].replaceAll("%20", " "))} </h2>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <h2 id="legend-schedule-two"> Schedule Two: {String(global.scheduleTwo.split("=")[1].replaceAll("%20", " "))} </h2>
+              </div>
+              <Button href={"/home?" + global.email} variant="secondary" type="submit" id="exit-compare-schedule" className="signup-form-field">
+                Exit
+              </Button>
             </div>
-            <h2 id="legend-schedule-one"> Schedule One: {String(global.scheduleOne.split("=")[1].replaceAll("%20", " "))} </h2>
-            <h2 id="legend-schedule-two"> Schedule Two: {String(global.scheduleTwo.split("=")[1].replaceAll("%20", " "))} </h2>
-            <Button href={"/home?" + global.email} variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
-              Exit
-            </Button>
         </div>
     );
   }

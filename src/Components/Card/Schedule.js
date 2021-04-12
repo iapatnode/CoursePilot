@@ -355,7 +355,7 @@ class Schedule extends Component {
                         />
                     </div>
                     <div className="col-md-3" id="search-container">
-                      <h2> Search Courses </h2>
+                      <h2 id="search-label"> Search Courses </h2>
                         <div id="div1">
                         <input type="text" id="myInput" onKeyUp={this.classFilter} placeholder="Search for Class" title="Type in a name"></input>
                         <ul id="courses"></ul>
@@ -363,15 +363,17 @@ class Schedule extends Component {
                     </div>
                 </div>
             </div>
-            <Button onClick={this.saveSchedule} variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
-                Save Schedule
-            </Button>
-            <Button onClick={this.exitSchedule} variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
-              Exit
-            </Button>
-            <Button onClick={this.deleteSchedule} variant="secondary" type="submit" id="delete-schedule" className="signup-form-field">
-              Delete Schedule
-            </Button>
+            <div id="btns">
+              <Button onClick={this.exitSchedule} variant="secondary" type="submit" id="exit-schedule">
+                Exit
+              </Button>
+              <Button onClick={this.saveSchedule} variant="primary" type="submit" id="save-schedule">
+                  Save Schedule
+              </Button>
+              <Button onClick={this.deleteSchedule} variant="secondary" type="submit" id="delete-schedule">
+                Delete Schedule
+              </Button>
+            </div>
         </div>
     );
   }

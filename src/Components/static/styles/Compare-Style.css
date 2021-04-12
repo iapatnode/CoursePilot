@@ -1,7 +1,29 @@
+#compare-content {
+    background-color: #4B4A4A;
+    height: 100vh;
+}
+
+#schedule {
+    background-color: lightgray
+}
+
 #legend-schedule-one {
     color: #926DD6;
 }
 
 #legend-schedule-two {
     color: #d89cf6;
+}
+
+#legend {
+    text-align: center;
+    justify-content: center;
+}
+
+#exit-compare-schedule {
+    justify-content: center;
+    background-color: #926DD6;
+    border-color: #926DD6;
+    width: 10%;
+    color: #F7F3F3;
 }
