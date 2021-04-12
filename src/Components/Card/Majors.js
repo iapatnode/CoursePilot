@@ -222,47 +222,55 @@ export const Majors = () => {
         getMajors();
     }
 
-      /*
-  ClassFilter() --> Helper function used to display courses that the user searches for using the 
-  searchbar on the side column. Courses that match the pattern that the user enters are displayed, 
-  while all others are hidden. 
+  /*
+    MajorFilter() --> Helper function used to display majors that the user searches for using the 
+    searchbar. Majors that match the pattern that the user enters are displayed, while all others are hidden. 
   */
   function majorFilter() {
-    var input, filter, ul, li, a, i, txtValue;
-    input = document.getElementById("myInput");
-    console.log(input)
+    var input, filter, ul, li, a, i, txtValue, panel;
+    input = document.getElementById("majorInput");
+    console.log(input.value)
     filter = input.value.toUpperCase();
     ul = document.getElementById("MajorList");
-    li = ul.getElementsByTagName("li");
+    li = ul.getElementsByClassName("accordion");
+    panel = ul.getElementsByClassName("panel");
+    
     for (i = 0; i < li.length; i++) {
-        a = li[i].getElementsByTagName("a")[0];
-        txtValue = a.textContent || a.innerText;
+        //console.log(li[i].innerHTML);
+        a = li[i].innerHTML.split(",")[0];
+        txtValue = a;
         if (txtValue.toUpperCase().indexOf(filter) > -1) {
             li[i].style.display = "";
+            // panel[i].style.display = "";
         } else {
             li[i].style.display = "none";
+            // panel[li].style.display = "none";
         }
     }
   }
-        /*
-  MinorFilter() --> Helper function used to display courses that the user searches for using the 
-  searchbar on the side column. Courses that match the pattern that the user enters are displayed, 
-  while all others are hidden. 
+
+  /*
+    MinorFilter() --> Helper function used to display minors that the user searches for using the 
+    searchbar. Minors that match the pattern that the user enters are displayed, while all others are hidden. 
   */
   function minorFilter() {
-    var input, filter, ul, li, a, i, txtValue;
+    var input, filter, ul, li, a, i, txtValue, panel;
     input = document.getElementById("minorInput");
-    console.log(input)
+    console.log(input.value)
     filter = input.value.toUpperCase();
     ul = document.getElementById("MinorList");
-    li = ul.getElementsByTagName("li");
+    li = ul.getElementsByClassName("accordion");
+    panel = ul.getElementsByClassName("panel");
+    
     for (i = 0; i < li.length; i++) {
-        a = li[i].getElementsByTagName("a")[0];
-        txtValue = a.textContent || a.innerText;
+        a = li[i].innerHTML.split(",")[0];
+        txtValue = a;
         if (txtValue.toUpperCase().indexOf(filter) > -1) {
             li[i].style.display = "";
+            panel[i].style.display = "";
         } else {
             li[i].style.display = "none";
+            panel[i].style.display = "none";
         }
     }
   }
@@ -290,24 +298,15 @@ export const Majors = () => {
                 <button onClick={() => {getMajorsAndMinors("2020")}} className="req-button">2020-2021</button> */}
             </div>
 
-            <h2> Search Majors </h2>
-                <div id="div1">
-                <input type="text" id="myInput" onKeyUp={majorFilter} placeholder="Search for Major" title="Type in a name"></input>
-                <ul id="courses"></ul>
-                </div>
 
-            <h2> Search Minors </h2>
-                <div id="div1">
-                <input type="text" id="minorInput" onKeyUp={minorFilter} placeholder="Search for Minor" title="Type in a name"></input>
-                <ul id="courses"></ul>
-                </div>
+
 
 
             <CoolTabs
                 tabKey={'1'}
-                style={{ width:  1500, height:  650, background:  'blue', margin: 20,}}
-                tabsHeaderStyle={{height: 100}}
-                activeTabStyle={{ background:  'purple', color:  'white' }}
+                style={{ width:  1500, height:  650, background:  'white', margin: 20,}}
+                tabsHeaderStyle={{height: 100, bottom: 15}}
+                activeTabStyle={{ background:  '#926DD6', color:  'white' }}
                 unActiveTabStyle={{ background:  'white', color:  'black'}}
                 leftContentStyle={{ background:  'white' }}
                 rightContentStyle={{ background:  'white' }}
@@ -318,21 +317,38 @@ export const Majors = () => {
                 leftTabTitle={'Majors'}
                 rightTabTitle={'Minors'}
                 leftContent={
-                    <div id="MajorList"> Click on a requirement year to view minors. It can take up to 10 seconds to display. </div> 
+                    <div>
+                        
+                        <div id="major-search-container">
+                            <h2> Search Majors </h2>
+                            <input type="text" id="majorInput" onKeyUp={majorFilter} placeholder="Search for Major" title="Type in a name"></input>
+                            <ul id="courses"></ul>
+                        </div>
+
+                        <div id="MajorList"> Click on a requirement year to view minors. It can take up to 10 seconds to display. </div> 
+                    </div>
                 }
                 rightContent={
                     <div>
                         <div id="sortingButton">
 
-                            <DropdownButton id="dropdown-basic-button" title="Sort by">
-                                <Dropdown.Item onClick={getMinors}>A-Z</Dropdown.Item>
+                        <DropdownButton id="dropdown-basic-button" title="Sort by">
+                            <Dropdown.Item onClick={getMinors}>A-Z</Dropdown.Item>
 
-                                <Dropdown.Item onClick={getMinorsRec}>Recommended</Dropdown.Item>
-                            </DropdownButton>
+                            <Dropdown.Item onClick={getMinorsRec}>Recommended</Dropdown.Item>
+                        </DropdownButton>
                         </div>
+                        
+                        <div id="minor-search-container">
+                        <h2> Search Minors </h2>
+                            <input type="text" id="minorInput" onKeyUp={minorFilter} placeholder="Search for Minor" title="Type in a name"></input>
+                            <ul id="courses"></ul>
+                        </div>
+
+
                 
 
-                <div id="MinorList"> Click on a requirement year to view minors. It can take up to 10 seconds to display. </div> 
+                    <div id="MinorList"> Click on a requirement year to view minors. It can take up to 10 seconds to display. </div> 
                 </div>
                 }
                 
@@ -340,7 +356,7 @@ export const Majors = () => {
 
 
             </div>
-            </div>
+        </div>
 
     );
 }
