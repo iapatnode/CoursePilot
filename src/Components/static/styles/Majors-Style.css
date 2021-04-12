@@ -75,7 +75,7 @@
 }
 
 #sortingButton {
-    padding-left: 90%;
+    padding-left: 500px;
     padding-top: 1%;
 }
 
@@ -85,7 +85,7 @@
 
 #MajorList .majorminorlist {
     position: absolute;
-    top: 50px;
+    top: 100px;
     bottom: 20px;
     left: 20px;
     right: 20px;
@@ -94,7 +94,7 @@
 }
 #MinorList .majorminorlist {
     position: absolute;
-    top: 50px;
+    top: 100px;
     bottom: 20px;
     left: 20px;
     right: 20px;
@@ -128,4 +128,38 @@
     background-color: white;
     display: none;
     overflow: hidden;
+  }
+
+  #minor-search-container {
+      float: left;
+      display: flex;
+      height: 75px;
+  }
+
+  #sortingButton {
+      float: right;
+      display: flex;
+  }
+
+  #dropdown-basic-button {
+      right: 20px;
+  }
+  #minorInput {
+    background-position: 10px 12px;
+    background-repeat: no-repeat;
+    width: 100%;
+    font-size: 16px;
+    padding: 12px 20px 12px 40px;
+    border: 1px solid #ddd;
+    margin-bottom: 12px;
+  }
+
+  #majorInput {
+    background-position: 10px 12px;
+    background-repeat: no-repeat;
+    width: 100%;
+    font-size: 16px;
+    padding: 12px 20px 12px 40px;
+    border: 1px solid #ddd;
+    margin-bottom: 12px;
   }

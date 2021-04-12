@@ -1,27 +1,13 @@
-import React, {Component, useState, useEffect, useRef} from 'react';
-import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react";
+import React, {Component} from 'react';
+import {DayPilotCalendar} from "daypilot-pro-react";
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import axios from 'axios'
-import Form from 'react-bootstrap/Form'
 import '../static/styles/Schedule-Style.css'
 import Button from 'react-bootstrap/Button'
 import Logo from '../static/images/logo.jpg'
 import Image from 'react-bootstrap/Image'
 
-
-// Styles used for the calendaty component
-const styles = {
-  wrap: {
-    display: "flex"
-  },
-  left: {
-    marginRight: "10px"
-  },
-  main: {
-    flexGrow: "1"
-  }
-};
 
 // Class Variables
 global.addedClass = false; // Variable that tells whether or not the user has added a class
@@ -60,9 +46,9 @@ class Schedule extends Component {
         var newEvents = [];
         var newCourses = [];
         global.classEvents.forEach(element => {
-          if(element.text != args.e.text()) {
+          if(element.text !== args.e.text()) {
             newEvents.push(element);
-            if(newCourses.includes(element.text) == false) {
+            if(newCourses.includes(element.text) === false) {
               newCourses.push(element.text)
             }
           }
@@ -81,7 +67,6 @@ class Schedule extends Component {
   classFilter() {
     var input, filter, ul, li, a, i, txtValue;
     input = document.getElementById("myInput");
-    console.log(input)
     filter = input.value.toUpperCase();
     ul = document.getElementById("courses");
     li = ul.getElementsByTagName("li");
@@ -102,11 +87,11 @@ class Schedule extends Component {
   */
   titleCase(x) {
     var str = x.toLowerCase();
-    var str = str.split(' ');
-    for(var i = 0; i < str.length; i++) {
-      str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1);
+    var str1 = str.split(' ');
+    for(var i = 0; i < str1.length; i++) {
+      str1[i] = str1[i].charAt(0).toUpperCase() + str1[i].slice(1);
     }
-    return str.join(' ');
+    return str1.join(' ');
   }
 
   /*
@@ -142,19 +127,15 @@ class Schedule extends Component {
       duplicate classes, and the course is not added to the schedule
       */
       var text = e.target.innerText
-      var test = e.target.id;
-      console.log(test);
       global.addedClass = true;
       global.classAdded = {text};
       global.className = text.substring(0, text.indexOf("-") - 9);
       global.classEvents.forEach(element => {
-        if(element["text"] == course_code && cont) {
+        if(element["text"] === course_code && cont) {
           alert("Error: You have already added this course to your schedule");
           cont = false;
         }
       });
-
-      var id = 1
     }
 
     /*
@@ -187,7 +168,7 @@ class Schedule extends Component {
         }
         // Check if adding the course will result in a time conflict. 
         global.classEvents.forEach(element => {
-          if((element.start.value == "2013-03-25T" + global.classTime) && element.resource == res) {
+          if((element.start.value === "2013-03-25T" + global.classTime) && element.resource === res) {
             global.conflict = true;
           }
         })
@@ -215,7 +196,6 @@ class Schedule extends Component {
         cont = false;
         alert("Error: Adding '" + global.classAdded.text + "' will cause a time conflict.");
       }
-      console.log(global.courses);
     }
   }
 
@@ -233,11 +213,10 @@ class Schedule extends Component {
         removed: global.removedCourses,
       }
     );
-    console.log(global.courses);
     http.open("POST", url, true);
 
     http.onreadystatechange = function() {
-      if(http.readyState == 4) {
+      if(http.readyState === 4) {
         alert(this.responseText);
         global.courses = [];
         window.location = "/Home?" + String(queryString).split("&")[0];
@@ -263,14 +242,12 @@ class Schedule extends Component {
     var email = queryString.split("&")[0]
     var scheduleName = queryString.split("&")[1];
     scheduleName = scheduleName.split("=")[1]
-    // scheduleName = scheduleName.replaceAll("%20", " ");
-    console.log(scheduleName);
     var queryString = String(window.location).split("?")[1]
     var url = '/api/delete?' + queryString;
     http.open("POST", url, true);
     http.onreadystatechange = function() {
       if(http.readyState === 4) {
-        if(this.responseText == "success") {
+        if(this.responseText === "success") {
           alert("Schedule Deleted Successfully");
           global.formSubmitting = true;
           window.location = "/Home?" + email;
@@ -299,7 +276,6 @@ class Schedule extends Component {
     global.email = String(window.location).split("?")[1]
     global.email = String(global.email).split("&")[0]
     global.email = String(global.email).split("=")[1]
-    console.log(global.email)
     if(this.state.myRef) {
       var queryString = String(window.location).split("?")[1]
       await axios.get('http://localhost:5000/api/getScheduleInfo?' + queryString) 
@@ -315,7 +291,6 @@ class Schedule extends Component {
               events: response.data,
           })
           global.classEvents = response.data;
-          console.log(global.classEvents);
       })
       await axios.get('http://localhost:5000/api/schedule?' + queryString)
       .then((response) => {
@@ -340,10 +315,6 @@ class Schedule extends Component {
             element.appendChild(para);
           })
           document.getElementById("courses").addEventListener("click", this.addClass);
-
-          document.getElementById("myInput").addEventListener("click", function(e) {
-            console.log("bar was clicked")
-          })
       })
     }
   }
@@ -384,7 +355,7 @@ class Schedule extends Component {
                         />
                     </div>
                     <div className="col-md-3" id="search-container">
-                      <h2> Search Courses </h2>
+                      <h2 id="search-label"> Search Courses </h2>
                         <div id="div1">
                         <input type="text" id="myInput" onKeyUp={this.classFilter} placeholder="Search for Class" title="Type in a name"></input>
                         <ul id="courses"></ul>
@@ -392,15 +363,17 @@ class Schedule extends Component {
                     </div>
                 </div>
             </div>
-            <Button onClick={this.saveSchedule} variant="primary" type="submit" id="signup-form-submit" className="signup-form-field">
-                Save Schedule
-            </Button>
-            <Button onClick={this.exitSchedule} variant="secondary" type="submit" id="exit-schedule" className="signup-form-field">
-              Exit
-            </Button>
-            <Button onClick={this.deleteSchedule} variant="secondary" type="submit" id="delete-schedule" className="signup-form-field">
-              Delete Schedule
-            </Button>
+            <div id="btns">
+              <Button onClick={this.exitSchedule} variant="secondary" type="submit" id="exit-schedule">
+                Exit
+              </Button>
+              <Button onClick={this.saveSchedule} variant="primary" type="submit" id="save-schedule">
+                  Save Schedule
+              </Button>
+              <Button onClick={this.deleteSchedule} variant="secondary" type="submit" id="delete-schedule">
+                Delete Schedule
+              </Button>
+            </div>
         </div>
     );
   }

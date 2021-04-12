@@ -1,0 +1,34 @@
+
+#save-change {
+    justify-content: center;
+    background-color: #926DD6;
+    border-color: #926DD6;
+}
+
+#report-header {
+    background-color: lightgray
+}
+
+h1, h3, .h1, .h3 {
+    color: #060606;
+}
+
+#degree-report-content {
+    height: 76vh;
+    overflow-y: scroll;
+    background-color: #4B4A4A;
+    color: #F7F3F3;
+}
+
+h2, .h2  {
+    color: #926DD6
+}
+
+h4, .h4 {
+    color: #F7F3F3
+}
+
+#elective-courses {
+    margin: auto;
+    width: 50%
+}
