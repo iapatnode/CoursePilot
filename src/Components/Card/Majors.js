@@ -29,7 +29,7 @@ export const Majors = () => {
     function getMajorsAndMinorsData(requirementYear) {
         var email = String(window.location).split("?")[1];
         email = String(email).split("=")[1]
-        axios.get('http://localhost:5000/api/getAllMajorsAndMinors?email=' + email).then((response) => {
+        axios.get('http://coursepilot.gcc.edu:5000/api/getAllMajorsAndMinors?email=' + email).then((response) => {
             const firstResponse = response.data[requirementYear];
             const majorResponse = firstResponse["majors"];
             const minorResponse = firstResponse["minors"];
