@@ -25,7 +25,6 @@ export const Majors = () => {
     function getMajorsAndMinorsData(requirementYear) {
         var email = String(window.location).split("?")[1];
         email = String(email).split("=")[1]
-        console.log(email);
         axios.get('http://localhost:5000/api/getAllMajorsAndMinors?email=' + email).then((response) => {
             const firstResponse = response.data[requirementYear];
             const majorResponse = firstResponse["majors"];
@@ -40,7 +39,7 @@ export const Majors = () => {
                     var currentRequirementString = "";
                     currentRequirementString += requirement["name"] + ": ";
                     var listLength = requirement["courseList"].length;
-                    if (listLength == 0) {
+                    if (listLength === 0) {
                         currentRequirementString += requirement["numHoursRequired"] + " hours";
                     }
                     else {
@@ -48,7 +47,7 @@ export const Majors = () => {
                         currentRequirementString += requirement["numHoursRequired"] + " hours from ";
                         requirement["courseList"].forEach(course => {
                             currentLength++;
-                            if (currentLength == listLength) {
+                            if (currentLength === listLength) {
                                 currentRequirementString += course;
                             }
                             else {
@@ -92,7 +91,7 @@ export const Majors = () => {
                     var currentRequirementString = "";
                     currentRequirementString += requirement["name"] + ": ";
                     var listLength = requirement["courseList"].length;
-                    if (listLength == 0) {
+                    if (listLength === 0) {
                         currentRequirementString += requirement["numHoursRequired"] + " hours";
                     }
                     else {
@@ -100,7 +99,7 @@ export const Majors = () => {
                         currentRequirementString += requirement["numHoursRequired"] + " hours from ";
                         requirement["courseList"].forEach(course => {
                             currentLength++;
-                            if (currentLength == listLength) {
+                            if (currentLength === listLength) {
                                 currentRequirementString += course;
                             }
                             else {
@@ -144,7 +143,7 @@ export const Majors = () => {
                     var currentRequirementString = "";
                     currentRequirementString += requirement["name"] + ": ";
                     var listLength = requirement["courseList"].length;
-                    if (listLength == 0) {
+                    if (listLength === 0) {
                         currentRequirementString += requirement["numHoursRequired"] + " hours";
                     }
                     else {
@@ -152,7 +151,7 @@ export const Majors = () => {
                         currentRequirementString += requirement["numHoursRequired"] + " hours from ";
                         requirement["courseList"].forEach(course => {
                             currentLength++;
-                            if (currentLength == listLength) {
+                            if (currentLength === listLength) {
                                 currentRequirementString += course;
                             }
                             else {

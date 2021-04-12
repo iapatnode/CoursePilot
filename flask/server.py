@@ -3,11 +3,13 @@ from flask_cors import CORS
 import os, re, json
 from datetime import datetime
 from mysql.connector import connect, Error
-import AutoGenerateSchedule as AGS
 import MinorRecomendation as MinorRecommendation
-import dbQueries as db_queries
-import degreeReport as report
+import string
+import random
 
+
+#Which users are logged in
+user_dict = {}
 
 #Flask App Setup
 app = Flask(__name__)
@@ -97,8 +99,15 @@ def login():
             cursor.close()
 
         if valid:
+            uid = ""
+            if not email in user_dict:
+                letters = string.ascii_letters
+                uid = ''.join(random.choice(letters) for i in range(32))
+                user_dict[email] = uid
+            else:
+                uid = user_dict[email]
             return {
-                "text": "success"
+                "text": uid
             }
         
         #If the user's credentials are not found, redirect them back to the login page
@@ -243,9 +252,13 @@ def sign_up():
             cursor.close()
 
             user_email = email
-
+            uid = ""
+            if not email in user_dict:
+                letters = string.ascii_letters
+                uid = ''.join(random.choice(letters) for i in range(32))
+                user_dict[email] = uid
             return {
-                "text": return_message
+                "text": uid
             }
         else:
             return {
@@ -296,6 +309,10 @@ def home():
     # Variable to tell which user is logged in and what semester they have selected for their schedule
     semester_selection = request.args.get("semester")
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     if request.method == "GET":
         all_schedules = []
         cursor = conn.cursor()
@@ -346,7 +363,6 @@ def search():
         search_val = ""
         search_val = request.form.get("outlined-search")
         cursor = conn.cursor()
-        classArray = []
         courseArray = []
 
         cursor.execute(''' 
@@ -390,11 +406,14 @@ POST: When a post request is received, the route takes all of the courses that
 def schedule():
     semester_selection = request.args.get("semester")
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     schedule_name = request.args.get("ScheduleName")
 
     if request.method == "GET":
         cursor = conn.cursor()
-        classArray = []
         courseArray = []
 
         
@@ -441,18 +460,22 @@ def schedule():
         return json.dumps(courseArray)
     
     if request.method == "POST":
-        return_text = ""
         cursor = conn.cursor()
+        # Update the time that the schedule was last modified
+        created_at = datetime.now()
+        formatted_date = created_at.strftime('%Y-%m-%d %H:%M:%S')
+        update_schedule = "UPDATE Schedule SET dateModified = %s where scheduleName = %s and email = %s"
+        cursor.execute(update_schedule, (formatted_date, schedule_name, user_email,))
+
+        return_text = ""
 
         # Get data from the semester form that the user submitted
         data = request.data.decode("utf-8")
         json_data = json.loads(data)
         code_pt_1 = ""
-        code_pt_2 = ""
         section = ""
         codes = []
         sections = []
-        classes = []
 
         #Delete courses that were removed from the schedule
         for course in json_data.get("removed"):
@@ -466,9 +489,6 @@ def schedule():
             ''', (f"%{(schedule_name)}%", f"%{(user_email)}%",))
 
         semester = cursor.fetchall()
-        # for result in semester:
-        #     semester_current = result[0]
-        # semester_selection = semester_current
 
         #Do some formatting with the strings to get course name, codes, etc...
         if json_data.get("courses"):
@@ -478,7 +498,6 @@ def schedule():
                 code_pt_1 = course_string[0: index + 4]
                 section = course[-1]
                 code = code_pt_1.replace("-", " ")
-                course_w_section = f"{code} {section}"
                 codes.append(code)
                 sections.append(section)
 
@@ -565,6 +584,10 @@ POST: When the user posts to this endpoint, the following code removed
 def delete_schedule():
     schedule_name = request.args.get("ScheduleName")
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     cursor = conn.cursor()
     cursor.execute('''
         delete from ScheduleClass WHERE email like %s AND scheduleName like %s;
@@ -617,6 +640,10 @@ def get_data_compare():
         compare_schedule_two = request.args.get("scheduleTwo")
         user_email = request.args.get("email")
         user_email = user_email[6:]
+        global user_dict
+        for entry in user_dict: 
+            if user_dict[entry] == user_email:
+                user_email = entry
         semester_selection = "fall"
         schedule_name = "bruh"
         backColor = ""
@@ -722,6 +749,10 @@ def get_data_compare():
 def profile():
     if request.method == "GET":
         user_email = request.args.get("email")
+        global user_dict
+        for entry in user_dict: 
+            if user_dict[entry] == user_email:
+                user_email = entry
         passwrd = ""
         majors = []
         minors = []
@@ -745,7 +776,6 @@ def profile():
         cursor.execute(password_query, (user_email,))
         results = cursor.fetchone()
         passwrd = results[0]
-        print(f"Password: {passwrd}")
         return {
             "email": user_email,
             "majors": majors, 
@@ -759,6 +789,10 @@ def changeMajor():
     cursor = conn.cursor()
     valid = True
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     data = request.data.decode("utf-8")
     json_data = json.loads(data)
     major = json_data.get("major")
@@ -813,6 +847,11 @@ def changeMajor():
                 addMinors = "insert into StudentMajorMinor values (%s, %s)"
                 cursor.execute(addMinors, (user_email, minor))
                 conn.commit()
+            
+            # Delete courses that Student has taken (fixes bug in Degree report)
+            delete_courses_query = "delete from StudentCourses where email = %s"
+            cursor.execute(delete_courses_query, (user_email,))
+            conn.commit()
 
         except Error as error:
             #If you cannot insert the invidual into the database, print error and reroute
@@ -826,6 +865,10 @@ def changeMinor():
     valid = True
     requirement_year = 2017
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     data = request.data.decode("utf-8")
     json_data = json.loads(data)
     minor = json_data.get("minor")
@@ -894,7 +937,10 @@ def changePassword():
     oldPassword = json_data.get("oldPassword")
     newPassword = json_data.get("newPassword")
     user_email = request.args.get("email")
-    print(f"New Password: {newPassword} ----- Old Password: {oldPassword}")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     valid = False
     cursor = conn.cursor()
     getUserPassword = "select passwrd from Student where email = %s"
@@ -910,6 +956,21 @@ def changePassword():
         return  "success"
     else:
         return "error"
+    
+@app.route("/api/logout", methods=["POST"])
+def logout():
+    user_email = request.args.get("email")
+    global user_dict
+    email = ""
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            email = entry
+    if entry != "":
+        del user_dict[entry]
+    return {
+        "text": "success"
+    }
+
     
     
 """
@@ -931,6 +992,10 @@ def get_new_schedule():
 
         schedule_name = request.args.get("ScheduleName")
         user_email = request.args.get("email")
+        global user_dict
+        for entry in user_dict: 
+            if user_dict[entry] == user_email:
+                user_email = entry
 
         # Make sure the user entered a schedule name, get all courses in that schedule
         if schedule_name != "":
@@ -1030,18 +1095,40 @@ def get_existing_schedule():
     else:
         return "blah"
 
+'''
+/API/DEGREEREPORT
+-------------------
+This is the endpoint that handles the user adding and removing courses from the Degree Report page
+
+GET: sets up the Degree report page with the necessary information about the database from the student: 
+     degree name, requirement categories, requirement courses, courses completed
+
+POST: The user sends a post request when they submit the form that is the Degree Report page. When they
+      do, the courses that they have selected are added to the database (if not yet in the datase) and
+      the courses they have unmarked are removed from the database (if in the database)
+'''
 @app.route("/api/degreereport", methods=["GET", "POST"])
 def degree_report():
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
 
     if request.method == "GET":
+        # Gets the ids of all majors of the students
+        degreeIds = getStudentMajors(user_email)
 
-        degreeIds = report.getStudentMajors(user_email)
-        studentDegreeReqs = report.getMajorRequirements(degreeIds[0][0])
+        # Gets the degree details of the first major of the student
+        studentDegreeReqs = getMajorRequirements(degreeIds[0][0])
 
-        studentCourses = report.getStudentCourses(user_email)
+        # Gets all courses in the database
+        courses = getAllCourses()
 
-        studentReqDetails = [studentDegreeReqs, studentCourses]
+        # Gets all courses the student has taken: parsed into selected courses and checked courses
+        parsedCourses = parseStudentCourses(user_email, studentDegreeReqs)
+
+        studentReqDetails = [studentDegreeReqs, courses, parsedCourses]
 
         return json.dumps(studentReqDetails)
         
@@ -1049,21 +1136,31 @@ def degree_report():
         data = request.data.decode("utf-8")
         json_data = json.loads(data)
 
-        addCourses = json_data.get("add")
-        deleteCourses = json_data.get("remove")
+        addCheckedCourses = json_data.get("checkedAdd")
+        addSelectedCourses = json_data.get("selectedAdd")
+        deleteCheckedCourses = json_data.get("checkedRemove")
+        deleteSelectedCourses = json_data.get("selectedRemove")
 
-        report.insertStudentCourses(user_email, addCourses)
-        report.deleteStudentCourses(user_email, deleteCourses)
+        # Adds completed courses to the database
+        insertStudentCourses(user_email, addCheckedCourses)
+        insertStudentCourses(user_email, addSelectedCourses)
 
-        return redirect(f"http://localhost:3000/degreereport?email={user_email}")
+        # Removes now incompleted courses from the database
+        deleteStudentCourses(user_email, deleteCheckedCourses)
+        deleteStudentCourses(user_email, deleteSelectedCourses)
 
-
+        return redirect(f"http://localhost:3000/api/degreereport?email={user_email}")
 
 
 @app.route("/api/autoGenerate", methods=["GET", "POST"])
 def autoGenerate():
     #TODO: Return user data retrieved from database tables as needed
     user_email = request.args.get("email")
+    uid = user_email
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     semester_selection = request.args.get("semester")
     schedule_name = request.args.get("name")
     if request.method == "GET":
@@ -1094,28 +1191,18 @@ def autoGenerate():
         formatted_date = created_at.strftime('%Y-%m-%d %H:%M:%S')
         session["schedule_semester"] = schedule_semester #Test to load courses and whatnot
 
-        insert_schedule_query = "INSERT INTO Schedule values (%s, %s, %s, %s)"
-        cursor.execute(insert_schedule_query, (schedule_name, formatted_date, user_email, schedule_semester))
-        conn.commit()
+        try:
+            insert_schedule_query = "INSERT INTO Schedule values (%s, %s, %s, %s)"
+            cursor.execute(insert_schedule_query, (schedule_name, formatted_date, user_email, schedule_semester))
+            conn.commit()
+        except Exception:
+            return redirect(f"http://localhost:3000/Home?email={uid}")
 
         semester = semester_selection
 
-        RecommendedCourses = AGS.GetAutoGeneratedSchedule(user_email, semester)
+        RecommendedCourses = GetAutoGeneratedSchedule(user_email, semester)
 
-        #classInsert = "INSERT into ScheduleClass (scheduleName, email, courseSection, courseCode, meetingDays, classSemester) VALUES (%s, %s, %s, %s, %s, %s)"
-        #cursor.execute(classInsert, (schedule_name, user_email, RecommendedCourses[0].courseSection, RecommendedCourses[0].courseCode, RecommendedCourses[0].dayAvail, RecommendedCourses[0].semesterAvail))
-      
-
-
-        # for course in RecommendedCourses:
-        #     print(course.courseSection)
-        #     print(course.courseCode)
-        #     print(course.dayAvail)
-        #     print(course.semesterAvail)
-        #     print(course.startTime)
-        #     print(course.endTime)
         for course in RecommendedCourses:
-            #print(course.courseName)
             classInsert = "INSERT into ScheduleClass (scheduleName, email, courseSection, courseCode, meetingDays, classSemester, startTime, endTime) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
             cursor.execute(classInsert, (schedule_name, user_email, course.courseSection, course.courseCode, course.dayAvail, course.semesterAvail, course.startTime, course.endTime))
             conn.commit()
@@ -1123,12 +1210,646 @@ def autoGenerate():
 
 
 
-        schedule_url = f"http://localhost:3000/Schedule?email={user_email}&ScheduleName={schedule_name}"
+        schedule_url = f"http://localhost:3000/Schedule?email={uid}&ScheduleName={schedule_name}"
 
         return redirect(schedule_url)
 
 @app.route("/api/getAllMajorsAndMinors", methods=["GET"])
 def getAllMajorsAndMinors():
     user_email = request.args.get("email")
+    global user_dict
+    for entry in user_dict: 
+        if user_dict[entry] == user_email:
+            user_email = entry
     all = MinorRecommendation.getEverythingJSON(user_email)
     return json.dumps(all)
+
+
+"""
+***DATABASE QUERIES FOR DEGREE REPORT***
+"""
+# Gets all majors of the student signed in from the database
+def getStudentMajors(email):
+    cursor = conn.cursor()
+
+    studentDegreeQuery = '''select degreeId from StudentMajorMinor join MajorMinor 
+                            using(degreeId) where email = %s and isMinor = 0'''
+
+    studentDegrees = []
+    try:
+        cursor.execute(studentDegreeQuery, (email,))
+        studentDegrees = cursor.fetchall()
+
+    except Error as error:
+        print("Unable to obtain student majors..." + str(error))
+
+    cursor.close()
+
+    return studentDegrees
+
+# Grabs requirement details from the database pertaining to the specified major
+# Includes: degree information; requirement category, details, and hours; and course information
+def getMajorRequirements(degreeId):
+    cursor = conn.cursor()
+
+    majorReqQuery = '''select degreeName, degreeHrs, reqYear, category from MajorMinor 
+                    join MajorMinorRequirements using(degreeId) where degreeId = %s'''
+
+    reqDetailsQuery = '''select category, reqDetails, requiredHrs, totalHrs from Requirement
+                        where category = %s and requirementYear = %s'''
+
+    reqCoursesQuery = '''select reqGroup, courseCode, courseName from Requirement join ReqCourses
+                        on Requirement.category = ReqCourses.category and requirementYear = catYear
+                        join Course using(courseCode) where Requirement.category = %s and 
+                        requirementYear = %s'''
+
+    degreeReqDict = {}
+
+    try:
+        # Gets degree requirement details
+        cursor.execute(majorReqQuery, (degreeId,))
+        degreeReq = cursor.fetchall()
+
+        reqCats = []
+
+        # Gets each requirement for the specified degree
+        for category in degreeReq:
+            reqCats.append(category[3])
+        
+        studentReqDetails = []
+
+        # Gets information for each requirement under the specified degree
+        for req in reqCats:
+            # Gets courses related to the requirement specified
+            # Note: degreeReq[0][2] is the requirement year
+            cursor.execute(reqCoursesQuery, (req, degreeReq[0][2],))
+
+            courses = cursor.fetchall()
+
+            courseList = []
+
+            # Creates a list of courses where each course is a dictionary
+            for course in courses:
+                courseDict = {
+                    #NOTE: MAY NOT NEED REQ_GROUP
+                    "req_group": course[0],
+                    "course_code": course[1],
+                    "course_name": course[2]
+                }
+                courseList.append(courseDict)
+
+            # Gets details related to the requirement (excluding the courses)
+            # Note: degreeReq[0][2] is the requirement year
+            cursor.execute(reqDetailsQuery, (req, degreeReq[0][2],))
+
+            reqDetails = cursor.fetchall()
+
+            # Adds the requirement and its details (including the courses) to a list of the degree requirements
+            # Note: the requirement information is stored as a dictionary
+            for detail in reqDetails:
+                reqDict = {
+                    "req_category": detail[0],
+                    "req_details": detail[1],
+                    #NOTE: MAY NOT NEED BOTH REQUIRED HRS AND TOTAL HRS
+                    "required_hrs": detail[2],
+                    "total_hrs": detail[3],
+                    "req_courses": courseList
+                }
+                studentReqDetails.append(reqDict)
+        
+        # Final dictionary that has degree information stored as a dictionary
+        degreeReqDict = {
+            "degree_name": degreeReq[0][0],
+            "degree_hours": degreeReq[0][1],
+            "req_yr": degreeReq[0][2],
+            "req_details": studentReqDetails
+        }
+
+    except Error as error:
+        print("Unable to obtain student major details..." + str(error))
+
+    cursor.close()
+
+    return degreeReqDict
+
+# Gets all courses from the database
+def getAllCourses():
+    cursor = conn.cursor()
+
+    selectQuery = "select courseCode, courseName from Course"
+
+    courses = []
+
+    try:
+        cursor.execute(selectQuery)
+
+        dbCourses = cursor.fetchall()
+
+        for course in dbCourses:
+            courseDict = {
+                "course_code": course[0],
+                "course_name": course[1],
+            }
+            courses.append(courseDict)
+
+    except Error as error:
+        print("Unable to get courses..." + str(error))
+    
+    cursor.close()
+
+    return courses
+
+# Gets information for courses the student has taken
+def getStudentCourses(email):
+    cursor = conn.cursor()
+
+    selectQuery = '''select courseCode, courseName, reqCategory, reqYear from StudentCourses
+                    join Course using(courseCode) where email = %s'''
+
+    studentCourses = []
+
+    try:
+        cursor.execute(selectQuery, (email,))
+
+        courseDetails = cursor.fetchall()
+
+        # Adds each course as a dictionary to a list of courses
+        for course in courseDetails:
+            courseDict = {
+                "course_code": course[0],
+                "course_name": course[1],
+                "req_category": course[2],
+                "req_yr": course[3]
+            }
+            studentCourses.append(courseDict)
+
+    except Error as error:
+        print("Unable to obtain student courses..." + str(error))
+    
+    cursor.close()
+    
+    return studentCourses
+
+# Splits the courses into two groups: ones that were checked and ones that were selected
+def parseStudentCourses(email, requirementDetails):
+    checkedCourses = []
+    selectedCourses = []
+
+    # Get courses from database that the student has completed
+    studentCourses = getStudentCourses(email)
+
+    for requirement in requirementDetails["req_details"]:
+        # If requirement has courses related to it, it is a checked requirement
+        if requirement["req_courses"]:
+            for course in studentCourses:
+                if course["req_category"] == requirement["req_category"]:
+                    checkedCourses.append({"course_code": course["course_code"], "course_name": course["course_name"], "req_category": course["req_category"], "req_yr": course["req_yr"]})
+        # If requirement does not have courses related to it, it is a selected requirement
+        else:
+            for course in studentCourses:
+                if course["req_category"] == requirement["req_category"]:
+                    selectedCourses.append({"course_code": course["course_code"], "course_name": course["course_name"], "req_category": course["req_category"], "req_yr": course["req_yr"]})
+                        
+    return {"checked": checkedCourses, "selected": selectedCourses}
+
+# Inserts completed courses into the database
+def insertStudentCourses(email, courses):
+    cursor = conn.cursor()
+
+    courseQuery = "Insert into StudentCourses(email, courseCode, reqCategory, reqYear) values (%s, %s, %s, %s)"
+
+    studentCourses = getStudentCourses(email)
+
+    try:
+        for course in courses:
+            # Checks that course is not already in the database
+            if not any(c["course_code"] == course["course_code"] and c["req_category"] == course["req_category"] for c in studentCourses):
+                cursor.execute(courseQuery, (email, course["course_code"], course["req_category"], course["req_yr"],))
+            
+        conn.commit()
+    
+    except Error as error:
+        print("Unable to insert courses..." + str(error))
+    
+    cursor.close()
+
+# Deletes courses that were previously completed but are now incompleted from the database
+def deleteStudentCourses(email, courses):
+    cursor = conn.cursor()
+
+    deleteQuery = "Delete from StudentCourses where email = %s and courseCode = %s and reqCategory = %s"
+
+    studentCourses = getStudentCourses(email)
+
+    try:
+        for course in courses:
+            # Checks that course exists in the database
+            if any(c["course_code"] == course["course_code"] and c["req_category"] == course["req_category"] for c in studentCourses):
+                cursor.execute(deleteQuery, (email, course["course_code"], course["req_category"],))
+            
+        conn.commit()
+    
+    except Error as error:
+        print("Unable to delete course..." + str(error))
+
+    cursor.close()
+
+
+
+#----------------------------------------------------------------------------------------
+#                            AUTO GENERATE SCHEDULE ALGORITHM
+#
+# This algorithm will return a tailored schedule to the user based on the courses they
+# have already taken and the ones they can take. The algoritm is weighted heavily on
+# prerequisite depth, available times and the courses not taken by the user. 
+#
+# it runs in three seperate operations
+# REMOVAL - remove all the courses the user has taken and the ones they cannot take
+# SORT - sort the courses based on their weights
+# APPEND - place the courses into a list that will be returned to the user as a schedule
+#----------------------------------------------------------------------------------------
+
+
+
+# class structure for a student
+class Student:
+    def __init__(self, name, studentID, studentMajor):
+        self.name = name
+        self.studentID = studentID
+        self.studentMajor = studentMajor
+
+# class structure for a Course (which is different from a class - explained below)
+class Course:
+    def __init__(self, courseCode, semesterAvail, courseName, creditHours, prerequisites, prerequisiteDepth, courseSection, dayAvail, startTime, endTime):
+        self.courseCode = courseCode
+        self.semesterAvail = semesterAvail
+        self.courseName = courseName
+        self.creditHours = creditHours
+        self.prerequisites = prerequisites
+        self.prerequisiteDepth = prerequisiteDepth
+        self.courseSection = courseSection
+        self.dayAvail = dayAvail
+        self.startTime = startTime
+        self.endTime = endTime
+
+'''
+class structure for a Class
+    Course and Class are different becuase a Course is unique... there is only one Course
+    with a Class however there are multiple different sections, times, days avaiable for that
+    Course. Thus the Class structure is here to keep account for that
+'''
+class Class:
+    def __init__(self, courseCode=None, semesterAvail=None, timeAvail=None, dayAvail=None, courseSection=None, startTime=None, endTime=None):
+        self.courseCode = courseCode
+        self.semesterAvail = semesterAvail
+        self.timeAvail = timeAvail
+        self.dayAvail = dayAvail
+        self.courseSection = courseSection
+        self.startTime = startTime
+        self.endTime = endTime
+    
+
+'''
+----------------------------------------------------
+                    AUTO GENERATION
+----------------------------------------------------
+This method is the actual algorithm in play. It will
+make calls to other functions and use lists generated
+by those functions but this is where the logic takes
+place for the algorithm to function properly.
+
+user_email - the email of the user
+semester_selection - which semester to generate 
+                     courses for
+----------------------------------------------------
+'''
+def GetAutoGeneratedSchedule(user_email, semester_selection):
+    # list of all the courses the user has already taken
+    CoursesTaken = getTakenCourses(user_email)
+    # list of all the courses that are required to be taken
+    CoursesRequired = getRequiredCourses(user_email)
+    # list of all the class times of the required courses
+    ClassTimes = getRequiredClasses(CoursesRequired, semester_selection)
+
+    # variable used to determine the year of the user
+    creditHoursTaken = getCreditHours(CoursesTaken)
+    
+    
+    for course in CoursesRequired:
+        # complicated function to get the prerequisite depth of each course - see below for more detail
+        getPrereqDepth(course, course.prerequisiteDepth)
+
+    
+    #------------------------------------------
+    #                  REMOVAL
+    #------------------------------------------
+
+    for courseRequired in CoursesRequired[:]:
+        # making sure the course required is in the right semester
+        if (courseRequired.semesterAvail != semester_selection and courseRequired.semesterAvail != "both"):
+            CoursesRequired.remove(courseRequired)
+        # if the user has not taken any courses then any course with prereqs will be removed
+        elif (len(CoursesTaken) == 0):
+            if (len(courseRequired.prerequisites) != 0):
+                CoursesRequired.remove(courseRequired)
+        else:
+            # variable used to determine if a course should be removed
+            removeCourse = False
+            for courseTaken in CoursesTaken:
+                # if the course has already been taken remove it
+                if (courseRequired.courseCode == courseTaken.courseCode):
+                    removeCourse = True
+
+            for prereq in courseRequired.prerequisites:
+                # prereq size is used as a variable to check if all the prereqs have been taken
+                prereqSize = 0
+                for courseTaken in CoursesTaken:
+                    # if the user has taken the prereq then increment the size
+                    if (prereq.courseCode == courseTaken.courseCode):
+                        prereqSize += 1
+                # if the user hasn't taken the prereqs then remove the course
+                if (prereqSize != len(courseRequired.prerequisites)):
+                    removeCourse = True
+
+            if (removeCourse == True):
+                CoursesRequired.remove(courseRequired)
+
+    # used for displaying the courses in the UI. Making the semester both assures it works with either semester
+    for course in CoursesRequired:
+        if (course.semesterAvail == "both"):
+            course.semesterAvail = semester_selection
+
+    #------------------------------------------
+    #                   SORT
+    #------------------------------------------
+    # sort the courses by their prerequisites in decreasing order
+    CoursesRequired.sort(reverse=True, key=sortValue)
+
+    # the schedule that will be returned
+    recommendedSchedule = []
+    # list used to assure no class overlap
+    takenTimes = []
+
+    # used to make sure the user doesn't go over 17 credit hours and get overcharged
+    creditHours = 0
+
+    for course in CoursesRequired:
+        # if there are no courses currently recommended
+        if (len(recommendedSchedule) == 0):
+            # checking to make sure the courses time isn't already taken (even though it is the first class)
+            if (checkIfTimeAvail(course, ClassTimes, takenTimes) != False):
+                # append the course
+                recommendedSchedule.append(course)
+                creditHours += course.creditHours
+        else:
+            # making sure there are no two duplicates
+            # this should be handled with the Class times but this backs it up to assure no two courses are the same at all
+            courseDuplicate = True
+            # only one huma should be taken at a time
+            oneHuma = True
+            # this variable is used to see if the user can take level 300 and 400 courses
+            canTakeHigher = True
+            for recommendedCourse in recommendedSchedule[:]:
+                # checking for a duplicate
+                if (recommendedCourse.courseCode == course.courseCode):
+                    courseDuplicate = False
+                # assuring only one huma
+                if (course.courseName[0:3] == "CIV" and recommendedCourse.courseName[0:3] == "CIV" or course.courseCode[0:4] == "HUMA" and recommendedCourse.courseCode[0:4] == "HUMA"):
+                    oneHuma = False
+                courseLevel = re.findall('\d+', course.courseCode)
+                # assuring freshman and sophomores only take 100-200 level courses and seniors can take 300-400 courses
+                if (courseLevel[0][:1] == '3' and creditHoursTaken < 30 or courseLevel[0][:1] == '4' and creditHoursTaken < 30):
+                    canTakeHigher = False
+            # if every check passes
+            if (creditHours <= 12 and courseDuplicate == True and oneHuma == True and canTakeHigher == True):
+                # if the time is available
+                if (checkIfTimeAvail(course, ClassTimes, takenTimes) != False):
+                    # add the course
+                    recommendedSchedule.append(course)
+                    creditHours += course.creditHours
+            # reseting the variables
+            courseDuplicate = True
+            oneHuma = True
+            canTakeHigher = True
+
+    return recommendedSchedule
+    
+'''
+----------------------------------------------
+This function will return the number of credit
+hours the user has taken
+----------------------------------------------
+CoursesTaken - the courses the user has taken
+----------------------------------------------
+'''
+def getCreditHours(CoursesTaken):
+    creditHoursTaken = 0
+    for course in CoursesTaken:
+        creditHoursTaken += course.creditHours
+    return creditHoursTaken
+
+'''
+----------------------------------------------
+This function checks if a course can be added
+without overlap between courses
+----------------------------------------------
+course - the course in question to be added
+ClassTimes - the classtimes of all the courses
+takenTimes - the times of all the courses 
+            already in the schedule
+----------------------------------------------
+'''
+def checkIfTimeAvail(course, ClassTimes, takenTimes):
+    for classTime in ClassTimes:
+        # go to the course in question and get it's class times
+        if (course.courseCode == classTime.courseCode):
+            # if the user already has courses in the recommended schedule
+            if (len(takenTimes) != 0):
+                # variable to make sure the time is avaiable
+                timeFree = True
+                for takenTime in takenTimes[:]:
+                    # if the timeavail is the same then don't add
+                    if (classTime.timeAvail == takenTime.timeAvail):
+                        timeFree = False
+                    # if the starttime is between the taken time then don't add
+                    elif (takenTime.startTime <= classTime.startTime and classTime.startTime <= takenTime.endTime):
+                        timeFree = False
+                    # if the endtime is between the taken time then don't add
+                    elif (takenTime.startTime <= classTime.endTime and classTime.endTime <= takenTime.endTime):
+                        timeFree = False
+                # if ya can add the course
+                if (timeFree == True):
+                    # THEN ADD THE COURSE!
+                    course.courseSection = classTime.courseSection
+                    course.dayAvail = classTime.dayAvail
+                    course.startTime = classTime.startTime
+                    course.endTime = classTime.endTime
+                    takenTimes.append(classTime)
+                    return True
+            else:
+                # if it's the first course to be added then add it
+                course.courseSection = classTime.courseSection
+                course.dayAvail = classTime.dayAvail
+                course.startTime = classTime.startTime
+                course.endTime = classTime.endTime
+                takenTimes.append(classTime)
+                return True
+    return False
+
+'''
+----------------------------
+Used for sorting in reverse
+----------------------------
+'''
+def sortValue(course):
+    return course.prerequisiteDepth
+
+'''
+---------------------------------------------------
+This function is a recursive function that will
+return the prerequisite depth of each course.
+Prereq depth is given by how many courses need
+the course in question... I.E. COMP 141 is needed
+by almost every computer science class, thus it
+will have a massive prerequisite depth
+---------------------------------------------------
+course - the course to get prereq depth of
+coursePrereqDepth - the current depth of the course
+---------------------------------------------------
+'''
+def getPrereqDepth(course, coursePrereqDepth):
+    # base case for the courses that have zero prereqs
+    if (len(course.prerequisites) == 0):
+        # the default coursePrereqDepth will be 0
+        course.prerequisiteDepth = coursePrereqDepth
+        return 0
+    else:
+        for prereq in course.prerequisites:
+            # some courses have themselves as a prereq... 
+            # this makes sure that wont result in an infinite loop
+            if prereq.courseCode != course.courseCode:
+                # set this courses prereq depth
+                prereq.coursePrereqDepth = coursePrereqDepth
+                # RECURSIVE FUNCTION!!!!
+                getPrereqDepth(prereq, coursePrereqDepth + 1)
+    return 0
+
+'''
+---------------------------------------------------
+This function will get the courses the user has
+already taken and assign them to a class structure
+---------------------------------------------------
+user_email - the users email
+---------------------------------------------------
+'''
+def getTakenCourses(user_email):
+
+    try:
+        # getting all of the courses the user has taken
+        cursor = conn.cursor()
+        cursor.execute("select Course.courseCode, Course.courseSemester, Course.courseName, Course.creditHours from StudentCourses JOIN Course on StudentCourses.courseCode = Course.courseCode WHERE StudentCourses.email = %s;", (user_email,))
+        info = cursor.fetchall()
+        takenCourses = []
+
+        for val in info:
+            # creating a new course structure for each course recieved through the query
+            newCourse = Course(val[0], val[1], val[2], val[3], [], 0, "", "", "", "")
+            takenCourses.append(newCourse)
+
+        return takenCourses
+    except error as error:
+        print("Could not pull the data" + str(error))
+
+'''
+---------------------------------------------------
+This function will get the courses the user needs 
+to take and assign them to a class structure
+---------------------------------------------------
+user_email - the users email
+---------------------------------------------------
+'''
+def getRequiredCourses(user_email):
+    
+    try:
+        # getting all of the required courses for the user's major
+        cursor = conn.cursor()
+        cursor.execute("select degreeId from StudentMajorMinor WHERE email = %s;", (user_email,))
+
+        # we only want the first value from this query which is the degree ID
+        degreeID = cursor.fetchall()[0]
+        
+
+        # getting the required courses for the user's major
+        cursor.execute("select Course.courseCode, Course.courseSemester, Course.courseName, Course.creditHours from Course JOIN ReqCourses ON Course.courseCode = ReqCourses.courseCode JOIN MajorMinorRequirements ON ReqCourses.category = MajorMinorRequirements.category JOIN MajorMinor ON MajorMinorRequirements.degreeId = MajorMinor.degreeId WHERE MajorMinor.degreeId = %s", (degreeID))
+        info = cursor.fetchall()
+        requiredCourses = []
+
+        for val in info:
+            # if it is not the first course being created
+            if (len(requiredCourses) != 0):
+                # variable used to see if we should add a course
+                addCourse = True
+                # for loop to make sure duplicates don't occur
+                for course in requiredCourses:
+                    if (course.courseCode == val[0]):
+                        addCourse = False
+                if (addCourse == True):
+                    # add the course!
+                    newCourse = Course(val[0], val[1], val[2], val[3], [], 0, "x", "x", "", "")
+                    requiredCourses.append(newCourse)
+            # if it is the first course being created
+            else:
+                # add the course!
+                newCourse = Course(val[0], val[1], val[2], val[3], [], 0, "x", "x", "", "")
+                requiredCourses.append(newCourse)
+
+        # get the prereqs for each of the courses
+        cursor.execute("SELECT * FROM Prerequisite WHERE prereqGroup = 1;")
+        prereqs = cursor.fetchall()
+        
+        # add the prereqs to each course
+        for prereq in prereqs:
+            for course in requiredCourses:
+                if (course.courseCode == prereq[2]):
+                    for secondCourse in requiredCourses:
+                        if (secondCourse.courseCode == prereq[1]):
+                            course.prerequisites.append(secondCourse)
+
+        return requiredCourses
+
+    except error as error:
+        print("Could not pull the data" + str(error))
+
+
+'''
+---------------------------------------------------
+This function will get the classes the user needs
+to take and assign them to a class structure
+---------------------------------------------------
+user_email - the users email
+---------------------------------------------------
+'''
+def getRequiredClasses(CoursesRequired, semester_selection):
+    try:
+        # get all of the times for each course
+        cursor = conn.cursor()
+        cursor.execute("select * FROM Class WHERE classSemester = %s;", (semester_selection,))
+        info = cursor.fetchall()
+        times = []
+
+        for val in info:
+            # assign them to a class structure
+            newClass = Class(val[5], val[1], str(val[2]) + str(val[3]), val[4], val[0], val[2], val[3])
+            times.append(newClass)
+        
+
+        # only return the times for the courses required
+        classTimes = []
+        for classTime in times:
+            for course in CoursesRequired:
+                if (classTime.courseCode == course.courseCode):
+                    classTimes.append(classTime)
+
+        return classTimes
+    except error as error:
+        print("Could not pull the data" + str(error))

@@ -263,7 +263,6 @@ def recommendMinorsJSON(userEmail, allMinors):
     classesChecked = []
 
     #1st Pass
-    print("Taken Classes")
     for classTaken in classesTaken:
         if (classTaken["code"] not in classesChecked):
             classesChecked.append(classTaken["code"])
@@ -275,14 +274,12 @@ def recommendMinorsJSON(userEmail, allMinors):
                         if classTaken["code"] in requirement["courseList"]:
                             usedInMinor = True
                             if (requirement["requirementMet"] == False):
-                                print(classTaken["code"])
                                 minorVar["hoursRemaining"] -= classTaken["hours"]
                                 requirement["hoursRemaining"] -= classTaken["hours"]
                                 if (requirement["hoursRemaining"] <= 0):
                                     requirement["requirementMet"] = True
 
     #2nd Pass
-    print("Remaining Classes")
     for remainingClass in remainingClassesInMajor:
         if remainingClass["code"] not in classesChecked:
             classesChecked.append(remainingClass["code"])
@@ -294,7 +291,6 @@ def recommendMinorsJSON(userEmail, allMinors):
                         if remainingClass["code"] in requirement["courseList"]:
                             usedInMinor = True
                             if (requirement["requirementMet"] == False):
-                                print(remainingClass["code"])
                                 minorVar["hoursRemaining"] -= remainingClass["hours"]
                                 requirement["hoursRemaining"] -= remainingClass["hours"]
                                 if (requirement["hoursRemaining"] <= 0):
@@ -344,7 +340,6 @@ def getRequiredCourses(user_email):
 
         # add the prereqs to the user
                             
-        print(requiredCourses)
         return requiredCourses
 
     except error as error:

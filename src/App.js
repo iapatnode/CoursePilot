@@ -7,7 +7,6 @@ import DegreeReportPage from './Pages/DegreeReportPage';
 import MajorsPage from './Pages/MajorsPage';
 import ProfilePage from './Pages/ProfilePage';
 import { Route, BrowserRouter } from 'react-router-dom'
-import DemoSchedulePage from './Pages/DemoSchedulePage';
 import ComparePage from './Pages/ComparePage';
 
 
@@ -22,7 +21,6 @@ function App() {
         <Route exact path="/Degree" component={DegreeReportPage}/>
         <Route exact path="/Majors" component={MajorsPage}/>
         <Route exact path="/Profile" component={ProfilePage}/>
-        <Route exact path="/Demo" component={DemoSchedulePage}/>
         <Route exact path="/Compare" component={ComparePage}/>
       </BrowserRouter>
     </div>
