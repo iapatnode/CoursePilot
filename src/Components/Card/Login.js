@@ -32,7 +32,6 @@ export const Login = ()  => {
         var url = "/api/login?email=" + email;
         axios.post(url, parameters).then(response => {
             var response = response.data.text;
-            console.log(response);
             if(response.includes("Error")) {
                 alert(response);
             }
@@ -60,7 +59,7 @@ export const Login = ()  => {
                         <Image src={Logo} fluid id="logo"/>
                         <Form.Control onChange={handleEmailChange} type="email" name="email" id="email-field" className="login-form-field" placeholder="Enter Email"></Form.Control> 
                         <Form.Control onChange={handlePasswordChange} type="password" name="password" id="password-field" className="login-form-field" placeholder="Enter Password"></Form.Control>
-                        <Button onClick={handleSubmit} variant="primary" id="login-form-submit" className="login-form-field">
+                        <Button onClick={handleSubmit} variant="primary" id="login-form-submit">
                                 Sign In
                         </Button>
                         <p id="sign-up-link">Don't have an account? Sign up <Link to="/SignUp">Here</Link></p>

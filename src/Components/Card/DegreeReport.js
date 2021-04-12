@@ -133,7 +133,7 @@ export const Report = () => {
      */
     function isChecked(courseCode, reqCat) {
         for(const course of checked) {
-            if(course["course_code"] == courseCode && course["req_category"] == reqCat) {
+            if(course["course_code"] === courseCode && course["req_category"] === reqCat) {
                 return true
             }
         }
@@ -170,7 +170,7 @@ export const Report = () => {
      */
     const handleChecked = (event, courseCode, courseName, reqCat, reqYear) => {
         //Checks if course has already been marked as completed in some other category and alerts the user if so
-        if(event.target.checked && (checked.some(e => e.course_code == courseCode && e.req_category != reqCat) || selected.some(e => e.course_code == courseCode))) {
+        if(event.target.checked && (checked.some(e => e.course_code === courseCode && e.req_category !== reqCat) || selected.some(e => e.course_code === courseCode))) {
             alert(courseCode + " " + courseName + " has already been marked as completed.")
         }
 
@@ -232,7 +232,7 @@ export const Report = () => {
 
         for(const course of completedCategoryCourses) {
             // If course is in the completed courses list but not in the updated completed courses list for the requirement category, then it has been deleted
-            if(completedCourses.some(e => e.course_code == course.course_code) === false) {
+            if(completedCourses.some(e => e.course_code === course.course_code) === false) {
                 isDeletion = true
                 deletedCourses.push({course_code: course.course_code, course_name: course.course_name, req_category: reqCat, req_yr: reqYear})
             }
@@ -240,7 +240,7 @@ export const Report = () => {
 
         if(isDeletion === true) {
             // Updates the list of selected courses to not include the deleted courses
-            setSelected(selected.filter((course) => deletedCourses.some(e => e.course_code == course.course_code) === false || course.req_category !== reqCat))
+            setSelected(selected.filter((course) => deletedCourses.some(e => e.course_code === course.course_code) === false || course.req_category !== reqCat))
             // Adds deleted courses to the list of deselected courses
             setUnselected(unselected.concat(deletedCourses))
         }
@@ -248,7 +248,7 @@ export const Report = () => {
             const completedCourse= completedCourses[completedCourses.length - 1]
 
             // Alerts user if course has already been marked complete somewhere on the page
-            if(selected.some(e => e.course_code == completedCourse.course_code) || checked.some(e => e.course_code == completedCourse.course_code)) {
+            if(selected.some(e => e.course_code === completedCourse.course_code) || checked.some(e => e.course_code === completedCourse.course_code)) {
                 alert(completedCourse.course_code + " " + completedCourse.course_name + " has already been marked as completed.")
             }
 
