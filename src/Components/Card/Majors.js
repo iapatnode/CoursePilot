@@ -237,22 +237,18 @@ export const Majors = () => {
   function majorFilter() {
     var input, filter, ul, li, a, i, txtValue, panel;
     input = document.getElementById("majorInput");
-    console.log(input.value)
     filter = input.value.toUpperCase();
     ul = document.getElementById("MajorList");
     li = ul.getElementsByClassName("accordion");
     panel = ul.getElementsByClassName("panel");
     
     for (i = 0; i < li.length; i++) {
-        //console.log(li[i].innerHTML);
         a = li[i].innerHTML.split(",")[0];
         txtValue = a;
         if (txtValue.toUpperCase().indexOf(filter) > -1) {
             li[i].style.display = "";
-            // panel[i].style.display = "";
         } else {
             li[i].style.display = "none";
-            // panel[li].style.display = "none";
         }
     }
   }
@@ -264,7 +260,6 @@ export const Majors = () => {
   function minorFilter() {
     var input, filter, ul, li, a, i, txtValue, panel;
     input = document.getElementById("minorInput");
-    console.log(input.value)
     filter = input.value.toUpperCase();
     ul = document.getElementById("MinorList");
     li = ul.getElementsByClassName("accordion");
@@ -306,10 +301,6 @@ export const Majors = () => {
                 <button onClick={() => {getMajorsAndMinors("2020")}} className="req-button">2020-2021</button>
             </div>
 
-
-
-
-
             <CoolTabs
                 tabKey={'1'}
                 style={{ width:  1500, height:  650, background:  'white', margin: 20,}}
@@ -325,14 +316,12 @@ export const Majors = () => {
                 leftTabTitle={'Majors'}
                 rightTabTitle={'Minors'}
                 leftContent={
-                    <div>
-                        
+                    <div>      
                         <div id="major-search-container">
                             <h2> Search Majors </h2>
                             <input type="text" id="majorInput" onKeyUp={majorFilter} placeholder="Search for Major" title="Type in a name"></input>
                             <ul id="courses"></ul>
                         </div>
-
                         <div id="MajorList"> Click on a requirement year to view minors. It can take up to 10 seconds to display. </div> 
                     </div>
                 }
@@ -352,27 +341,14 @@ export const Majors = () => {
                             <input type="text" id="minorInput" onKeyUp={minorFilter} placeholder="Search for Minor" title="Type in a name"></input>
                             <ul id="courses"></ul>
                         </div>
-
-
-                
-
                     <div id="MinorList"> Click on a requirement year to view minors. It can take up to 10 seconds to display. </div> 
                 </div>
-                }
-                
+                }   
             />
-
-
             </div>
         </div>
 
     );
 }
 
-
 export default Majors
-
-
-
-
-
