@@ -831,16 +831,19 @@ def changeMajor():
             conn.commit()
 
             # Workflow 5: Add back new major info
-            studentDegreeQuery = "select degreeID from MajorMinor where degreeName = %s and reqYear = %s and isMinor = %s"
+            studentDegreeQuery = "select degreeID from MajorMinor where degreeName = %s and isMinor = %s"
             for m in major:
                 mid = 0
-                cursor.execute(studentDegreeQuery, (m, 2017, 0))
+                cursor.execute(studentDegreeQuery, (m, 0))
                 result = cursor.fetchall()
+                i = 0
                 for row in result:
-                    mid = row[0]
-                    addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
-                    cursor.execute(addToMajorMinor, (user_email, mid))
-                    conn.commit()
+                    if i < 1:
+                        mid = row[0]
+                        addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
+                        cursor.execute(addToMajorMinor, (user_email, mid))
+                        i = i + 1
+                        conn.commit()
                 
             # Workflow 6: Add back minor info
             for minor in minors:
