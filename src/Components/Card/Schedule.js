@@ -193,6 +193,7 @@ class Schedule extends Component {
       }
       // Alert the user of potential time conflicts. 
       if(global.conflict) {
+        global.courses.pop()
         global.conflict = false;
         cont = false;
         alert("Error: Adding '" + global.classAdded.text + "' will cause a time conflict.");
