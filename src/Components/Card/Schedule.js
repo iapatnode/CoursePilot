@@ -47,6 +47,7 @@ class Schedule extends Component {
         var newCourses = [];
         global.classEvents.forEach(element => {
           if(element.text !== args.e.text()) {
+            console.log(element.text + " was not deleted")
             newEvents.push(element);
             if(newCourses.includes(element.text) === false) {
               newCourses.push(element.text)
@@ -54,7 +55,7 @@ class Schedule extends Component {
           }
           global.classEvents = newEvents;
           global.courses = newCourses;
-        });        
+        });       
       }
     };
   }
@@ -132,7 +133,7 @@ class Schedule extends Component {
       global.className = text.substring(0, text.indexOf("-") - 9);
       var section = global.classAdded.text.slice(-1)
       global.classEvents.forEach(element => {
-        if(element["text"] === course_code && cont && section <= "L") {
+        if(element["text"] === course_code && cont && section < "L") {
           alert("Error: You have already added this course to your schedule");
           cont = false;
         }
@@ -175,11 +176,11 @@ class Schedule extends Component {
           if((element.start.value === "2013-03-25T" + global.classTime) && element.resource === res) {
             global.conflict = true;
           }
-          else if (element.start.value.substring(11, 13) < classTime.substring(11, 13) && element.start.value.substring(11, 13) < endTime.substring(11, 13)) {
-            global.conflict = true;
+          else if((element.start.value.substring(0, 13) < classTime.substring(0, 13)) && (element.end.value.substring(0, 13) >= classTime.substring(0, 13)) && (element.resource == res)) {
+            global.conflict = true
           }
-          else if (element.start.value.substring(11, 13) > classTime.substring(11, 13) && element.start.value.substring(11, 13) <= endTime.substring(11, 13)) {
-            global.conflict = true;
+          else if((element.start.value.substring(0, 13) > classTime.substring(0, 13)) && (element.end.value.substring(0, 13) < endTime.substring(0, 13)) && element.resource == res) {
+            global.conflict = true
           }
         })
 
@@ -218,6 +219,7 @@ class Schedule extends Component {
     var http = new XMLHttpRequest();
     var queryString = String(window.location).split("?")[1];
     var url = '/api/schedule?' + queryString + "&semester=fall";
+    console.log(global.courses)
     var params = JSON.stringify(
       {
         courses: global.courses,
