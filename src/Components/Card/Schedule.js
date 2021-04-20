@@ -130,8 +130,9 @@ class Schedule extends Component {
       global.addedClass = true;
       global.classAdded = {text};
       global.className = text.substring(0, text.indexOf("-") - 9);
+      var section = global.classAdded.text.slice(-1)
       global.classEvents.forEach(element => {
-        if(element["text"] === course_code && cont) {
+        if(element["text"] === course_code && cont && section <= "L") {
           alert("Error: You have already added this course to your schedule");
           cont = false;
         }
