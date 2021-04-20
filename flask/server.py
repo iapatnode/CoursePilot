@@ -7,6 +7,8 @@ import MinorRecomendation as MinorRecommendation
 import string
 import random
 
+#NEED TO TEST!!!!
+
 
 #Which users are logged in
 user_dict = {}
@@ -93,6 +95,7 @@ def login():
                     return_message = f"Error: Incorrect email or password detected"
                 
             except Error as error:
+                print("Unable to execute query..." + str(error))
                 valid = False
             
             #DBMS connection cleanup
@@ -205,22 +208,16 @@ def sign_up():
                 cont = False
 
         if valid:
-            # conn = connection()
             cursor = conn.cursor()
-            newStudentQuery = "Insert into Student values (%s, %s, %s)"
-            newStudentData = (email, password, graduation_year)
 
-            #adds student and his/her info to the database
             try:
+                #adds student and his/her info to the database
+                newStudentQuery = "Insert into Student values (%s, %s, %s)"
+                newStudentData = (email, password, graduation_year)
+
                 cursor.execute(newStudentQuery, newStudentData)
 
-                conn.commit()
-            except Error as error:
-                #If you cannot insert the invidual into the database, print error and reroute
-                return redirect("http//coursepilot.gcc.edu:3000/SignUp")
-            
-            #Adds student major and minor information to database
-            try:
+                #Adds student major and minor information to database
                 studentDegreeQuery = "select degreeID from MajorMinor where degreeName = %s and reqYear = %s and isMinor = %s"
                 for m in major:
                     mid = 0
@@ -231,7 +228,6 @@ def sign_up():
                     
                         addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
                         cursor.execute(addToMajorMinor, (email, mid))
-                        conn.commit()
                 
                 for mm in minor:
                     mid = 0
@@ -242,7 +238,7 @@ def sign_up():
                     
                         addToMinor = "insert into StudentMajorMinor values (%s, %s)"
                         cursor.execute(addToMinor, (email, mid))
-                        conn.commit()
+                conn.commit()
             
             except Error as error:
                 #If you cannot insert the major/minor into the database, print error and reroute
@@ -251,7 +247,6 @@ def sign_up():
             #DBMS connection cleanup
             cursor.close()
 
-            user_email = email
             uid = ""
             if not email in user_dict:
                 letters = string.ascii_letters
@@ -306,8 +301,7 @@ POST: When a post request is received, we know that the user is trying to make a
 """
 @app.route("/api/home", methods=["GET", "POST"])
 def home():
-    # Variable to tell which user is logged in and what semester they have selected for their schedule
-    semester_selection = request.args.get("semester")
+    # Variable to tell which user is logged in
     user_email = request.args.get("email")
     global user_dict
     for entry in user_dict: 
@@ -345,7 +339,6 @@ def home():
         json_data = json.loads(data)
         schedule_name = json_data.get("schedule-name")
         schedule_semester = json_data.get("schedule-semester")
-        semester_selection = json_data.get("schedule-semester")
         created_at = datetime.now()
         formatted_date = created_at.strftime('%Y-%m-%d %H:%M:%S')
 
@@ -356,7 +349,7 @@ def home():
 
         return "Created Schedule Successfully"
 
-
+#NOTE: NEEDS COMMENTS
 @app.route("/api/search", methods=["GET","POST"])
 def search():
     if request.method == "POST":
@@ -365,9 +358,11 @@ def search():
         cursor = conn.cursor()
         courseArray = []
 
-        cursor.execute(''' 
+        classCourseQuery = ''' 
             SELECT * from Course join Class on Class.courseCode = Course.courseCode where Class.courseCode like %s;
-        ''', (f"%{(search_val)}%",))
+        '''
+
+        cursor.execute(classCourseQuery, (f"%{(search_val)}%",))
 
         class_table = cursor.fetchall()
 
@@ -418,9 +413,10 @@ def schedule():
 
         
         # Select the schedule that the user has created
-        cursor.execute('''
+        scheduleQuery = '''
             SELECT scheduleSemester from Schedule WHERE scheduleName = %s AND email = %s;
-            ''', (schedule_name, user_email,))
+            '''
+        cursor.execute(scheduleQuery, (schedule_name, user_email,))
 
         semester = cursor.fetchall()
         semester_current = ""
@@ -430,10 +426,11 @@ def schedule():
             semester_current = result[0]
 
         # Get all of the courses that are available for the semester that the student chose
-        cursor.execute(''' 
+        courseQuery = ''' 
             SELECT * from Course join Class on Class.courseCode = Course.courseCode WHERE
              (classSemester = %s or classSemester = %s or classSemester = %s) order by Course.courseCode;
-            ''', (semester_current, "both", "alternate",))
+            '''
+        cursor.execute(courseQuery, (semester_current, "both", "alternate",))
 
         class_table = cursor.fetchall()
 
@@ -484,9 +481,10 @@ def schedule():
         conn.commit()
 
         #Get the appropriate semester from the Schedule table
-        cursor.execute('''
+        semesterScheduleQuery = '''
             SELECT scheduleSemester from Schedule WHERE scheduleName like %s AND email like %s;
-            ''', (f"%{(schedule_name)}%", f"%{(user_email)}%",))
+            '''
+        cursor.execute(semesterScheduleQuery, (f"%{(schedule_name)}%", f"%{(user_email)}%",))
 
         semester = cursor.fetchall()
 
@@ -502,9 +500,10 @@ def schedule():
                 sections.append(section)
 
                 #Get class info from Class table using code and section as keys
-                cursor.execute(''' 
+                classCodeSectionQuery = ''' 
                     SELECT * from Class WHERE courseCode like %s AND courseSection like %s and classSemester = %s;
-                    ''', (f"%{(code)}%", f"%{(section)}", semester_selection,))
+                    '''
+                cursor.execute(classCodeSectionQuery, (f"%{(code)}%", f"%{(section)}", semester_selection,))
                 schedule_class = cursor.fetchall()
 
                 # Insert all courses that the student added into the database. 
@@ -589,13 +588,15 @@ def delete_schedule():
         if user_dict[entry] == user_email:
             user_email = entry
     cursor = conn.cursor()
-    cursor.execute('''
+    deleteClassQuery = '''
         delete from ScheduleClass WHERE email like %s AND scheduleName like %s;
-    ''', (f"%{(user_email)}%", f"{(schedule_name)}",))
+    '''
+    cursor.execute(deleteClassQuery, (f"%{(user_email)}%", f"{(schedule_name)}",))
 
-    cursor.execute('''
+    deleteScheduleQuery = '''
         delete from Schedule WHERE email like %s AND scheduleName like %s;
-    ''', (f"%{(user_email)}%", f"{(schedule_name)}",))
+    '''
+    cursor.execute(deleteScheduleQuery, (f"%{(user_email)}%", f"{(schedule_name)}",))
 
     conn.commit()
     return "success"
@@ -612,7 +613,6 @@ POST: When the user sends a post request to this url, we set two variables indic
 """
 @app.route("/api/compare", methods=["POST"])
 def compare_schedules():
-    cursor = conn.cursor()
     if request.method == "POST":
         data = request.form
         compare_schedule_one = request.args.get('scheduleOne')
@@ -644,7 +644,6 @@ def get_data_compare():
         for entry in user_dict: 
             if user_dict[entry] == user_email:
                 user_email = entry
-        semester_selection = "fall"
         schedule_name = "bruh"
         backColor = ""
 
@@ -744,7 +743,7 @@ def get_data_compare():
     )
     return data
 
-
+#NOTE: NEEDS COMMENTS
 @app.route("/api/profile", methods=["GET", "POST"])
 def profile():
     if request.method == "GET":
@@ -757,7 +756,8 @@ def profile():
         majors = []
         minors = []
         cursor = conn.cursor()
-        user_info = ''' SELECT Student.email, StudentMajorMinor.degreeId, Student.passwrd FROM Student join StudentMajorMinor on Student.email = StudentMajorMinor.email where Student.email = %s; '''
+        user_info = ''' SELECT Student.email, StudentMajorMinor.degreeId, Student.passwrd FROM Student join StudentMajorMinor 
+                        on Student.email = StudentMajorMinor.email where Student.email = %s; '''
         cursor.execute(user_info, (user_email,))
         results = cursor.fetchall()
         for result in results:
@@ -821,7 +821,6 @@ def changeMajor():
             results = cursor.fetchall()
             # Workflow 2/3: Search each entry in major minor database to determine whether the id represents a minor, add to list
             for result in results:
-                isMinor = result[4]
                 if(result[4]) == 1:
                     minors.append(result[1])
 
@@ -831,16 +830,19 @@ def changeMajor():
             conn.commit()
 
             # Workflow 5: Add back new major info
-            studentDegreeQuery = "select degreeID from MajorMinor where degreeName = %s and reqYear = %s and isMinor = %s"
+            studentDegreeQuery = "select degreeID from MajorMinor where degreeName = %s and isMinor = %s"
             for m in major:
                 mid = 0
-                cursor.execute(studentDegreeQuery, (m, 2017, 0))
+                cursor.execute(studentDegreeQuery, (m, 0))
                 result = cursor.fetchall()
+                i = 0
                 for row in result:
-                    mid = row[0]
-                    addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
-                    cursor.execute(addToMajorMinor, (user_email, mid))
-                    conn.commit()
+                    if i < 1:
+                        mid = row[0]
+                        addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
+                        cursor.execute(addToMajorMinor, (user_email, mid))
+                        i = i + 1
+                        conn.commit()
                 
             # Workflow 6: Add back minor info
             for minor in minors:
@@ -857,13 +859,13 @@ def changeMajor():
             #If you cannot insert the invidual into the database, print error and reroute
             return redirect("http//coursepilot.gcc.edu:3000/Profile")
 
-    return "good"
+    return "success"
 
+#NOTE: NEEDS COMMENTS
 @app.route("/api/changeMinor", methods=["POST"])
 def changeMinor():
     cursor = conn.cursor()
     valid = True
-    requirement_year = 2017
     user_email = request.args.get("email")
     global user_dict
     for entry in user_dict: 
@@ -897,7 +899,6 @@ def changeMinor():
             results = cursor.fetchall()
             # Workflow 2/3: Search each entry in major minor database to determine whether the id represents a minor, add to list
             for result in results:
-                isMajor = result[4]
                 if(result[4]) == 0:
                     majors.append(result[1])
 
@@ -928,7 +929,7 @@ def changeMinor():
             #If you cannot insert the invidual into the database, print error and reroute
             return redirect("http//coursepilot.gcc.edu:3000/Profile")
 
-    return "good"
+    return "success"
 
 @app.route("/api/changePassword", methods=["POST"])
 def changePassword():
@@ -1090,10 +1091,9 @@ def get_existing_schedule():
     if request.method == "POST":
         data = request.data.decode("utf-8")
         json_data = json.loads(data)
-        schedule_name = json_data.get("name").rstrip()
-        return "good"
+        return "success"
     else:
-        return "blah"
+        return "error"
 
 '''
 /API/DEGREEREPORT
@@ -1151,10 +1151,10 @@ def degree_report():
 
         return redirect(f"http://coursepilot.gcc.edu:3000/api/degreereport?email={user_email}")
 
-
+#NOTE: NEEDS COMMENTS
 @app.route("/api/autoGenerate", methods=["GET", "POST"])
 def autoGenerate():
-    #TODO: Return user data retrieved from database tables as needed
+    # Return user data retrieved from database tables as needed
     user_email = request.args.get("email")
     uid = user_email
     global user_dict
@@ -1206,14 +1206,12 @@ def autoGenerate():
             classInsert = "INSERT into ScheduleClass (scheduleName, email, courseSection, courseCode, meetingDays, classSemester, startTime, endTime) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
             cursor.execute(classInsert, (schedule_name, user_email, course.courseSection, course.courseCode, course.dayAvail, course.semesterAvail, course.startTime, course.endTime))
             conn.commit()
-
-
-
-
+            
         schedule_url = f"http://coursepilot.gcc.edu:3000/Schedule?email={uid}&ScheduleName={schedule_name}"
 
         return redirect(schedule_url)
 
+#NOTE: NEEDS COMMENTS
 @app.route("/api/getAllMajorsAndMinors", methods=["GET"])
 def getAllMajorsAndMinors():
     user_email = request.args.get("email")
@@ -1747,7 +1745,11 @@ def getTakenCourses(user_email):
     try:
         # getting all of the courses the user has taken
         cursor = conn.cursor()
-        cursor.execute("select Course.courseCode, Course.courseSemester, Course.courseName, Course.creditHours from StudentCourses JOIN Course on StudentCourses.courseCode = Course.courseCode WHERE StudentCourses.email = %s;", (user_email,))
+        coursesTakenQuery = '''
+            select Course.courseCode, Course.courseSemester, Course.courseName, Course.creditHours from StudentCourses JOIN Course 
+            on StudentCourses.courseCode = Course.courseCode WHERE StudentCourses.email = %s
+        '''
+        cursor.execute(coursesTakenQuery, (user_email,))
         info = cursor.fetchall()
         takenCourses = []
 
@@ -1773,14 +1775,20 @@ def getRequiredCourses(user_email):
     try:
         # getting all of the required courses for the user's major
         cursor = conn.cursor()
-        cursor.execute("select degreeId from StudentMajorMinor WHERE email = %s;", (user_email,))
+        degreeQuery = "select degreeId from StudentMajorMinor WHERE email = %s"
+        cursor.execute(degreeQuery, (user_email,))
 
         # we only want the first value from this query which is the degree ID
         degreeID = cursor.fetchall()[0]
         
 
         # getting the required courses for the user's major
-        cursor.execute("select Course.courseCode, Course.courseSemester, Course.courseName, Course.creditHours from Course JOIN ReqCourses ON Course.courseCode = ReqCourses.courseCode JOIN MajorMinorRequirements ON ReqCourses.category = MajorMinorRequirements.category JOIN MajorMinor ON MajorMinorRequirements.degreeId = MajorMinor.degreeId WHERE MajorMinor.degreeId = %s", (degreeID))
+        requiredCoursesQuery = '''
+            select Course.courseCode, Course.courseSemester, Course.courseName, Course.creditHours from Course JOIN ReqCourses ON Course.courseCode = ReqCourses.courseCode 
+            JOIN MajorMinorRequirements ON ReqCourses.category = MajorMinorRequirements.category JOIN MajorMinor ON MajorMinorRequirements.degreeId = MajorMinor.degreeId 
+            WHERE MajorMinor.degreeId = %s
+        '''
+        cursor.execute(requiredCoursesQuery, (degreeID))
         info = cursor.fetchall()
         requiredCourses = []
 
@@ -1804,7 +1812,8 @@ def getRequiredCourses(user_email):
                 requiredCourses.append(newCourse)
 
         # get the prereqs for each of the courses
-        cursor.execute("SELECT * FROM Prerequisite WHERE prereqGroup = 1;")
+        prereqQuery = "SELECT * FROM Prerequisite WHERE prereqGroup = 1"
+        cursor.execute(prereqQuery)
         prereqs = cursor.fetchall()
         
         # add the prereqs to each course
@@ -1833,7 +1842,8 @@ def getRequiredClasses(CoursesRequired, semester_selection):
     try:
         # get all of the times for each course
         cursor = conn.cursor()
-        cursor.execute("select * FROM Class WHERE classSemester = %s;", (semester_selection,))
+        semesterQuery = "select * FROM Class WHERE classSemester = %s"
+        cursor.execute(semesterQuery, (semester_selection,))
         info = cursor.fetchall()
         times = []
 

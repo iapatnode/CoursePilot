@@ -47,6 +47,7 @@ class Schedule extends Component {
         var newCourses = [];
         global.classEvents.forEach(element => {
           if(element.text !== args.e.text()) {
+            console.log(element.text + " was not deleted")
             newEvents.push(element);
             if(newCourses.includes(element.text) === false) {
               newCourses.push(element.text)
@@ -54,7 +55,7 @@ class Schedule extends Component {
           }
           global.classEvents = newEvents;
           global.courses = newCourses;
-        });        
+        });       
       }
     };
   }
@@ -130,8 +131,9 @@ class Schedule extends Component {
       global.addedClass = true;
       global.classAdded = {text};
       global.className = text.substring(0, text.indexOf("-") - 9);
+      var section = global.classAdded.text.slice(-1)
       global.classEvents.forEach(element => {
-        if(element["text"] === course_code && cont) {
+        if(element["text"] === course_code && cont && section < "L") {
           alert("Error: You have already added this course to your schedule");
           cont = false;
         }
@@ -168,8 +170,17 @@ class Schedule extends Component {
         }
         // Check if adding the course will result in a time conflict. 
         global.classEvents.forEach(element => {
+          var classTime = "2013-03-25T" + global.classTime;
+          var endTime = "2013-03-25T" + global.endTime;
+          console.log(element.start.value.substring(11, 13))
           if((element.start.value === "2013-03-25T" + global.classTime) && element.resource === res) {
             global.conflict = true;
+          }
+          else if((element.start.value.substring(0, 13) < classTime.substring(0, 13)) && (element.end.value.substring(0, 13) >= classTime.substring(0, 13)) && (element.resource == res)) {
+            global.conflict = true
+          }
+          else if((element.start.value.substring(0, 13) > classTime.substring(0, 13)) && (element.end.value.substring(0, 13) < endTime.substring(0, 13)) && element.resource == res) {
+            global.conflict = true
           }
         })
 
@@ -177,7 +188,7 @@ class Schedule extends Component {
         if(!global.conflict) {
           global.classEvents.push({
             "id": 1,
-            "text": global.className,
+            "text": global.className.substring(0, 8),
             "start": "2013-03-25T" + global.classTime,
             "end": "2013-03-25T" + global.endTime,
             "resource": res,
@@ -192,6 +203,7 @@ class Schedule extends Component {
       }
       // Alert the user of potential time conflicts. 
       if(global.conflict) {
+        global.courses.pop()
         global.conflict = false;
         cont = false;
         alert("Error: Adding '" + global.classAdded.text + "' will cause a time conflict.");
@@ -207,6 +219,7 @@ class Schedule extends Component {
     var http = new XMLHttpRequest();
     var queryString = String(window.location).split("?")[1];
     var url = '/api/schedule?' + queryString + "&semester=fall";
+    console.log(global.courses)
     var params = JSON.stringify(
       {
         courses: global.courses,
@@ -300,7 +313,7 @@ class Schedule extends Component {
             para.appendChild(tag);
             var node = document.createTextNode(this.titleCase(element["course_name"]) + " " + element["course_section"]);
             var course = document.createTextNode(element["course_code"]);
-            var time = document.createTextNode(" " + element["course_time"] + " - " + element["course_end"])
+            var time = document.createTextNode(" " + element["days"] + " " + element["course_time"] + " - " + element["course_end"])
             var br = document.createElement("br");
             tag.appendChild(course);
             tag.appendChild(br);
