@@ -11,7 +11,7 @@ from datetime import datetime
 2nd Pass: Sort the list of minors based on the classes that the student has not yet taken but needs to take.
 """
 
-#Credentails for database connection
+#Credentials for database connection
 scriptdir = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(scriptdir, "config.json")) as text:
     config = json.load(text)
