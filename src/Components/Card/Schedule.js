@@ -169,7 +169,16 @@ class Schedule extends Component {
         }
         // Check if adding the course will result in a time conflict. 
         global.classEvents.forEach(element => {
+          var classTime = "2013-03-25T" + global.classTime;
+          var endTime = "2013-03-25T" + global.endTime;
+          console.log(element.start.value.substring(11, 13))
           if((element.start.value === "2013-03-25T" + global.classTime) && element.resource === res) {
+            global.conflict = true;
+          }
+          else if (element.start.value.substring(11, 13) < classTime.substring(11, 13) && element.start.value.substring(11, 13) < endTime.substring(11, 13)) {
+            global.conflict = true;
+          }
+          else if (element.start.value.substring(11, 13) > classTime.substring(11, 13) && element.start.value.substring(11, 13) <= endTime.substring(11, 13)) {
             global.conflict = true;
           }
         })
