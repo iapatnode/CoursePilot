@@ -45,17 +45,24 @@ class Schedule extends Component {
         this.message("Course Deleted: " + args.e.text());
         var newEvents = [];
         var newCourses = [];
-        global.classEvents.forEach(element => {
-          if(element.text !== args.e.text()) {
-            console.log(element.text + " was not deleted")
-            newEvents.push(element);
-            if(newCourses.includes(element.text) === false) {
-              newCourses.push(element.text)
-            }
+        var index = 0;
+        global.courses.forEach(element => {
+          if(element.includes(args.e.text())) {
+            global.courses.slice(index, 1);
+            global.removedCourses.push(element);
           }
-          global.classEvents = newEvents;
-          global.courses = newCourses;
-        });       
+        })
+        // global.classEvents.forEach(element => {
+        //   if(element.text !== args.e.text()) {
+        //     console.log(element.text + " was not deleted")
+        //     newEvents.push(element);
+        //     if(newCourses.includes(element.text) === false) {
+        //       newCourses.push(element.text)
+        //     }
+        //   }
+        //   global.classEvents = newEvents;
+        //   global.courses = newCourses;
+        // });       
       }
     };
   }

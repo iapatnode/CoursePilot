@@ -470,16 +470,25 @@ def schedule():
         # Get data from the semester form that the user submitted
         data = request.data.decode("utf-8")
         json_data = json.loads(data)
+        added_courses = json_data.get("courses")
+        removed_courses = json_data.get("removed")
         code_pt_1 = ""
         section = ""
         codes = []
         sections = []
 
         #Delete courses that were removed from the schedule
-        for course in json_data.get("removed"):
+        print(f"Removed Courses: {json_data.get('removed')}")
+        for course in removed_courses:
             delete_query = "delete from ScheduleClass where email = %s and scheduleName = %s and courseCode = %s"
             cursor.execute(delete_query, (user_email, schedule_name, course))
         conn.commit()
+
+        #Ger duplicate courses out of added courses
+        for added in added_courses:
+            for removed in removed_courses:
+                if added == removed:
+                    added_courses.remove(removed)
 
         #Get the appropriate semester from the Schedule table
         semesterScheduleQuery = '''
@@ -490,8 +499,10 @@ def schedule():
         semester = cursor.fetchall()
 
         #Do some formatting with the strings to get course name, codes, etc...
+        print(f"Added: {json_data.get('courses')}")
         if json_data.get("courses"):
-            for course in json_data.get("courses"):
+            for course in added_courses:
+                print(f"Course: {course}")
                 course_string = course.replace(" ", "-")
                 index = course_string.index('-')
                 code_pt_1 = course_string[0: index + 4]
@@ -502,18 +513,21 @@ def schedule():
 
                 #Get class info from Class table using code and section as keys
                 classCodeSectionQuery = ''' 
-                    SELECT * from Class WHERE courseCode like %s AND courseSection like %s and classSemester = %s;
+                    SELECT * from Class WHERE courseCode like %s AND courseSection like %s and (classSemester = %s or classSemester = %s or classSemester = %s);
                     '''
-                cursor.execute(classCodeSectionQuery, (f"%{(code)}%", f"%{(section)}", semester_selection,))
+                cursor.execute(classCodeSectionQuery, (f"%{(code)}%", f"%{(section)}", semester_selection, "alternate", "both"))
                 schedule_class = cursor.fetchall()
+                print(f"{code} {semester_selection}")
 
                 # Insert all courses that the student added into the database. 
                 for row in schedule_class:
+                    print("Made it inside the loop")
                     classInsert = """INSERT into ScheduleClass 
                         (scheduleName, email, courseSection, courseCode, meetingDays, classSemester, startTime, endTime)
                         values (%s, %s, %s, %s, %s, %s, %s, %s);
                     """
                     cursor.execute(classInsert, (schedule_name, user_email, row[0], row[5], row[4], row[1], row[2], row[3],))
+                    print(f"Successfully added {row[5]}")
                 conn.commit()
             
             # Prerequisite checking
