@@ -177,7 +177,7 @@ class Schedule extends Component {
         if(!global.conflict) {
           global.classEvents.push({
             "id": 1,
-            "text": global.className,
+            "text": global.className.substring(0, 8),
             "start": "2013-03-25T" + global.classTime,
             "end": "2013-03-25T" + global.endTime,
             "resource": res,
@@ -300,7 +300,7 @@ class Schedule extends Component {
             para.appendChild(tag);
             var node = document.createTextNode(this.titleCase(element["course_name"]) + " " + element["course_section"]);
             var course = document.createTextNode(element["course_code"]);
-            var time = document.createTextNode(" " + element["course_time"] + " - " + element["course_end"])
+            var time = document.createTextNode(" " + element["days"] + " " + element["course_time"] + " - " + element["course_end"])
             var br = document.createElement("br");
             tag.appendChild(course);
             tag.appendChild(br);
