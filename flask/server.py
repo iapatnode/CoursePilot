@@ -493,12 +493,20 @@ def schedule():
         codes = []
         sections = []
 
-        #Delete courses that were removed from the schedule
-        print(f"Removed Courses: {json_data.get('removed')}")
-        for course in removed_courses:
-            delete_query = "delete from ScheduleClass where email = %s and scheduleName = %s and courseCode = %s"
-            cursor.execute(delete_query, (user_email, schedule_name, course))
-        conn.commit()
+        new_schedule = False
+        get_schedule_info = "select * from ScheduleClass where email = %s and scheduleName = %s"
+        cursor.execute(get_schedule_info, (user_email, schedule_name,))
+        results = cursor.fetchall()
+        if len(results) == 0:
+            new_schedule = True
+
+        if not new_schedule:
+            #Delete courses that were removed from the schedule
+            print(f"Removed Courses: {json_data.get('removed')}")
+            for course in removed_courses:
+                delete_query = "delete from ScheduleClass where email = %s and scheduleName = %s and courseCode = %s"
+                cursor.execute(delete_query, (user_email, schedule_name, course))
+            conn.commit()
 
         #Ger duplicate courses out of added courses
         for added in added_courses:
