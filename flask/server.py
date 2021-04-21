@@ -509,9 +509,11 @@ def schedule():
             conn.commit()
 
         #Ger duplicate courses out of added courses
+        already_removed = []
         for added in added_courses:
             for removed in removed_courses:
-                if added == removed:
+                if added == removed and removed not in already_removed:
+                    already_removed.append(removed)
                     added_courses.remove(removed)
 
         #Get the appropriate semester from the Schedule table
