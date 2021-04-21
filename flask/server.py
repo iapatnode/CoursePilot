@@ -223,11 +223,19 @@ def sign_up():
                     mid = 0
                     cursor.execute(studentDegreeQuery, (m, requirement_year, 0))
                     result = cursor.fetchall()
-                    for row in result:
-                        mid = row[0]
-                    
-                        addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
-                        cursor.execute(addToMajorMinor, (email, mid))
+                    if len(result) == 0:
+                        studentDegreeQuery = "select degreeId from MajorMinor where degreeName = %s and isMinor = %s"
+                        cursor.execute(studentDegreeQuery, (m, 0))
+                        result = cursor.fetchall()
+                        for row in result:
+                            mid = row[0]
+                        
+                    else:
+                        for row in result:
+                            mid = row[0]
+                        
+                    addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
+                    cursor.execute(addToMajorMinor, (email, mid))
                 
                 for mm in minor:
                     mid = 0
