@@ -236,16 +236,25 @@ def sign_up():
                         
                     addToMajorMinor = "insert into StudentMajorMinor values (%s, %s)"
                     cursor.execute(addToMajorMinor, (email, mid))
-                
+
+                studentDegreeQuery = "select degreeID from MajorMinor where degreeName = %s and reqYear = %s and isMinor = %s"
                 for mm in minor:
                     mid = 0
                     cursor.execute(studentDegreeQuery, (mm, requirement_year, 1))
                     result = cursor.fetchall()
-                    for row in result:
-                        mid = row[0]
+                    if len(result) == 0:
+                        studentDegreeQuery = "select degreeId from MajorMinor where degreeName = %s and isMinor = %s"
+                        cursor.execute(studentDegreeQuery, (mm, 1,))
+                        result = cursor.fetchall()
+                        for row in result:
+                            mid = result[0]
                     
-                        addToMinor = "insert into StudentMajorMinor values (%s, %s)"
-                        cursor.execute(addToMinor, (email, mid))
+                    else:
+                        for row in result:
+                            mid = row[0]
+                    
+                    addToMinor = "insert into StudentMajorMinor values (%s, %s)"
+                    cursor.execute(addToMinor, (email, mid))
                 conn.commit()
             
             except Error as error:
