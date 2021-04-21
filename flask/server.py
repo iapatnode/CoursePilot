@@ -493,14 +493,14 @@ def schedule():
         codes = []
         sections = []
 
-        new_schedule = False
+        courses_in_schedule = True
         get_schedule_info = "select * from ScheduleClass where email = %s and scheduleName = %s"
         cursor.execute(get_schedule_info, (user_email, schedule_name,))
         results = cursor.fetchall()
         if len(results) == 0:
-            new_schedule = True
+            courses_in_schedule = False
 
-        if not new_schedule:
+        if courses_in_schedule:
             #Delete courses that were removed from the schedule
             print(f"Removed Courses: {json_data.get('removed')}")
             for course in removed_courses:
