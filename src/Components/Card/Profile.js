@@ -139,12 +139,21 @@ export const Profile = () => {
         }
         if(message === "") {
             axios.post('/api/changePassword?email=' + global.email, parameters).finally(response => {
-                alert("Password Changed Successfully");
-                setShowPassword(false);
+                if(response == "success") {
+                    alert("Password Changed Successfully");
+                    setShowPassword(false);
+                    window.location = "/Profile?email=" + global.email
+                }
+                else {
+                    alert("Whoops... something went wrong there")
+                    setShowPassword(false);
+                    window.location = "/Profile?email=" + global.email
+                }
             })
             .catch(err => {
                 if (err.response) {
                     alert("Whoops... something went wrong there")
+                    window.location = "/Profile?email=" + global.email
                 }
             })
         }
