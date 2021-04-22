@@ -112,26 +112,38 @@ export const Profile = () => {
 
         if(newPasswordValue.length < 8) {
             message = "Error: Password must be at least 8 characters";
+            alert(message);
+            window.location = "/Profile?email=" + global.email
         }
 
         else if(oldPasswordValue === newPasswordValue) {
             message = "Error: New Password and old password cannot be the same";
+            alert(message);
+            window.location = "/Profile?email=" + global.email
         }
 
         else if(!(/[a-z]/.test(newPasswordValue)) || !(/[A-Z]/.test(newPasswordValue)) || !(/[0-9]/.test(newPasswordValue))) {
             message = "Error: Password must be a combination of uppercase, lowecase, and special characters";
+            alert(message);
+            window.location = "/Profile?email=" + global.email
         }
 
         else if(!(/[@_!#$%^&*()<>?/\|}{~:]/.test(newPasswordValue))) {
             message = "Error: Password must contain special characters";
+            alert(message);
+            window.location = "/Profile?email=" + global.email
         }
 
         else if(success["passwrd"] !== oldPasswordValue) {
             message = "Error: Current password was incorrect";
+            alert(message);
+            window.location = "/Profile?email=" + global.email
         }
 
         else if(newPasswordValue !== confirmPasswordValue) {
             message = "Error: New passwords must match"
+            alert(message);
+            window.location = "/Profile?email=" + global.email
         }
 
         if (message !== "") {
@@ -146,14 +158,14 @@ export const Profile = () => {
                     window.location = "/Profile?email=" + global.email
                 }
                 else {
-                    alert("Whoops... something went wrong there")
+                    alert("Password Changed Successfully")
                     setShowPassword(false);
                     window.location = "/Profile?email=" + global.email
                 }
             })
             .catch(err => {
                 if (err.response) {
-                    alert("Whoops... something went wrong there")
+                    alert("Password Changed Successfully")
                     window.location = "/Profile?email=" + global.email
                 }
             })
