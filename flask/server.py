@@ -137,6 +137,7 @@ POST: When a post request is received, get all of the user information that
 @app.route("/api/signup", methods=["POST", "GET"])
 def sign_up():
     if request.method == "POST":
+        cursor = conn.cursor()
         # On a post request, get all user data from the form received. 
         valid = True
         cont = True
@@ -206,10 +207,17 @@ def sign_up():
             if cont:
                 return_message = "Error: You must select a major"
                 cont = False
+        
+        already_registered = False
+        getStudentQuery = "select * from Student where email = %s"
+        cursor.execute(getStudentQuery, (email,))
+        results = cursor.fetchall()
+        if len(results) > 0:
+            return_message = "Error: This email is already registered for an account"
+            valid = False
+            cont = False
 
         if valid:
-            cursor = conn.cursor()
-
             try:
                 #adds student and his/her info to the database
                 newStudentQuery = "Insert into Student values (%s, %s, %s)"
