@@ -976,11 +976,9 @@ def changeMinor():
 def changePassword():
     if request.method == "POST":
         data = request.data.decode("utf-8")
-        json_data = ""
-        try:
-            json_data = json.loads(data)
-        except Error as error:
+        if data is None:
             return "error"
+        json_data = json.loads(data)
         oldPassword = json_data.get("oldPassword")
         newPassword = json_data.get("newPassword")
         user_email = request.args.get("email")
