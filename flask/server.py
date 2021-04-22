@@ -976,33 +976,33 @@ def changeMinor():
 def changePassword():
     if request.method == "POST":
         data = request.data.decode("utf-8")
+        json_data = ""
         try:
             json_data = json.loads(data)
-            oldPassword = json_data.get("oldPassword")
-            newPassword = json_data.get("newPassword")
-            user_email = request.args.get("email")
-            global user_dict
-            for entry in user_dict: 
-                if user_dict[entry] == user_email:
-                    user_email = entry
-            valid = False
-            cursor = conn.cursor()
-            getUserPassword = "select passwrd from Student where email = %s"
-            cursor.execute(getUserPassword, (user_email,))
-            results = cursor.fetchone()
-            password = results[0]
-            if password == oldPassword:
-                valid = True
-            if valid:
-                updateUserPassword = "update Student set passwrd = %s where email = %s"
-                cursor.execute(updateUserPassword, (newPassword, user_email,))
-                conn.commit()
-                return  "success"
-            else:
-                return "error"
         except Error as error:
             return "error"
-    return "success"
+        oldPassword = json_data.get("oldPassword")
+        newPassword = json_data.get("newPassword")
+        user_email = request.args.get("email")
+        global user_dict
+        for entry in user_dict: 
+            if user_dict[entry] == user_email:
+                user_email = entry
+        valid = False
+        cursor = conn.cursor()
+        getUserPassword = "select passwrd from Student where email = %s"
+        cursor.execute(getUserPassword, (user_email,))
+        results = cursor.fetchone()
+        password = results[0]
+        if password == oldPassword:
+            valid = True
+        if valid:
+            updateUserPassword = "update Student set passwrd = %s where email = %s"
+            cursor.execute(updateUserPassword, (newPassword, user_email,))
+            conn.commit()
+            return  "success"
+        else:
+            return "error"
     
 @app.route("/api/logout", methods=["POST"])
 def logout():
