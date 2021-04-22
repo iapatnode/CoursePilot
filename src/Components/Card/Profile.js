@@ -138,7 +138,7 @@ export const Profile = () => {
             alert(message);
             window.location = "/Profile?email=" + global.email
         }
-        if(message === "") {
+        else if(message === "") {
             axios.post('/api/changePassword?email=' + global.email, parameters).finally(response => {
                 if(response == "success") {
                     alert("Password Changed Successfully");
