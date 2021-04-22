@@ -144,29 +144,45 @@ export const Profile = () => {
         if (message !== "") {
             alert(message);
             cont = false;
-            window.location = "/Profile?email=" + global.email
         }
 
         else if(cont) {
-            console.log(cont);
-            axios.post('/api/changePassword?email=' + global.email, parameters).finally(response => {
-                if(response == "success") {
-                    alert("Password Changed Successfully");
-                    setShowPassword(false);
-                    window.location = "/Profile?email=" + global.email
+            // console.log(cont);
+            // axios.post('/api/changePassword?email=' + global.email, parameters).finally(response => {
+            //     if(response == "success") {
+            //         alert("Password Changed Successfully");
+            //         setShowPassword(false);
+            //         window.location = "/Profile?email=" + global.email
+            //     }
+            //     else {
+            //         alert("Password Changed Successfully")
+            //         setShowPassword(false);
+            //         window.location = "/Profile?email=" + global.email
+            //     }
+            // })
+            // .catch(err => {
+            //     if (err.response) {
+            //         alert("Password Changed Successfully")
+            //         window.location = "/Profile?email=" + global.email
+            //     }
+            // })
+            var url = "/api/changePassword"
+            var params = "email=" + global.email
+            var http = new XMLHttpRequest();
+            http.open("POST", url + "?" + params, true)
+            http.onreadystatechange = function () {
+                if(http.readyState == 4 && http.status == 200) {
+                    if(http.responseText == "success") {
+                        alert("Password Successfully Changed")
+                        setShowPassword(false);
+                    }
+                    else {
+                        alert("Password Successfully Changed")
+                        setShowPassword(false);
+                    }
                 }
-                else {
-                    alert("Password Changed Successfully")
-                    setShowPassword(false);
-                    window.location = "/Profile?email=" + global.email
-                }
-            })
-            .catch(err => {
-                if (err.response) {
-                    alert("Password Changed Successfully")
-                    window.location = "/Profile?email=" + global.email
-                }
-            })
+            }
+            http.send(null);
         }
     }
 
