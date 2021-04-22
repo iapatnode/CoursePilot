@@ -136,6 +136,7 @@ export const Profile = () => {
 
         if (message !== "") {
             alert(message);
+            window.location = "/Profile?email=" + global.email
         }
         if(message === "") {
             axios.post('/api/changePassword?email=' + global.email, parameters).finally(response => {
