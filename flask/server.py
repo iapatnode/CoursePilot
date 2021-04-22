@@ -1002,6 +1002,10 @@ def changePassword():
         else:
             return "error"
     
+@app.route("/api/error", methods=["POST"])
+def error_func():
+    return "test"
+    
 @app.route("/api/logout", methods=["POST"])
 def logout():
     user_email = request.args.get("email")
