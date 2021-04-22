@@ -147,7 +147,7 @@ export const Profile = () => {
             window.location = "/Profile?email=" + global.email
         }
 
-        else if(message === "" || cont) {
+        else if(cont) {
             console.log(cont);
             axios.post('/api/changePassword?email=' + global.email, parameters).finally(response => {
                 if(response == "success") {
