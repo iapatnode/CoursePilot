@@ -284,32 +284,39 @@ export const Report = () => {
             </div>
 
             <div class="container-fluid" id="report-header">
-                <div class="row">
-                    <div class="col-md-12 text-center align-items-center">
-                        <h1> { success[0]["degree_name"] } </h1>
-                        <h3> { "Total Hours: "} { success[0]["degree_hours"] } </h3> 
+                <div class="row align-items-center text-center">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4 align-items-center">
+                            <h1> { success[0]["degree_name"] } </h1>
+                            <h3> { "Total Hours: "} { success[0]["degree_hours"] } </h3> 
                     </div>
-
-                    <Button variant="primary" value="Submit" id="save-change" onClick={submitListener}>
-                            Save Changes
-                    </Button>
+                    <div class="col-sm-3">
+                        <Button variant="primary" value="Submit" id="save-change" onClick={submitListener}>
+                                        Save Changes
+                        </Button>
+                    </div> 
+                    <div class="col-sm-1"></div>
                 </div>
             </div>
 
             <div id="degree-report-content"> 
-                <Form id="degree_report">      
-                
                 { success[0]["req_details"].map((req) => {
                     return <div>
                         {req["req_courses"].length > 0 ? 
-                            <div className="col-md-12">
-                                <Form.Group>
-                                    <h2> {req["req_category"]} </h2> 
-                                    <h4> {"Required Hours: "} {req["required_hrs"]} </h4>
-                                    <p> {req["req_details"]} </p>
-                                    <div className="col-md-12 text-center">
-                                        { req["req_courses"].map((course) => {
-                                            return <FormControlLabel control = {
+                            <div class="mt-3 col-md-12" id="req_block">
+                                <h2> {req["req_category"]} </h2> 
+                                <h4> {"Required Hours: "} {req["required_hrs"]} </h4>
+                                <div class="row">
+                                    <div class="col-md-4"></div>
+                                    <p class="col-md-4"> {req["req_details"]} </p>
+                                    <div class="col-md-4"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3"></div>
+                                    <div class="col-md-4 text-left">
+                                        { req["req_courses"].filter(course => req["req_courses"].indexOf(course) % 2 == 0).map((course) => {
+                                            return <div>
+                                                <FormControlLabel control = {
                                                     <Checkbox 
                                                         style = {{color: "#d89cf6"}}
                                                         defaultChecked = {isChecked(course["course_code"], req["req_category"])}
@@ -318,20 +325,44 @@ export const Report = () => {
                                                     />
                                                 }
                                                 label = {course["course_code"] + " " + course["course_name"]}/>
-                                            })
-                                        }
+                                            
+                                        </div>
+                                        })}
                                     </div>
-                                </Form.Group>
+                                    <div class="col-md-4 text-left">
+                                        { req["req_courses"].filter(course => req["req_courses"].indexOf(course) % 2 == 1).map((course) => {
+                                                return <div>
+                                                    <FormControlLabel control = {
+                                                        <Checkbox 
+                                                            style = {{color: "#d89cf6"}}
+                                                            defaultChecked = {isChecked(course["course_code"], req["req_category"])}
+                                                            name = {req["req_category"] + " " + course["course_name"]}
+                                                            onChange={(event) => handleChecked(event, course["course_code"], course["course_name"], req["req_category"], success[0]["req_yr"])}
+                                                        />
+                                                    }
+                                                    label = {course["course_code"] + " " + course["course_name"]}/>
+                                                
+                                            </div>
+                                        })}
+                                    </div>
+                                    <div class="col-md-1"></div>
+                                </div>
                             </div>
-                            : <div className="col-md-12 text-center">
-                                <Form.Group>
-                                    <h2> { req["req_category"] }</h2>
-                                    <h4> {"Required Hours: "} { req["required_hrs"]} </h4>
-                                    <p> { req["req_details"] }</p>
-                                    <div>
+                            :
+                             <div class="mt-3 col-md-12" id="req_block">
+                                <h2> { req["req_category"] }</h2>
+                                <h4> {"Required Hours: "} { req["required_hrs"]} </h4>
+                                <div class="row">
+                                    <div class="col-md-3"></div>
+                                    <p class="col-md-6"> {req["req_details"]} </p>
+                                    <div class="col-md-3"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4"></div>
+                                    <div class="col-md-4 align-items-center">
                                         <Autocomplete
                                             defaultValue = {isSelected(req["req_category"])}
-                                            id="elective-courses"
+                                            // id="elective-courses"
                                             classes={styles}
                                             multiple
                                             options={success[1].map((course) => course["course_code"] + " " + course["course_name"])}
@@ -346,12 +377,13 @@ export const Report = () => {
                                             }
                                         />
                                     </div>
-                                </Form.Group>
+                                    <div class="col-md-4"></div>
+                                </div>
                             </div>
                         }
+                    
                     </div>
                 })}
-            </Form>
             </div>
         </div>
     );
