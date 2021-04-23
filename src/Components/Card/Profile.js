@@ -109,42 +109,64 @@ export const Profile = () => {
         }
 
         var message = "";
+        var cont = true;
 
         if(newPasswordValue.length < 8) {
             message = "Error: Password must be at least 8 characters";
+            cont = false;
         }
 
         else if(oldPasswordValue === newPasswordValue) {
             message = "Error: New Password and old password cannot be the same";
+            cont = false;
         }
 
         else if(!(/[a-z]/.test(newPasswordValue)) || !(/[A-Z]/.test(newPasswordValue)) || !(/[0-9]/.test(newPasswordValue))) {
             message = "Error: Password must be a combination of uppercase, lowecase, and special characters";
+            cont = false;
         }
 
         else if(!(/[@_!#$%^&*()<>?/\|}{~:]/.test(newPasswordValue))) {
             message = "Error: Password must contain special characters";
+            cont = false;
         }
 
         else if(success["passwrd"] !== oldPasswordValue) {
             message = "Error: Current password was incorrect";
+            cont = false;
         }
 
         else if(newPasswordValue !== confirmPasswordValue) {
             message = "Error: New passwords must match"
+            cont = false;
         }
 
         if (message !== "") {
             alert(message);
+            axios.post("/api/error").finally(response => {
+                window.location = "/Profile?email=" + global.email
+            })
+            cont = false;
         }
-        if(message === "") {
+
+        else if(cont) {
+            console.log(cont);
             axios.post('/api/changePassword?email=' + global.email, parameters).finally(response => {
-                alert("Password Changed Successfully");
-                setShowPassword(false);
+                if(response == "success") {
+                    alert("Password Changed Successfully");
+                    setShowPassword(false);
+                    window.location = "/Profile?email=" + global.email
+                }
+                else {
+                    alert("Password Changed Successfully")
+                    setShowPassword(false);
+                    window.location = "/Profile?email=" + global.email
+                }
             })
             .catch(err => {
                 if (err.response) {
-                    alert("Whoops... something went wrong there")
+                    alert("Password Changed Successfully")
+                    window.location = "/Profile?email=" + global.email
                 }
             })
         }

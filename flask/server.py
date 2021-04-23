@@ -137,6 +137,7 @@ POST: When a post request is received, get all of the user information that
 @app.route("/api/signup", methods=["POST", "GET"])
 def sign_up():
     if request.method == "POST":
+        cursor = conn.cursor()
         # On a post request, get all user data from the form received. 
         valid = True
         cont = True
@@ -206,9 +207,17 @@ def sign_up():
             if cont:
                 return_message = "Error: You must select a major"
                 cont = False
+        
+        already_registered = False
+        getStudentQuery = "select * from Student where email = %s"
+        cursor.execute(getStudentQuery, (email,))
+        results = cursor.fetchall()
+        if len(results) > 0:
+            return_message = "Error: This email is already registered for an account"
+            valid = False
+            cont = False
 
         if valid:
-            cursor = conn.cursor()
 
             try:
                 #adds student and his/her info to the database
@@ -950,30 +959,37 @@ def changeMinor():
 
 @app.route("/api/changePassword", methods=["POST"])
 def changePassword():
-    data = request.data.decode("utf-8")
-    json_data = json.loads(data)
-    oldPassword = json_data.get("oldPassword")
-    newPassword = json_data.get("newPassword")
-    user_email = request.args.get("email")
-    global user_dict
-    for entry in user_dict: 
-        if user_dict[entry] == user_email:
-            user_email = entry
-    valid = False
-    cursor = conn.cursor()
-    getUserPassword = "select passwrd from Student where email = %s"
-    cursor.execute(getUserPassword, (user_email,))
-    results = cursor.fetchone()
-    password = results[0]
-    if password == oldPassword:
-        valid = True
-    if valid:
-        updateUserPassword = "update Student set passwrd = %s where email = %s"
-        cursor.execute(updateUserPassword, (newPassword, user_email,))
-        conn.commit()
-        return  "success"
-    else:
-        return "error"
+    if request.method == "POST":
+        data = request.data.decode("utf-8")
+        if data is None:
+            return "error"
+        json_data = "test"
+        try:
+            json_data = json.loads(data)
+            oldPassword = json_data.get("oldPassword")
+            newPassword = json_data.get("newPassword")
+            user_email = request.args.get("email")
+            global user_dict
+            for entry in user_dict: 
+                if user_dict[entry] == user_email:
+                    user_email = entry
+            valid = False
+            cursor = conn.cursor()
+            getUserPassword = "select passwrd from Student where email = %s"
+            cursor.execute(getUserPassword, (user_email,))
+            results = cursor.fetchone()
+            password = results[0]
+            if password == oldPassword:
+                valid = True
+            if valid:
+                updateUserPassword = "update Student set passwrd = %s where email = %s"
+                cursor.execute(updateUserPassword, (newPassword, user_email,))
+                conn.commit()
+                return  "success"
+            else:
+                return "error"
+        except Error as error:
+            return "error"
     
 @app.route("/api/logout", methods=["POST"])
 def logout():
