@@ -13,22 +13,22 @@ h1, h3, .h1, .h3 {
     color: #060606;
 }
 
+h1, .h2 {
+    font-size: xx-large
+}
+
 #degree-report-content {
-    height: 76vh;
+    height: 81vh;
     overflow-y: scroll;
     background-color: #4B4A4A;
     color: #F7F3F3;
 }
 
 h2, .h2  {
-    color: #926DD6
+    color: #926DD6;
+    font-size: x-large
 }
 
 h4, .h4 {
     color: #F7F3F3
-}
-
-#elective-courses {
-    margin: auto;
-    width: 50%
 }

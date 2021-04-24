@@ -520,9 +520,9 @@ def schedule():
         already_removed = []
         for added in added_courses:
             for removed in removed_courses:
-                if added == removed and removed not in already_removed:
-                    already_removed.append(removed)
-                    added_courses.remove(removed)
+                if added == removed:
+                    if removed in added_courses:
+                        added_courses.remove(removed)
 
         #Get the appropriate semester from the Schedule table
         semesterScheduleQuery = '''
@@ -1013,11 +1013,7 @@ def changePassword():
                 return "error"
         except Error as error:
             return "error"
-    
-@app.route("/api/error", methods=["POST"])
-def error_func():
-    return "test"
-    
+
 @app.route("/api/logout", methods=["POST"])
 def logout():
     user_email = request.args.get("email")
