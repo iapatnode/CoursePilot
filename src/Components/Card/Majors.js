@@ -174,7 +174,7 @@ export const Majors = () => {
                     recMinorRequirementsInformation.appendChild(currentRequirementNode);
                 })
 
-                var node = document.createTextNode(name + ", Required Hours: " + element["hoursRemaining"]);
+                var node = document.createTextNode(name + ", Required Hours: " + Math.max(0, parseInt(element["hoursRemaining"])));
                 var recMinorTitleButton = document.createElement("button");
                 recMinorTitleButton.setAttribute("class", "accordion");
                 recMinorTitleButton.appendChild(node);
