@@ -497,7 +497,8 @@ def schedule():
         for added in added_courses:
             for removed in removed_courses:
                 if added == removed:
-                    added_courses.remove(removed)
+                    if removed in added_courses:
+                        added_courses.remove(removed)
 
         #Get the appropriate semester from the Schedule table
         semesterScheduleQuery = '''

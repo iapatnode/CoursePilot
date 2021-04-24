@@ -140,10 +140,12 @@ class Schedule extends Component {
       global.className = text.substring(0, text.indexOf("-") - 9);
       var section = global.classAdded.text.slice(-1)
       global.classEvents.forEach(element => {
+        console.log(element["start"] + ", " + element["end"])
         if(element["text"] === course_code && cont && section < "L") {
           alert("Error: You have already added this course to your schedule");
           cont = false;
         }
+        
       });
     }
 
@@ -177,18 +179,40 @@ class Schedule extends Component {
         }
         // Check if adding the course will result in a time conflict. 
         global.classEvents.forEach(element => {
+          console.log(global.classAdded.text)
           var classTime = "2013-03-25T" + global.classTime;
           var endTime = "2013-03-25T" + global.endTime;
-          console.log(element.start.value.substring(11, 13))
+          var oldStart = parseInt(global.classTime.substring(0, 2))
+          var oldEnd = parseInt(global.endTime.substring(0, 2))
+          var newStart = parseInt(element.start.value.substring(11, 13))
+          var newEnd = parseInt(element.end.value.substring(11, 13))
+
           if((element.start.value === "2013-03-25T" + global.classTime) && element.resource === res) {
+            console.log("Met condition 1")
             global.conflict = true;
           }
-          else if((element.start.value.substring(0, 13) < classTime.substring(0, 13)) && (element.end.value.substring(0, 13) >= classTime.substring(0, 13)) && (element.resource == res)) {
+
+          else if (newStart > oldStart && newStart < oldEnd + 1 && newEnd !== oldStart) {
+            console.log("Met condition 2")
+            global.conflict = true;
+          }
+
+          else if (newStart < oldStart && newEnd <= oldStart && oldStart === newEnd) {
+            console.log("Met condition 3")
+            global.conflict = true;
+          }
+
+          //square in the middle (oldStart = new class, newClass = existing class)
+          else if (newStart < oldStart && newEnd > oldEnd) {
+            console.log(newStart + " " + newEnd)
+            console.log(oldStart + " " + oldEnd)
             global.conflict = true
           }
-          else if((element.start.value.substring(0, 13) > classTime.substring(0, 13)) && (element.end.value.substring(0, 13) < endTime.substring(0, 13)) && element.resource == res) {
+
+          else if (oldStart === newStart && !String(global.classAdded).includes(element["text"]) && newEnd !== oldEnd) {
             global.conflict = true
           }
+
         })
 
         // If adding the course does not result in a time conflict, add the course to the schedule
@@ -214,6 +238,7 @@ class Schedule extends Component {
         global.conflict = false;
         cont = false;
         alert("Error: Adding '" + global.classAdded.text + "' will cause a time conflict.");
+        console.log(global.courses)
       }
     }
   }
