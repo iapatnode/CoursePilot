@@ -106,20 +106,20 @@
 
 /* Style the buttons that are used to open and close the accordion panel */
 .accordion {
-    background-color: #eee;
+    background-color: #ccc;
     color: #444;
     cursor: pointer;
     padding: 18px;
     width: 100%;
     text-align: left;
-    border: none;
+    border: 2px solid #ddd;
     outline: none;
     transition: 0.4s;
   }
   
   /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
   .active, .accordion:hover {
-    background-color: #ccc;
+    background-color: #926DD6;
   }
   
   /* Style the accordion panel. Note: hidden by default */
@@ -128,12 +128,6 @@
     background-color: white;
     display: none;
     overflow: hidden;
-  }
-
-  #minor-search-container {
-      float: left;
-      display: flex;
-      height: 75px;
   }
 
   #sortingButton {
@@ -163,3 +157,16 @@
     border: 1px solid #ddd;
     margin-bottom: 12px;
   }
+
+  #major-search-container {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+#minor-search-container {
+    /* float: left;
+    display: flex;
+    height: 75px; */
+    padding-left: 20px;
+    padding-right: 20px;
+}

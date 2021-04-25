@@ -307,8 +307,8 @@ export const Majors = () => {
                 tabsHeaderStyle={{height: 100, bottom: 15}}
                 activeTabStyle={{ background:  '#926DD6', color:  'white' }}
                 unActiveTabStyle={{ background:  'white', color:  'black'}}
-                leftContentStyle={{ background:  'white' }}
-                rightContentStyle={{ background:  'white' }}
+                leftContentStyle={{ background:  '#4B4A4A' }}
+                rightContentStyle={{ background:  '#4B4A4A' }}
 
                 leftTabTitleStyle={{fontSize: 40}}
                 rightTabTitleStyle={{fontSize: 40}}
@@ -327,20 +327,23 @@ export const Majors = () => {
                 }
                 rightContent={
                     <div>
-                        <div id="sortingButton">
 
-                        <DropdownButton id="dropdown-basic-button" title="Sort by">
-                            <Dropdown.Item onClick={getMinors}>A-Z</Dropdown.Item>
-
-                            <Dropdown.Item onClick={getMinorsRec}>Recommended</Dropdown.Item>
-                        </DropdownButton>
-                        </div>
-                        
-                        <div id="minor-search-container">
                         <h2> Search Minors </h2>
-                            <input type="text" id="minorInput" onKeyUp={minorFilter} placeholder="Search for Minor" title="Type in a name"></input>
-                            <ul id="courses"></ul>
+                        <div id="minor-search-container">
+                            
+                            <input type="text" id="minorInput" onKeyUp={minorFilter} 
+                                placeholder="Search for Minor" title="Type in a name"></input>
+                                <div id="sortingButton">
+
+                                <DropdownButton id="dropdown-basic-button" title="Sort by">
+                                    <Dropdown.Item onClick={getMinors}>A-Z</Dropdown.Item>
+
+                                    <Dropdown.Item onClick={getMinorsRec}>Recommended</Dropdown.Item>
+                                </DropdownButton>
+                                </div>
                         </div>
+
+                        <ul id="courses"></ul>
                     <div id="MinorList"> Click on a requirement year to view minors. It can take up to 10 seconds to display. </div> 
                 </div>
                 }   
