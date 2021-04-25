@@ -331,7 +331,7 @@ export const Majors = () => {
                         <h2 id="minor-search-header"> Search Minors </h2>
                         <div id="minor-search-container">
 
-                            <div id="minor-search-bar" className="col-sm-9">
+                            <div id="minor-search-bar" className="col-sm-10">
                                 <input type="text" id="minorInput" onKeyUp={minorFilter} 
                                     placeholder="Search for Minor" title="Type in a name"></input>
                             </div>
