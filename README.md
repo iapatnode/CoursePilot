@@ -93,5 +93,5 @@ You may need to start the backend running before the front end.
 
 # Deployment
 
-You can access our deployment branch ar
+You can access our deployment branch at
 #### http://coursepilot.gcc.edu:3000/
