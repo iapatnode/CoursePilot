@@ -328,19 +328,25 @@ export const Majors = () => {
                 rightContent={
                     <div>
 
-                        <h2> Search Minors </h2>
+                        <h2 id="minor-search-header"> Search Minors </h2>
                         <div id="minor-search-container">
+
+                            <div id="minor-search-bar" className="col-sm-9">
+                                <input type="text" id="minorInput" onKeyUp={minorFilter} 
+                                    placeholder="Search for Minor" title="Type in a name"></input>
+                            </div>
                             
-                            <input type="text" id="minorInput" onKeyUp={minorFilter} 
-                                placeholder="Search for Minor" title="Type in a name"></input>
-                                <div id="sortingButton">
+                            <div id="sortingButton">
 
                                 <DropdownButton id="dropdown-basic-button" title="Sort by">
                                     <Dropdown.Item onClick={getMinors}>A-Z</Dropdown.Item>
 
                                     <Dropdown.Item onClick={getMinorsRec}>Recommended</Dropdown.Item>
                                 </DropdownButton>
-                                </div>
+                            </div>
+
+                            
+                                
                         </div>
 
                         <ul id="courses"></ul>

@@ -161,6 +161,7 @@
   #major-search-container {
     padding-left: 20px;
     padding-right: 20px;
+    padding-top: 5px;
 }
 
 #minor-search-container {
@@ -169,4 +170,18 @@
     height: 75px; */
     padding-left: 20px;
     padding-right: 20px;
+}
+
+#sortingButton {
+    display: flex;
+    float: right;
+}
+
+#minor-search-bar {
+    display: flex;
+    float: left;
+}
+
+#minor-search-header {
+    padding-top: 5px;
 }
