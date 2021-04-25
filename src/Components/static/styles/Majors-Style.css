@@ -2,7 +2,7 @@
     flex: 1;
     justify-content: center;
     overflow: hidden;
-    border: 1px solid #ccc;
+    border: 1px solid #8E8D8D;
     height: 100%;
     margin: 0;
 }
@@ -46,6 +46,9 @@
     margin: 10;
     padding-left: 5%;
     padding-right: 5%;
+    background-color: #8E8D8D;
+    height: 100vh;
+    align-items: center;
 }
 
 .req-button {
@@ -53,8 +56,8 @@
     padding-bottom: 15px;
     margin-top: 25px;
     border-radius: 15px;
-    background-color: white;
-    color: black;
+    background-color: #926DD6;
+    color: white;
     border: 2px solid #926DD6;
     width: 150%;
 }
@@ -89,6 +92,7 @@
     left: 20px;
     right: 20px;
     overflow: scroll;
+    margin-top: 10px;
     
 }
 #MinorList .majorminorlist {
@@ -98,7 +102,7 @@
     left: 20px;
     right: 20px;
     overflow: scroll;
-    
+    margin-top: 10px;
 }
 
 
@@ -117,7 +121,7 @@
   }
   
   /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
-  .active, .accordion:hover {
+  .accordion:hover {
     background-color: #926DD6;
   }
   
@@ -136,6 +140,8 @@
 
   #dropdown-basic-button {
       right: 20px;
+      background-color: #926DD6;
+      border: 0px;
   }
   #minorInput {
     background-position: 10px 12px;
@@ -164,16 +170,8 @@
 }
 
 #minor-search-container {
-    /* float: left;
-    display: flex;
-    height: 75px; */
-    padding-left: 20px;
-    padding-right: 20px;
-}
-
-#sortingButton {
-    display: flex;
-    float: right;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 #minor-search-bar {
@@ -183,4 +181,28 @@
 
 #minor-search-header {
     padding-top: 5px;
+    font-size: 25px;
+}
+
+#click-delay-text {
+    color: white;
+}
+
+.req-content {
+    background-color: #4B4A4A;
+}
+
+#req-content-header {
+    color: white;
+    font-size: 25px;
+}
+
+.req-text div {
+    text-align: left;
+    margin-top: 1%;
+    border-bottom: 1px solid lightgray;
+}
+
+#major-search-header {
+    font-size: 25px;
 }
