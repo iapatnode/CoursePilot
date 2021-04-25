@@ -1241,6 +1241,9 @@ def autoGenerate():
     if request.method == "POST":
         cursor = conn.cursor()
         schedule_name = request.form.get("schedule-name")
+
+        if not schedule_name or schedule_name == "":
+            return redirect(f"http://localhost:3000/Home?email={uid}")
         schedule_semester = request.form.get("schedule-semester")
         semester_selection = request.form.get("schedule-semester")
         created_at = datetime.now()
