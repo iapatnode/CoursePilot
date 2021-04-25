@@ -43,6 +43,7 @@ export const Majors = () => {
                 var name = element["name"];
                 var requirements = element["requiredClasses"];
                 var majorRequirementsInformation = document.createElement("div");
+                majorRequirementsInformation.setAttribute("class", "req-text")
                 majorRequirementsInformation.appendChild(document.createTextNode("Requirements:"));
                 requirements.forEach(requirement => {
                     var currentRequirementString = "";
@@ -95,6 +96,7 @@ export const Majors = () => {
                 var name = element["name"];
                 var requirements = element["requiredClasses"];
                 var minorRequirementsInformation = document.createElement("div");
+                minorRequirementsInformation.setAttribute("class", "req-text");
                 minorRequirementsInformation.appendChild(document.createTextNode("Requirements:"));
                 requirements.forEach(requirement => {
                     var currentRequirementString = "";
@@ -148,6 +150,7 @@ export const Majors = () => {
                 var requirements = element["requiredClasses"];
                 var recMinorRequirementsInformation = document.createElement("div");
                 recMinorRequirementsInformation.appendChild(document.createTextNode("Requirements:"));
+                recMinorRequirementsInformation.setAttribute("class", "req-text");
                 requirements.forEach(requirement => {
                     var currentRequirementString = "";
                     currentRequirementString += requirement["name"] + ": ";
@@ -247,8 +250,10 @@ export const Majors = () => {
         txtValue = a;
         if (txtValue.toUpperCase().indexOf(filter) > -1) {
             li[i].style.display = "";
+            panel[i].style.display = "";
         } else {
             li[i].style.display = "none";
+            panel[i].style.display = "none";
         }
     }
   }
@@ -294,7 +299,11 @@ export const Majors = () => {
             </Navbar>
         <div class="req-content">
             <div class="reqYear" className="req-buttons">
-                <div id="columnTitle" >Requirement Year</div>
+                <div id="columnTitle" >
+                    <p id="req-content-header">
+                        Requirement Year
+                    </p>
+                </div>
                 <button onClick={() => {getMajorsAndMinors("2017")}} className="req-button">2017-2018</button>
                 <button onClick={() => {getMajorsAndMinors("2018")}} className="req-button">2018-2019</button>
                 <button onClick={() => {getMajorsAndMinors("2019")}} className="req-button">2019-2020</button>
@@ -303,12 +312,12 @@ export const Majors = () => {
 
             <CoolTabs
                 tabKey={'1'}
-                style={{ width:  1500, height:  650, background:  'white', margin: 20,}}
+                style={{ width:  1500, height:  650, background:  '#4B4A4A', margin: 20,}}
                 tabsHeaderStyle={{height: 100, bottom: 15}}
                 activeTabStyle={{ background:  '#926DD6', color:  'white' }}
-                unActiveTabStyle={{ background:  'white', color:  'black'}}
-                leftContentStyle={{ background:  'white' }}
-                rightContentStyle={{ background:  'white' }}
+                unActiveTabStyle={{ background:  '#8E8D8D', color:  'black'}}
+                leftContentStyle={{ background:  '#4B4A4A' }}
+                rightContentStyle={{ background:  '#4B4A4A' }}
 
                 leftTabTitleStyle={{fontSize: 40}}
                 rightTabTitleStyle={{fontSize: 40}}
@@ -318,30 +327,49 @@ export const Majors = () => {
                 leftContent={
                     <div>      
                         <div id="major-search-container">
-                            <h2> Search Majors </h2>
-                            <input type="text" id="majorInput" onKeyUp={majorFilter} placeholder="Search for Major" title="Type in a name"></input>
-                            <ul id="courses"></ul>
+                            <h2 id="major-search-header"> Search Majors </h2>
+                            <input type="text" id="majorInput" onKeyUp={majorFilter} 
+                                placeholder="Search for Major" title="Type in a name">   
+                            </input>
+                            
                         </div>
-                        <div id="MajorList"> Click on a requirement year to view minors. It can take up to 10 seconds to display. </div> 
+                        <div id="MajorList"> 
+                            <p id="click-delay-text">
+                                Click on a requirement year to view minors. It can take up to 10 seconds to display. 
+                            </p>
+                        </div> 
                     </div>
                 }
                 rightContent={
                     <div>
-                        <div id="sortingButton">
 
-                        <DropdownButton id="dropdown-basic-button" title="Sort by">
-                            <Dropdown.Item onClick={getMinors}>A-Z</Dropdown.Item>
-
-                            <Dropdown.Item onClick={getMinorsRec}>Recommended</Dropdown.Item>
-                        </DropdownButton>
-                        </div>
-                        
+                        <h2 id="minor-search-header"> Search Minors </h2>
                         <div id="minor-search-container">
-                        <h2> Search Minors </h2>
-                            <input type="text" id="minorInput" onKeyUp={minorFilter} placeholder="Search for Minor" title="Type in a name"></input>
-                            <ul id="courses"></ul>
+
+                            <div id="minor-search-bar" className="col-sm-10">
+                                <input type="text" id="minorInput" onKeyUp={minorFilter} 
+                                    placeholder="Search for Minor" title="Type in a name"></input>
+                            </div>
+
+                            <div id="sortingButton">
+
+                                <DropdownButton id="dropdown-basic-button" title="Sort by">
+                                    <Dropdown.Item onClick={getMinors}>A-Z</Dropdown.Item>
+
+                                    <Dropdown.Item onClick={getMinorsRec}>Recommended</Dropdown.Item>
+                                </DropdownButton>
+                            </div>
+
+                            
+                                
                         </div>
-                    <div id="MinorList"> Click on a requirement year to view minors. It can take up to 10 seconds to display. </div> 
+
+                        <ul id="courses"></ul>
+                    <div id="MinorList">
+                        <p id="click-delay-text">
+                            Click on a requirement year to view minors. It can take up to 10 seconds to display. 
+                        </p>
+                    </div> 
                 </div>
                 }   
             />

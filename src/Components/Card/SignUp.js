@@ -132,6 +132,7 @@ export const SignUp = () => {
                                 </Form.Group>
                                 <Form.Group>
                                     <Form.Label>Password</Form.Label>
+                                    <p id="pwdreq">Must be at least 8 characters and contain an uppercase letter, a special character, and a number</p>
                                     <Form.Control onChange={handlePasswordChange} type="password" name="password" id="password-field" className="signup-form-field" placeholder="Enter Password"></Form.Control>
                                     <Form.Label>Confirm Password</Form.Label>
                                     <Form.Control onChange={handleConfirmChange} type="password" name="confirm-password" id="confirm-password-field" className="signup-form-field" placeholder="Confirm Password"></Form.Control>

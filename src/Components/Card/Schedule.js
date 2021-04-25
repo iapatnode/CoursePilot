@@ -209,7 +209,7 @@ class Schedule extends Component {
             global.conflict = true
           }
 
-          else if (oldStart === newStart && !String(global.classAdded).includes(element["text"]) && newEnd !== oldEnd) {
+          else if (oldStart === newStart && !String(global.classAdded).includes(element["text"]) && newEnd !== oldEnd && element.resource.includes(res)) {
             global.conflict = true
           }
 
