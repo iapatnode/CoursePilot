@@ -48,3 +48,11 @@
     height: 100vh;
     background-image: linear-gradient(#926DD6, gray, black);
 }
+
+#pwdreq {
+    width: 100%;
+    font-size: 12px;
+    margin-left: 0px;
+    margin-left: 0px;
+    justify-items: center
+}
