@@ -192,24 +192,26 @@ class Schedule extends Component {
             global.conflict = true;
           }
 
-          else if (newStart > oldStart && newStart < oldEnd + 1 && newEnd !== oldStart) {
-            console.log("Met condition 2")
-            global.conflict = true;
+          else if (newStart > oldStart && newStart < oldEnd + 1 && newEnd !== oldStart && element.resource.includes(res)) {
+            if(element.end.value === "2013-03-25T" + global.classTime) {
+              console.log("Met condition 2")
+              global.conflict = true;
+            }
           }
 
-          else if (newStart < oldStart && newEnd <= oldStart && oldStart === newEnd) {
+          else if (newStart < oldStart && newEnd <= oldStart && oldStart === newEnd && element.resource.includes(res) && newStart <= 12 && newEnd >= 12) {
             console.log("Met condition 3")
             global.conflict = true;
           }
 
           //square in the middle (oldStart = new class, newClass = existing class)
-          else if (newStart < oldStart && newEnd > oldEnd) {
-            console.log(newStart + " " + newEnd)
-            console.log(oldStart + " " + oldEnd)
+          else if (newStart < oldStart && newEnd > oldEnd && element.resource.includes(res)) {
+            console.log("Condition 4")
             global.conflict = true
           }
 
-          else if (oldStart === newStart && !String(global.classAdded).includes(element["text"]) && newEnd !== oldEnd && element.resource.includes(res)) {
+          else if (oldStart === newStart && !String(global.classAdded).includes(element["text"]) && newEnd !== oldEnd && element.resource.includes(res) && element.resource === res) {
+            console.log("Condition 5")
             global.conflict = true
           }
 
