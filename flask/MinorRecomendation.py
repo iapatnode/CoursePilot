@@ -342,7 +342,7 @@ def getRequiredCourses(user_email):
                             
         return requiredCourses
 
-    except error as error:
+    except Error as error:
         print("Could not pull the data" + str(error))
 """
 JSON?
