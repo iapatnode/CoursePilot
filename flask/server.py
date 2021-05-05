@@ -2088,14 +2088,14 @@ def getRequiredCoursesMajors(user_email):
         cursor.execute("select degreeId from StudentMajorMinor WHERE email = %s;", (user_email,))
 
         print(f"User email in minor recommendation: {user_email}")
-        degreeID = 0
-        degreeIDList = cursor.fetchall()
-        if len(degreeIDList) == 0:
-            print("Length is 0: try again")
-            cursor.execute("select degreeId from StudentMajorMinor WHERE email = %s;", ("dybasjt17@gcc.edu",))
-            degreeID = cursor.fetchall()[0]
-        else:
-            degreeID = degreeIDList[0]
+        degreeID = cursor.fetchall()[0]
+        # degreeIDList = cursor.fetchall()
+        # if len(degreeIDList) == 0:
+        #     print("Length is 0: try again")
+        #     cursor.execute("select degreeId from StudentMajorMinor WHERE email = %s;", ("dybasjt17@gcc.edu",))
+        #     degreeID = cursor.fetchall()[0]
+        # else:
+        #     degreeID = degreeIDList[0]
         
 
         #AND Course.courseCode NOT LIKE 'HUMA%' AND Course.courseCode NOT LIKE 'PHYE%' AND Course.courseCode NOT LIKE 'SSFT%' AND Course.courseCode NOT LIKE 'WRIT%'
