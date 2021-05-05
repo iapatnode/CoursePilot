@@ -1277,7 +1277,7 @@ def getAllMajorsAndMinors():
     for entry in user_dict: 
         if user_dict[entry] == user_email:
             user_email = entry
-    all = MinorRecommendation.getEverythingJSON(user_email)
+    all = getEverythingJSON(user_email)
     return json.dumps(all)
 
 
