@@ -1920,7 +1920,7 @@ def getRequiredClasses(CoursesRequired, semester_selection):
                     classTimes.append(classTime)
 
         return classTimes
-    except error as error:
+    except Error as error:
         print("Could not pull the data" + str(error))
 
 class courseRequirement:
