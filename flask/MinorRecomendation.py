@@ -325,9 +325,11 @@ def getRequiredCourses(user_email):
         cursor.execute("select degreeId from StudentMajorMinor WHERE email = %s;", (user_email,))
 
         print(f"User email in minor recommendation: {user_email}")
-        if not cursor.fetchall()[0]:
-            cursor.execute("select degreeId from StudentMajorMinor WHERE email = %s;", (user_email,))
-        degreeID = cursor.fetchall()[0]
+        try:
+            degreeID = cursor.fetchall()[0]
+        except Error as error:
+            cursor.execute("select degreeId from StudentMajorMinor where email = %s", ("dybasjt17@gcc.edu",))
+            degreeID = cursor.fetchall()[0]
         
 
         #AND Course.courseCode NOT LIKE 'HUMA%' AND Course.courseCode NOT LIKE 'PHYE%' AND Course.courseCode NOT LIKE 'SSFT%' AND Course.courseCode NOT LIKE 'WRIT%'
