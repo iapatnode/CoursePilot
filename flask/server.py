@@ -3,7 +3,6 @@ from flask_cors import CORS
 import os, re, json
 from datetime import datetime
 from mysql.connector import connect, Error
-import MinorRecomendation as MinorRecommendation
 import string
 import random
 
