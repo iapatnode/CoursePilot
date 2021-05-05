@@ -1978,7 +1978,7 @@ def getMinorsByRequirementYear(requirementYear):
     result = cursor.fetchall()
     minors = []
     for entry in result:
-        minors.append(major_minor(entry[3], getRequiredClasses(entry[1], requirementYear), entry[4], entry[0]))
+        minors.append(major_minor(entry[3], getRequiredClassesMinors(entry[1], requirementYear), entry[4], entry[0]))
     cursor.close()
     return minors
 
@@ -2052,7 +2052,7 @@ Once we obtain the list of minors, we need to get the classes required for each 
 This will most likely be stored in a tree structure or something similar because we need to account for
 ands and ors.
 """
-def getRequiredClasses(degreeId, reqYear):
+def getRequiredClassesMinors(degreeId, reqYear):
     validCourseCodes = []
     requiredCourses = []
     cursor = conn.cursor()
@@ -2084,7 +2084,7 @@ def getMajorClasses(majorName, reqYear, classesTaken):
     entry = result[0]
     degreeHours = entry[4]
     degreeId = entry[1]
-    major = major_minor(majorName, getRequiredClasses(degreeId, reqYear), degreeHours, degreeHours)
+    major = major_minor(majorName, getRequiredClassesMinors(degreeId, reqYear), degreeHours, degreeHours)
     for classTaken in classesTaken:
         for requirement in major.requiredCourses:
             if requirement.containsClass(classTaken):
