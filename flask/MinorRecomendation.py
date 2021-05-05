@@ -327,7 +327,7 @@ def getRequiredCourses(user_email):
         print(f"User email in minor recommendation: {user_email}")
         degreeId = 0
         degreeIDList = cursor.fetchall()
-        if(len(degreeIDList == 0)):
+        if len(degreeIDList) == 0:
             print("Length is 0: try again")
             cursor.execute("select degreeId from StudentMajorMinor WHERE email = %s;", ("dybasjt17@gcc.edu",))
             degreeId = cursor.fetchall()[0]
