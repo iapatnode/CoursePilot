@@ -2021,7 +2021,7 @@ def getEverythingJSON(user_email):
 
 def recommendMinorsJSON(userEmail, allMinors):
     classesTaken = getTakenCoursesMajor(userEmail)
-    remainingClassesInMajor = getRequiredCourses(userEmail)
+    remainingClassesInMajor = getRequiredCoursesMajors(userEmail)
 
     classesChecked = []
 
@@ -2080,7 +2080,7 @@ def getTakenCoursesMajor(user_email):
         print("Could not pull the data" + str(error))
 
 
-def getRequiredCourses(user_email):
+def getRequiredCoursesMajors(user_email):
     
     try:
         cursor = conn.cursor()
